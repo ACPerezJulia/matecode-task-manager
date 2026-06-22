@@ -25,4 +25,6 @@ export interface AuthFormValues {
 
 export type TaskFilter = 'all' | 'pending' | 'completed'
 
+export type TaskSort = 'recent' | 'priority' | 'dueDate'
+
 export type Theme = 'light' | 'dark'

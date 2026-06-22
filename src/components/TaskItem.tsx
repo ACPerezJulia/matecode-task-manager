@@ -5,7 +5,9 @@ import {
   deleteTask,
   toggleTaskCompleted,
 } from '../services/firestoreService'
-import type { Task } from '../types'
+import { priorityLabel } from '../utils/taskHelpers'
+import { formatDate, toDateInputValue } from '../utils/format'
+import type { Task, TaskFormValues } from '../types'
 
 interface TaskItemProps {
   task: Task
@@ -15,6 +17,10 @@ export function TaskItem({ task }: TaskItemProps) {
   const [editing, setEditing] = useState(false)
   const [title, setTitle] = useState(task.title)
   const [description, setDescription] = useState(task.description)
+  const [priority, setPriority] = useState<TaskFormValues['priority']>(
+    task.priority,
+  )
+  const [dueDate, setDueDate] = useState('') // string "aaaa-mm-dd" o ""
   // busy bloquea los botones mientras hay una operación en curso, para
   // evitar doble click (ej: dos borrados o dos toggles seguidos).
   const [busy, setBusy] = useState(false)
@@ -54,7 +60,14 @@ export function TaskItem({ task }: TaskItemProps) {
     // (que pueden haber cambiado por un update en tiempo real desde el mount).
     setTitle(task.title)
     setDescription(task.description)
+    setPriority(task.priority)
+    setDueDate(task.dueDate ? toDateInputValue(task.dueDate) : '')
     setEditing(true)
+  }
+
+  function handlePriorityChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const value = e.target.value
+    setPriority(value === '' ? undefined : (value as TaskFormValues['priority']))
   }
 
   function cancelEditing() {
@@ -72,6 +85,8 @@ export function TaskItem({ task }: TaskItemProps) {
       await updateTask(task.id, {
         title: title.trim(),
         description: description.trim(),
+        priority,
+        dueDate: dueDate || undefined,
       })
       toast.success('Tarea actualizada.')
       setEditing(false)
@@ -96,6 +111,22 @@ export function TaskItem({ task }: TaskItemProps) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             aria-label="Descripción"
+          />
+          <select
+            value={priority ?? ''}
+            onChange={handlePriorityChange}
+            aria-label="Prioridad"
+          >
+            <option value="">Sin prioridad</option>
+            <option value="low">Baja</option>
+            <option value="medium">Media</option>
+            <option value="high">Alta</option>
+          </select>
+          <input
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            aria-label="Fecha de vencimiento"
           />
           <button type="submit" disabled={busy}>
             Guardar
@@ -123,6 +154,8 @@ export function TaskItem({ task }: TaskItemProps) {
         {task.title}
       </strong>
       {task.description && <p>{task.description}</p>}
+      {task.priority && <span>Prioridad: {priorityLabel[task.priority]}</span>}
+      {task.dueDate && <span>Vence: {formatDate(task.dueDate)}</span>}
       <button type="button" onClick={startEditing} disabled={busy}>
         Editar
       </button>

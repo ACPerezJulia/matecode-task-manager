@@ -4,15 +4,16 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
+  deleteField,
   query,
   where,
   orderBy,
   onSnapshot,
   serverTimestamp,
-  Timestamp,
   type FirestoreError,
 } from 'firebase/firestore'
 import { db } from './firebase'
+import { dateStringToTimestamp } from '../utils/format'
 import type { Task, TaskFormValues } from '../types'
 
 // Referencia única a la colección, reutilizada por todas las operaciones.
@@ -33,23 +34,30 @@ export async function createTask(userId: string, values: TaskFormValues) {
     completed: false,
     createdAt: serverTimestamp(),
     ...(values.dueDate
-      ? { dueDate: Timestamp.fromDate(new Date(values.dueDate)) }
+      ? { dueDate: dateStringToTimestamp(values.dueDate) }
       : {}),
     ...(values.priority ? { priority: values.priority } : {}),
   })
 }
 
 /**
- * Edita el título y la descripción de una tarea.
- * updateDoc hace merge: solo toca estos campos y deja el resto (userId,
- * createdAt, completed) intacto. Por eso la regla de update de Firestore,
- * que exige que userId no cambie, sigue cumpliéndose.
+ * Edita los campos editables de una tarea (título, descripción, prioridad,
+ * fecha). updateDoc hace merge: no toca userId, createdAt ni completed, así
+ * que la regla de update de Firestore (userId no puede cambiar) se cumple.
+ *
+ * Para prioridad y fecha usamos deleteField() cuando vienen vacías: así, si
+ * el usuario borra una prioridad o fecha que existía, el campo se elimina del
+ * documento en vez de quedar como null.
  */
-export async function updateTask(
-  taskId: string,
-  updates: { title: string; description: string },
-) {
-  await updateDoc(doc(db, 'tasks', taskId), updates)
+export async function updateTask(taskId: string, values: TaskFormValues) {
+  await updateDoc(doc(db, 'tasks', taskId), {
+    title: values.title,
+    description: values.description,
+    priority: values.priority ?? deleteField(),
+    dueDate: values.dueDate
+      ? dateStringToTimestamp(values.dueDate)
+      : deleteField(),
+  })
 }
 
 /**

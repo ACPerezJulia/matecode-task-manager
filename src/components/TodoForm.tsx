@@ -7,7 +7,12 @@ interface TodoFormProps {
   userId: string
 }
 
-const emptyForm: TaskFormValues = { title: '', description: '' }
+const emptyForm: TaskFormValues = {
+  title: '',
+  description: '',
+  priority: undefined,
+  dueDate: '',
+}
 
 export function TodoForm({ userId }: TodoFormProps) {
   const [form, setForm] = useState<TaskFormValues>(emptyForm)
@@ -19,10 +24,19 @@ export function TodoForm({ userId }: TodoFormProps) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
+  function handlePriorityChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    // "" en el select significa "sin prioridad" -> lo guardamos como undefined
+    // para que el campo opcional no exista en Firestore.
+    const value = e.target.value
+    setForm((prev) => ({
+      ...prev,
+      priority: value === '' ? undefined : (value as TaskFormValues['priority']),
+    }))
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
-    // Validación: el título no puede estar vacío.
     if (!form.title.trim()) {
       toast.error('La tarea necesita un título.')
       return
@@ -33,9 +47,12 @@ export function TodoForm({ userId }: TodoFormProps) {
       await createTask(userId, {
         title: form.title.trim(),
         description: form.description.trim(),
+        priority: form.priority,
+        // "" -> undefined para no guardar una fecha vacía
+        dueDate: form.dueDate || undefined,
       })
       toast.success('Tarea creada.')
-      setForm(emptyForm) // limpia el form tras crear
+      setForm(emptyForm)
     } catch (err) {
       console.error('Error al crear tarea:', err)
       toast.error('No se pudo crear la tarea.')
@@ -54,6 +71,7 @@ export function TodoForm({ userId }: TodoFormProps) {
         value={form.title}
         onChange={handleChange}
       />
+
       <label htmlFor="description">Descripción</label>
       <textarea
         id="description"
@@ -61,6 +79,29 @@ export function TodoForm({ userId }: TodoFormProps) {
         value={form.description}
         onChange={handleChange}
       />
+
+      <label htmlFor="priority">Prioridad</label>
+      <select
+        id="priority"
+        name="priority"
+        value={form.priority ?? ''}
+        onChange={handlePriorityChange}
+      >
+        <option value="">Sin prioridad</option>
+        <option value="low">Baja</option>
+        <option value="medium">Media</option>
+        <option value="high">Alta</option>
+      </select>
+
+      <label htmlFor="dueDate">Fecha de vencimiento</label>
+      <input
+        id="dueDate"
+        name="dueDate"
+        type="date"
+        value={form.dueDate ?? ''}
+        onChange={handleChange}
+      />
+
       <button type="submit" disabled={submitting}>
         {submitting ? 'Creando...' : 'Agregar tarea'}
       </button>

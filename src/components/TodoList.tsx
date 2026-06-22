@@ -7,7 +7,7 @@ interface TodoListProps {
 
 export function TodoList({ tasks }: TodoListProps) {
   if (tasks.length === 0) {
-    return <p>Todavía no tenés tareas. Creá la primera arriba.</p>
+    return <p>No hay tareas que coincidan con el filtro.</p>
   }
 
   return (
