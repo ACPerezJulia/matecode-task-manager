@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useTasks } from '../hooks/useTasks'
 import { TodoForm } from '../components/TodoForm'
 import { TodoList } from '../components/TodoList'
+import { TaskListSkeleton } from '../components/Skeleton'
 import { filterTasks, sortTasks } from '../utils/taskHelpers'
 import type { TaskFilter, TaskSort } from '../types'
 
@@ -41,7 +42,7 @@ export default function Tasks() {
       {user && <TodoForm userId={user.uid} />}
 
       {loading ? (
-        <p>Cargando tareas...</p>
+        <TaskListSkeleton />
       ) : tasks.length === 0 ? (
         // Caso "no hay ninguna tarea": invitamos a crear la primera.
         <p>Todavía no tenés tareas. Creá la primera arriba.</p>
