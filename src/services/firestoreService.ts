@@ -1,6 +1,9 @@
 import {
   collection,
+  doc,
   addDoc,
+  updateDoc,
+  deleteDoc,
   query,
   where,
   orderBy,
@@ -34,6 +37,32 @@ export async function createTask(userId: string, values: TaskFormValues) {
       : {}),
     ...(values.priority ? { priority: values.priority } : {}),
   })
+}
+
+/**
+ * Edita el título y la descripción de una tarea.
+ * updateDoc hace merge: solo toca estos campos y deja el resto (userId,
+ * createdAt, completed) intacto. Por eso la regla de update de Firestore,
+ * que exige que userId no cambie, sigue cumpliéndose.
+ */
+export async function updateTask(
+  taskId: string,
+  updates: { title: string; description: string },
+) {
+  await updateDoc(doc(db, 'tasks', taskId), updates)
+}
+
+/**
+ * Marca una tarea como completada o pendiente.
+ * Solo cambia el campo completed; se recibe el nuevo valor ya calculado.
+ */
+export async function toggleTaskCompleted(taskId: string, completed: boolean) {
+  await updateDoc(doc(db, 'tasks', taskId), { completed })
+}
+
+/** Elimina una tarea por su id. */
+export async function deleteTask(taskId: string) {
+  await deleteDoc(doc(db, 'tasks', taskId))
 }
 
 /**

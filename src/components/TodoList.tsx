@@ -1,3 +1,4 @@
+import { TaskItem } from './TaskItem'
 import type { Task } from '../types'
 
 interface TodoListProps {
@@ -12,10 +13,7 @@ export function TodoList({ tasks }: TodoListProps) {
   return (
     <ul>
       {tasks.map((task) => (
-        <li key={task.id}>
-          <strong>{task.title}</strong>
-          {task.description && <p>{task.description}</p>}
-        </li>
+        <TaskItem key={task.id} task={task} />
       ))}
     </ul>
   )
