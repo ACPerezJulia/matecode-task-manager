@@ -1,0 +1,34 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Cada tarea pertenece a un único usuario (campo userId).
+    // El aislamiento entre usuarios se garantiza acá: nadie puede
+    // leer ni escribir una tarea cuyo userId no sea su propio uid.
+    match /tasks/{taskId} {
+
+      // Leer: solo si sos el dueño del documento existente.
+      // Aplica tanto a lecturas de un doc puntual como a queries
+      // (la query de useTasks filtra por userId == uid, así que
+      // todos los docs devueltos cumplen esta condición).
+      allow read: if request.auth != null
+        && request.auth.uid == resource.data.userId;
+
+      // Crear: el userId del nuevo documento tiene que ser el tuyo.
+      // En create todavía no existe "resource", se usa request.resource.
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.userId;
+
+      // Actualizar: tenés que ser el dueño Y no podés reasignar la
+      // tarea a otro usuario (el userId no puede cambiar).
+      allow update: if request.auth != null
+        && request.auth.uid == resource.data.userId
+        && request.resource.data.userId == resource.data.userId;
+
+      // Borrar: solo el dueño.
+      allow delete: if request.auth != null
+        && request.auth.uid == resource.data.userId;
+    }
+  }
+}
