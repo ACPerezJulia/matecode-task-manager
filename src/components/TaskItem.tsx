@@ -154,9 +154,22 @@ export function TaskItem({ task }: TaskItemProps) {
         {task.title}
       </strong>
       {task.description && <p>{task.description}</p>}
-      {task.priority && <span>Prioridad: {priorityLabel[task.priority]}</span>}
-      {task.dueDate && <span>Vence: {formatDate(task.dueDate)}</span>}
-      <button type="button" onClick={startEditing} disabled={busy}>
+      {task.priority && (
+        <span style={{ marginRight: '8px' }}>
+          Prioridad: {priorityLabel[task.priority]}
+        </span>
+      )}
+      {task.dueDate && (
+        <span style={{ marginRight: '8px' }}>
+          Vence: {formatDate(task.dueDate)}
+        </span>
+      )}
+      <button
+        type="button"
+        onClick={startEditing}
+        disabled={busy}
+        style={{ marginRight: '8px' }}
+      >
         Editar
       </button>
       <button type="button" onClick={handleDelete} disabled={busy}>
