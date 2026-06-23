@@ -100,81 +100,146 @@ export function TaskItem({ task }: TaskItemProps) {
 
   if (editing) {
     return (
-      <li>
-        <form onSubmit={handleSave}>
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            aria-label="Título"
-          />
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            aria-label="Descripción"
-          />
-          <select
-            value={priority ?? ''}
-            onChange={handlePriorityChange}
-            aria-label="Prioridad"
-          >
-            <option value="">Sin prioridad</option>
-            <option value="low">Baja</option>
-            <option value="medium">Media</option>
-            <option value="high">Alta</option>
-          </select>
-          <input
-            type="date"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-            aria-label="Fecha de vencimiento"
-          />
-          <button type="submit" disabled={busy}>
-            Guardar
-          </button>
-          <button type="button" onClick={cancelEditing} disabled={busy}>
-            Cancelar
-          </button>
+      <li className="task-item card">
+        <form className="task-form" onSubmit={handleSave}>
+          <div>
+            <label htmlFor={`edit-title-${task.id}`}>Título</label>
+            <input
+              id={`edit-title-${task.id}`}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              aria-label="Título"
+            />
+          </div>
+          <div>
+            <label htmlFor={`edit-desc-${task.id}`}>Descripción</label>
+            <textarea
+              id={`edit-desc-${task.id}`}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              aria-label="Descripción"
+            />
+          </div>
+          <div className="form-row">
+            <div>
+              <label htmlFor={`edit-prio-${task.id}`}>Prioridad</label>
+              <select
+                id={`edit-prio-${task.id}`}
+                value={priority ?? ''}
+                onChange={handlePriorityChange}
+                aria-label="Prioridad"
+              >
+                <option value="">Sin prioridad</option>
+                <option value="low">Baja</option>
+                <option value="medium">Media</option>
+                <option value="high">Alta</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor={`edit-due-${task.id}`}>Fecha de vencimiento</label>
+              <input
+                id={`edit-due-${task.id}`}
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                aria-label="Fecha de vencimiento"
+              />
+            </div>
+          </div>
+          <div className="task-actions">
+            <button type="submit" className="btn btn--primary" disabled={busy}>
+              Guardar
+            </button>
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={cancelEditing}
+              disabled={busy}
+            >
+              Cancelar
+            </button>
+          </div>
         </form>
       </li>
     )
   }
 
   return (
-    <li>
-      <input
-        type="checkbox"
-        checked={task.completed}
-        onChange={handleToggle}
-        disabled={busy}
-        aria-label="Completada"
-      />
-      <strong
-        style={{ textDecoration: task.completed ? 'line-through' : 'none' }}
-      >
-        {task.title}
-      </strong>
-      {task.description && <p>{task.description}</p>}
-      {task.priority && (
-        <span style={{ marginRight: '8px' }}>
-          Prioridad: {priorityLabel[task.priority]}
-        </span>
+    <li className="task-item card">
+      <div className="task-item__head">
+        <input
+          type="checkbox"
+          checked={task.completed}
+          onChange={handleToggle}
+          disabled={busy}
+          aria-label="Completada"
+        />
+        <strong className={`task-title${task.completed ? ' is-completed' : ''}`}>
+          {task.title}
+        </strong>
+      </div>
+      {task.description && <p className="task-desc">{task.description}</p>}
+      {(task.priority || task.dueDate) && (
+        <div className="task-meta">
+          {task.priority && (
+            <span className={`badge badge--${task.priority}`}>
+              {priorityLabel[task.priority]}
+            </span>
+          )}
+          {task.dueDate && (
+            <span className="task-due">Vence: {formatDate(task.dueDate)}</span>
+          )}
+        </div>
       )}
-      {task.dueDate && (
-        <span style={{ marginRight: '8px' }}>
-          Vence: {formatDate(task.dueDate)}
-        </span>
-      )}
-      <button
-        type="button"
-        onClick={startEditing}
-        disabled={busy}
-        style={{ marginRight: '8px' }}
-      >
-        Editar
-      </button>
-      <button type="button" onClick={handleDelete} disabled={busy}>
-        Eliminar
-      </button>
+      <div className="task-actions">
+        <button
+          type="button"
+          className="icon-btn"
+          onClick={startEditing}
+          disabled={busy}
+          aria-label="Editar tarea"
+          title="Editar tarea"
+        >
+          {/* Ícono de lápiz (SVG inline, stroke estilo Feather) */}
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          className="icon-btn icon-btn--danger"
+          onClick={handleDelete}
+          disabled={busy}
+          aria-label="Eliminar tarea"
+          title="Eliminar tarea"
+        >
+          {/* Ícono de tacho (SVG inline, stroke estilo Feather) */}
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M3 6h18" />
+            <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            <line x1="10" y1="11" x2="10" y2="17" />
+            <line x1="14" y1="11" x2="14" y2="17" />
+          </svg>
+        </button>
+      </div>
     </li>
   )
 }

@@ -62,47 +62,58 @@ export function TodoForm({ userId }: TodoFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="title">Título</label>
-      <input
-        id="title"
-        name="title"
-        type="text"
-        value={form.title}
-        onChange={handleChange}
-      />
+    <form className="card task-form" onSubmit={handleSubmit}>
+      <div>
+        <label htmlFor="title">Título</label>
+        <input
+          id="title"
+          name="title"
+          type="text"
+          value={form.title}
+          onChange={handleChange}
+        />
+      </div>
 
-      <label htmlFor="description">Descripción</label>
-      <textarea
-        id="description"
-        name="description"
-        value={form.description}
-        onChange={handleChange}
-      />
+      <div>
+        <label htmlFor="description">Descripción</label>
+        <textarea
+          id="description"
+          name="description"
+          value={form.description}
+          onChange={handleChange}
+        />
+      </div>
 
-      <label htmlFor="priority">Prioridad</label>
-      <select
-        id="priority"
-        name="priority"
-        value={form.priority ?? ''}
-        onChange={handlePriorityChange}
-      >
-        <option value="">Sin prioridad</option>
-        <option value="low">Baja</option>
-        <option value="medium">Media</option>
-        <option value="high">Alta</option>
-      </select>
+      {/* Prioridad y fecha: apiladas en mobile, lado a lado en tablet+ */}
+      <div className="form-row">
+        <div>
+          <label htmlFor="priority">Prioridad</label>
+          <select
+            id="priority"
+            name="priority"
+            value={form.priority ?? ''}
+            onChange={handlePriorityChange}
+          >
+            <option value="">Sin prioridad</option>
+            <option value="low">Baja</option>
+            <option value="medium">Media</option>
+            <option value="high">Alta</option>
+          </select>
+        </div>
 
-      <label htmlFor="dueDate">Fecha de vencimiento</label>
-      <input
-        id="dueDate"
-        name="dueDate"
-        type="date"
-        value={form.dueDate ?? ''}
-        onChange={handleChange}
-      />
+        <div>
+          <label htmlFor="dueDate">Fecha de vencimiento</label>
+          <input
+            id="dueDate"
+            name="dueDate"
+            type="date"
+            value={form.dueDate ?? ''}
+            onChange={handleChange}
+          />
+        </div>
+      </div>
 
-      <button type="submit" disabled={submitting}>
+      <button type="submit" className="btn btn--primary" disabled={submitting}>
         {submitting ? 'Creando...' : 'Agregar tarea'}
       </button>
     </form>

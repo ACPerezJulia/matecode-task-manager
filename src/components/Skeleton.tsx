@@ -19,9 +19,9 @@ export function Skeleton({ width = '100%', height = '1rem' }: SkeletonProps) {
  */
 export function TaskListSkeleton({ count = 3 }: { count?: number }) {
   return (
-    <ul aria-busy="true" aria-label="Cargando tareas">
+    <ul className="task-list" aria-busy="true" aria-label="Cargando tareas">
       {Array.from({ length: count }).map((_, index) => (
-        <li key={index}>
+        <li className="task-item card" key={index}>
           {/* línea del título y línea de la descripción */}
           <Skeleton width="60%" height="1.2rem" />
           <Skeleton width="90%" height="0.9rem" />

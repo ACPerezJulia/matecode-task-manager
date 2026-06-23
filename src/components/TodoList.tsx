@@ -7,11 +7,11 @@ interface TodoListProps {
 
 export function TodoList({ tasks }: TodoListProps) {
   if (tasks.length === 0) {
-    return <p>No hay tareas que coincidan con el filtro.</p>
+    return <p className="empty">No hay tareas que coincidan con el filtro.</p>
   }
 
   return (
-    <ul>
+    <ul className="task-list">
       {tasks.map((task) => (
         <TaskItem key={task.id} task={task} />
       ))}

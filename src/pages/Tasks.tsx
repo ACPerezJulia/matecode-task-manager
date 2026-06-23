@@ -28,14 +28,14 @@ export default function Tasks() {
 
   return (
     <main>
-      <header>
+      <header className="app-header">
         <h1>Mis tareas</h1>
-        <p>
-          Sesión iniciada como: <strong>{user?.email}</strong>
-        </p>
-        <button type="button" onClick={handleLogout}>
+        <button type="button" className="btn btn--ghost" onClick={handleLogout}>
           Cerrar sesión
         </button>
+        <p className="app-header__user">
+          Sesión iniciada como: <strong>{user?.email}</strong>
+        </p>
       </header>
 
       {/* user existe siempre acá: Tasks vive dentro de ProtectedRoute */}
@@ -45,13 +45,14 @@ export default function Tasks() {
         <TaskListSkeleton />
       ) : tasks.length === 0 ? (
         // Caso "no hay ninguna tarea": invitamos a crear la primera.
-        <p>Todavía no tenés tareas. Creá la primera arriba.</p>
+        <p className="empty">Todavía no tenés tareas. Creá la primera arriba.</p>
       ) : (
         <>
-          <div>
+          <div className="controls">
             <span>Filtrar: </span>
             <button
               type="button"
+              className="chip"
               onClick={() => setFilter('all')}
               disabled={filter === 'all'}
             >
@@ -59,6 +60,7 @@ export default function Tasks() {
             </button>
             <button
               type="button"
+              className="chip"
               onClick={() => setFilter('pending')}
               disabled={filter === 'pending'}
             >
@@ -66,6 +68,7 @@ export default function Tasks() {
             </button>
             <button
               type="button"
+              className="chip"
               onClick={() => setFilter('completed')}
               disabled={filter === 'completed'}
             >
@@ -73,7 +76,7 @@ export default function Tasks() {
             </button>
           </div>
 
-          <div>
+          <div className="controls">
             <label htmlFor="sort">Ordenar por: </label>
             <select
               id="sort"
