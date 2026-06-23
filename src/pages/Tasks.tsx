@@ -7,6 +7,7 @@ import { TodoForm } from '../components/TodoForm'
 import { TodoList } from '../components/TodoList'
 import { TaskListSkeleton } from '../components/Skeleton'
 import { filterTasks, sortTasks } from '../utils/taskHelpers'
+import { sendTaskSummary } from '../services/emailService'
 import type { TaskFilter, TaskSort } from '../types'
 
 export default function Tasks() {
@@ -16,6 +17,8 @@ export default function Tasks() {
 
   const [filter, setFilter] = useState<TaskFilter>('all')
   const [sort, setSort] = useState<TaskSort>('recent')
+  // Bloquea el botón de "enviar resumen" mientras la request está en curso.
+  const [sending, setSending] = useState(false)
 
   // Filtrado y orden en cliente: sobre las tareas ya traídas, en memoria.
   const visibleTasks = sortTasks(filterTasks(tasks, filter), sort)
@@ -26,10 +29,37 @@ export default function Tasks() {
     navigate('/login')
   }
 
+  async function handleSendSummary() {
+    if (!user?.email) return
+    setSending(true)
+    try {
+      // toast.promise muestra los 3 estados (cargando/éxito/error) en una
+      // sola llamada. El mensaje de error sale del Error que lanza el service.
+      await toast.promise(sendTaskSummary(user.email, tasks), {
+        loading: 'Enviando resumen...',
+        success: 'Resumen enviado a tu email.',
+        error: (err: Error) => err.message,
+      })
+    } catch {
+      // toast.promise ya mostró el error; el catch solo evita el
+      // "unhandled promise rejection" cuando el envío falla.
+    } finally {
+      setSending(false)
+    }
+  }
+
   return (
     <main>
       <header className="app-header">
         <h1>Mis tareas</h1>
+        <button
+          type="button"
+          className="btn btn--ghost"
+          onClick={handleSendSummary}
+          disabled={sending || tasks.length === 0}
+        >
+          {sending ? 'Enviando...' : 'Enviarme el resumen'}
+        </button>
         <button type="button" className="btn btn--ghost" onClick={handleLogout}>
           Cerrar sesión
         </button>
