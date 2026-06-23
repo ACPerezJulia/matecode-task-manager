@@ -57,35 +57,45 @@ export default function Login() {
   }
 
   return (
-    <main>
+    <main className="auth">
       <h1>Iniciar sesión</h1>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
-        <label htmlFor="password">Contraseña</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          value={form.password}
-          onChange={handleChange}
-          required
-        />
-        <button type="submit" disabled={loading}>
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="password">Contraseña</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <button type="submit" className="btn btn--primary" disabled={loading}>
           {loading ? 'Cargando...' : 'Ingresar'}
         </button>
       </form>
-      <button type="button" onClick={handleGoogle} disabled={loading}>
+      <div className="auth-divider">o</div>
+      <button
+        type="button"
+        className="btn btn--ghost"
+        onClick={handleGoogle}
+        disabled={loading}
+      >
         Continuar con Google
       </button>
-      <p>
+      <p className="auth-alt">
         ¿No tenés cuenta? <Link to="/register">Registrate</Link>
       </p>
     </main>

@@ -43,32 +43,36 @@ export default function Register() {
   }
 
   return (
-    <main>
+    <main className="auth">
       <h1>Crear cuenta</h1>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
-        <label htmlFor="password">Contraseña</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          value={form.password}
-          onChange={handleChange}
-          required
-        />
-        <button type="submit" disabled={loading}>
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="password">Contraseña</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <button type="submit" className="btn btn--primary" disabled={loading}>
           {loading ? 'Cargando...' : 'Crear cuenta'}
         </button>
       </form>
-      <p>
+      <p className="auth-alt">
         ¿Ya tenés cuenta? <Link to="/login">Ingresá</Link>
       </p>
     </main>
