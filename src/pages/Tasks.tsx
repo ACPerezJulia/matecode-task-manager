@@ -6,6 +6,7 @@ import { useTasks } from '../hooks/useTasks'
 import { TodoForm } from '../components/TodoForm'
 import { TodoList } from '../components/TodoList'
 import { TaskListSkeleton } from '../components/Skeleton'
+import { TyrionChat } from '../components/TyrionChat'
 import { filterTasks, sortTasks } from '../utils/taskHelpers'
 import { sendTaskSummary } from '../services/emailService'
 import type { TaskFilter, TaskSort } from '../types'
@@ -122,6 +123,9 @@ export default function Tasks() {
           <TodoList tasks={visibleTasks} />
         </>
       )}
+
+      {/* Asistente Tyrion: panel flotante, fijo en la esquina */}
+      <TyrionChat />
     </main>
   )
 }
