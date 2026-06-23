@@ -1,0 +1,119 @@
+/* tasks.css — Layout específico de la vista de tareas.
+   Header de la app, barra de filtros/orden y la lista de tareas. */
+
+/* --- Header (título + email + logout) --- */
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.app-header h1 {
+  margin: 0;
+  flex: 1 1 auto;
+}
+
+.app-header__user {
+  flex-basis: 100%;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+/* --- Barra de filtros y orden --- */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.controls > label,
+.controls > span {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.controls select {
+  width: auto;
+}
+
+/* "chips" de filtro (Todas / Pendientes / Completadas).
+   El filtro activo usa el atributo disabled -> lo mostramos resaltado,
+   no apagado. */
+.chip {
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+.chip:not(:disabled):hover {
+  border-color: var(--accent-border);
+}
+.chip:disabled {
+  cursor: default;
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+/* --- Lista de tareas --- */
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.task-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.task-item__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.task-title {
+  font-size: 1.05rem;
+  color: var(--text-h);
+}
+.task-title.is-completed {
+  text-decoration: line-through;
+  color: var(--text);
+}
+
+.task-desc {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.task-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.85rem;
+}
+
+.task-due {
+  color: var(--text);
+}
+
+.task-actions {
+  display: flex;
+  gap: var(--space-2);
+}

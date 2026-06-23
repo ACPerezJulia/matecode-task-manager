@@ -1,0 +1,25 @@
+/* index.css — Punto de entrada de los estilos.
+   Solo orquesta los parciales con @import. El ORDEN importa: va de lo
+   más general/abstracto a lo más específico, porque en CSS lo de abajo
+   pisa lo de arriba cuando la especificidad empata.
+
+   tokens   -> variables (todo depende de ellas, van primero)
+   base     -> estilos de elementos HTML (reset, tipografía, inputs)
+   components -> primitivas reutilizables (.card, .badge, .empty)
+   buttons  -> sistema de botones
+   forms    -> layout de formularios
+   tasks    -> vista de tareas
+   auth     -> vistas de login/registro
+   skeleton -> placeholders de carga
+
+   Nota: Vite/PostCSS une todos estos archivos en un solo CSS al compilar,
+   así que dividirlo no tiene costo de performance: es solo organización. */
+
+@import './tokens.css';
+@import './base.css';
+@import './components.css';
+@import './buttons.css';
+@import './forms.css';
+@import './tasks.css';
+@import './auth.css';
+@import './skeleton.css';

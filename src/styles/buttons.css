@@ -1,0 +1,99 @@
+/* buttons.css — Sistema de botones reutilizable.
+   .btn (con variantes --primary/--ghost/--danger) para botones con texto,
+   .icon-btn para botones de solo ícono (editar, eliminar). */
+
+.btn {
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+.btn--primary:not(:disabled):hover {
+  box-shadow: var(--shadow);
+}
+
+.btn--ghost {
+  background: var(--surface);
+  color: var(--text-h);
+  border-color: var(--border);
+}
+.btn--ghost:not(:disabled):hover {
+  border-color: var(--accent-border);
+}
+
+.btn--danger {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-color: transparent;
+}
+.btn--danger:not(:disabled):hover {
+  border-color: var(--danger);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Botón de solo ícono (ej: tacho de eliminar). Discreto por defecto:
+   sin fondo, el ícono coloreado; el fondo aparece recién al hover. */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+.icon-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.icon-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+/* Hover por defecto (ej: editar): resalta con el acento.
+   La variante --danger lo pisa con su propio hover rojo (más específico). */
+.icon-btn:not(:disabled):hover {
+  color: var(--accent);
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.icon-btn--danger {
+  color: var(--danger);
+}
+.icon-btn--danger:not(:disabled):hover {
+  background: var(--danger-bg);
+  border-color: var(--danger);
+}

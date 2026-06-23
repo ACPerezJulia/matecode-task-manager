@@ -1,0 +1,70 @@
+/* tokens.css — Design tokens (variables CSS).
+   Es la "fuente de verdad" de colores, espaciados y radios.
+   Todo lo demás referencia estas variables con var(--...), así el
+   dark mode (más abajo) cambia toda la app sin tocar cada regla. */
+
+:root {
+  /* --- Paleta (modo claro) --- */
+  --text: #5b5566;
+  --text-h: #08060d;
+  --bg: #faf9fb; /* fondo de la página */
+  --surface: #ffffff; /* fondo de tarjetas/inputs, contrasta con --bg */
+  --border: #e5e4e7;
+  --code-bg: #f4f3ec;
+  --accent: #aa3bff;
+  --accent-bg: rgba(170, 59, 255, 0.1);
+  --accent-border: rgba(170, 59, 255, 0.5);
+  --accent-contrast: #ffffff; /* texto sobre fondo accent */
+  --danger: #d4373a;
+  --danger-bg: rgba(212, 55, 58, 0.1);
+  --shadow:
+    rgba(0, 0, 0, 0.08) 0 8px 16px -6px, rgba(0, 0, 0, 0.04) 0 2px 4px -2px;
+
+  /* Colores de los badges de prioridad */
+  --prio-low: #2f8f5b;
+  --prio-low-bg: rgba(47, 143, 91, 0.12);
+  --prio-medium: #b97309;
+  --prio-medium-bg: rgba(185, 115, 9, 0.12);
+  --prio-high: #d4373a;
+  --prio-high-bg: rgba(212, 55, 58, 0.12);
+
+  /* Escala de espaciado y radios (para mantener consistencia) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --radius: 10px;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+}
+
+/* --- Modo oscuro: solo redefinimos los tokens de color --- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #9ca3af;
+    --text-h: #f3f4f6;
+    --bg: #111217;
+    --surface: #1c1d24;
+    --border: #2e303a;
+    --code-bg: #1f2028;
+    --accent: #c084fc;
+    --accent-bg: rgba(192, 132, 252, 0.15);
+    --accent-border: rgba(192, 132, 252, 0.5);
+    --accent-contrast: #1a1320;
+    --danger: #f06a6c;
+    --danger-bg: rgba(240, 106, 108, 0.14);
+    --shadow:
+      rgba(0, 0, 0, 0.4) 0 8px 16px -6px, rgba(0, 0, 0, 0.25) 0 2px 4px -2px;
+
+    --prio-low: #5fcf8f;
+    --prio-low-bg: rgba(95, 207, 143, 0.14);
+    --prio-medium: #e0a64a;
+    --prio-medium-bg: rgba(224, 166, 74, 0.14);
+    --prio-high: #f06a6c;
+    --prio-high-bg: rgba(240, 106, 108, 0.14);
+  }
+}

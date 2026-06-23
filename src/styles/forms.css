@@ -1,0 +1,24 @@
+/* forms.css — Layout de formularios compuestos.
+   El estilo de los inputs nativos vive en base.css; acá va solo
+   cómo se ACOMODAN los campos dentro de un formulario. */
+
+.task-form,
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+/* .form-row agrupa campos que en mobile van apilados y en tablet+
+   pasan a ir lado a lado (ej: prioridad + fecha de vencimiento). */
+@media (min-width: 640px) {
+  .task-form .form-row,
+  .auth-form .form-row {
+    display: flex;
+    gap: var(--space-3);
+  }
+  .task-form .form-row > * {
+    flex: 1;
+  }
+}

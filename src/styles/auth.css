@@ -1,0 +1,41 @@
+/* auth.css — Vistas de autenticación (Login / Register).
+   Tarjeta angosta y centrada, con el separador "o" antes de Google. */
+
+.auth {
+  max-width: 380px;
+  margin: 0 auto;
+  padding-top: var(--space-6);
+}
+
+.auth h1 {
+  text-align: center;
+}
+
+.auth .btn {
+  width: 100%;
+}
+
+.auth-alt {
+  text-align: center;
+  margin-top: var(--space-4);
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+/* Separador "o" entre el form y el botón de Google.
+   Las dos líneas se dibujan con ::before y ::after. */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--text);
+  font-size: 0.85rem;
+  margin: var(--space-4) 0;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}

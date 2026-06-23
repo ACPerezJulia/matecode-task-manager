@@ -1,0 +1,51 @@
+/* skeleton.css — Loading skeletons con animación shimmer.
+   Bloques grises que imitan la forma del contenido mientras carga. */
+
+.skeleton {
+  display: block;
+  margin-bottom: var(--space-2);
+  border-radius: 6px;
+  background: var(--code-bg);
+  position: relative;
+  overflow: hidden; /* recorta el brillo que se desliza por encima */
+}
+
+/* El "shimmer": un brillo que cruza el bloque de izquierda a derecha. */
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.45),
+    transparent
+  );
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+/* En modo oscuro el brillo blanco fuerte molesta: lo bajamos. */
+@media (prefers-color-scheme: dark) {
+  .skeleton::after {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.08),
+      transparent
+    );
+  }
+}
+
+/* Accesibilidad: si el usuario pidió menos movimiento, sin animación. */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
+}
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
