@@ -76,10 +76,30 @@
 }
 
 .task-item {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
 }
+/* Tarea completada: atenuada (el título además va tachado, ver .task-title). */
+.task-item.is-completed {
+  opacity: 0.6;
+}
+
+/* Barra de color izquierda: misma lógica que la barra superior del grid. */
+.task-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 4px;
+}
+.task-item--bar-red::before    { background: var(--prio-high); }
+.task-item--bar-yellow::before { background: var(--prio-medium); }
+.task-item--bar-green::before  { background: var(--prio-low); }
+.task-item--bar-grey::before   { background: var(--border); }
 
 .task-item__head {
   display: flex;
@@ -88,6 +108,7 @@
 }
 
 .task-title {
+  flex: 1; /* ocupa el espacio libre, empuja chip y badge a la derecha */
   font-size: 1.05rem;
   color: var(--text-h);
 }
@@ -107,10 +128,6 @@
   align-items: center;
   gap: var(--space-2);
   font-size: 0.85rem;
-}
-
-.task-due {
-  color: var(--text);
 }
 
 .task-actions {
