@@ -1,4 +1,4 @@
-import { formatDate } from '../utils/format'
+import { formatDateForEmail } from '../utils/format'
 import type { Task } from '../types'
 
 /**
@@ -21,7 +21,7 @@ export async function sendTaskSummary(to: string, tasks: Task[]): Promise<void> 
     tasks: tasks.map((t) => ({
       title: t.title,
       completed: t.completed,
-      dueDate: t.dueDate ? formatDate(t.dueDate) : undefined,
+      dueDate: t.dueDate ? formatDateForEmail(t.dueDate) : undefined,
     })),
   }
 

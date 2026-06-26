@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { Timestamp } from 'firebase/firestore'
 import { sendTaskSummary } from '../src/services/emailService'
-import { formatDate } from '../src/utils/format'
+import { formatDateForEmail } from '../src/utils/format'
 import type { Task } from '../src/types'
 
 function makeTask(overrides: Partial<Task> = {}): Task {
@@ -60,8 +60,9 @@ describe('sendTaskSummary', () => {
     const [, options] = fetchMock.mock.calls[0]
     const sent = JSON.parse(options.body)
     // El cliente formatea dueDate ANTES de enviar (no manda el Timestamp).
-    expect(sent.tasks[0].dueDate).toBe(formatDate(dueDate))
-    expect(sent.tasks[0].dueDate).toContain('26/06/2026')
+    // El email usa formato dd/mm/aa (año corto).
+    expect(sent.tasks[0].dueDate).toBe(formatDateForEmail(dueDate))
+    expect(sent.tasks[0].dueDate).toContain('26/06/26')
   })
 
   it('lanza con el mensaje del error cuando el serverless falla (caso borde: error del serverless)', async () => {
