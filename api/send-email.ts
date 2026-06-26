@@ -113,9 +113,9 @@ function buildSummary(pending: TaskSummary[], completed: TaskSummary[]) {
   const appUrl = process.env.APP_URL ?? 'https://matecode-task-manager.vercel.app'
 
   // --- Texto plano: para clientes de correo que no renderizan HTML ---
-  // Cada línea muestra el título y, si la tarea tiene vencimiento, la fecha/hora.
+  // Cada línea muestra el título y, si la tarea tiene fecha, la fecha/hora.
   const lineOf = (t: TaskSummary) =>
-    `- ${titleOf(t)}${t.dueDate ? ` (vence: ${t.dueDate})` : ''}`
+    `- ${titleOf(t)}${t.dueDate ? ` (${t.dueDate})` : ''}`
 
   const text = [
     'Tu resumen de tareas',
@@ -135,7 +135,7 @@ function buildSummary(pending: TaskSummary[], completed: TaskSummary[]) {
       ? `<ul>${items
           .map((t) => {
             const due = t.dueDate
-              ? ` <span style="color: #666;">(vence: ${escapeHtml(t.dueDate)})</span>`
+              ? ` <span style="color: #666;">(${escapeHtml(t.dueDate)})</span>`
               : ''
             return `<li>${escapeHtml(titleOf(t))}${due}</li>`
           })

@@ -107,7 +107,7 @@ export function TodoForm({ userId }: TodoFormProps) {
         </div>
 
         <div>
-          <label htmlFor="dueDate">Fecha y hora de vencimiento</label>
+          <label htmlFor="dueDate">Fecha y hora</label>
           <input
             id="dueDate"
             name="dueDate"

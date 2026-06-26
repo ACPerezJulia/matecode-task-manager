@@ -116,7 +116,7 @@ export default function Tasks() {
             >
               <option value="recent">Más recientes</option>
               <option value="priority">Prioridad</option>
-              <option value="dueDate">Fecha de vencimiento</option>
+              <option value="dueDate">Fecha</option>
             </select>
           </div>
 
