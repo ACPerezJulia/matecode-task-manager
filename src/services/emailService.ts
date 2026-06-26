@@ -1,4 +1,5 @@
 import { formatDateForEmail } from '../utils/format'
+import { getDueStatus } from '../utils/taskHelpers'
 import type { Task } from '../types'
 
 /**
@@ -20,8 +21,12 @@ export async function sendTaskSummary(to: string, tasks: Task[]): Promise<void> 
     to,
     tasks: tasks.map((t) => ({
       title: t.title,
+      description: t.description || undefined,
       completed: t.completed,
+      priority: t.priority,
       dueDate: t.dueDate ? formatDateForEmail(t.dueDate) : undefined,
+      // status lo calcula el cliente (conoce la zona horaria); el servidor no.
+      status: t.dueDate && !t.completed ? getDueStatus(t.dueDate, t.completed) : undefined,
     })),
   }
 

@@ -21,7 +21,7 @@ describe('sendTaskSummary', () => {
     vi.unstubAllGlobals()
   })
 
-  it('llama a /api/send-email con el payload reducido (solo title y completed)', async () => {
+  it('llama a /api/send-email con el payload correcto (title, description, completed)', async () => {
     // Arrange: fetch global mockeado con respuesta OK.
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
@@ -40,7 +40,7 @@ describe('sendTaskSummary', () => {
     expect(url).toBe('/api/send-email')
     expect(JSON.parse(options.body)).toEqual({
       to: 'test@example.com',
-      tasks: [{ title: 'Comprar vino', completed: false }],
+      tasks: [{ title: 'Comprar vino', description: 'Desc', completed: false }],
     })
   })
 
