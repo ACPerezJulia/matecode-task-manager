@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { Timestamp } from 'firebase/firestore'
 import { sendTaskSummary } from '../src/services/emailService'
+import { formatDate } from '../src/utils/format'
 import type { Task } from '../src/types'
 
 function makeTask(overrides: Partial<Task> = {}): Task {
@@ -41,6 +42,26 @@ describe('sendTaskSummary', () => {
       to: 'test@example.com',
       tasks: [{ title: 'Comprar vino', completed: false }],
     })
+  })
+
+  it('incluye la fecha/hora de vencimiento ya formateada en el payload', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ ok: true }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    // Vencimiento con hora puntual (15:00 hora local).
+    const dueDate = Timestamp.fromDate(new Date(2026, 5, 26, 15, 0))
+    await sendTaskSummary('test@example.com', [
+      makeTask({ title: 'Cita odontólogo', dueDate }),
+    ])
+
+    const [, options] = fetchMock.mock.calls[0]
+    const sent = JSON.parse(options.body)
+    // El cliente formatea dueDate ANTES de enviar (no manda el Timestamp).
+    expect(sent.tasks[0].dueDate).toBe(formatDate(dueDate))
+    expect(sent.tasks[0].dueDate).toContain('26/06/2026')
   })
 
   it('lanza con el mensaje del error cuando el serverless falla (caso borde: error del serverless)', async () => {

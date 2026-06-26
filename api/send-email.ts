@@ -12,6 +12,10 @@ import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses'
 interface TaskSummary {
   title: string
   completed: boolean
+  // Fecha/hora de vencimiento YA formateada por el cliente (string legible),
+  // o ausente si la tarea no tiene vencimiento. Ver nota de zona horaria en
+  // emailService.ts: no formateamos acá porque la function corre en UTC.
+  dueDate?: string
 }
 
 interface SendEmailBody {
@@ -104,23 +108,38 @@ function buildSummary(pending: TaskSummary[], completed: TaskSummary[]) {
   // Tomamos el título de forma defensiva por si viniera vacío/indefinido.
   const titleOf = (t: TaskSummary) => String(t.title ?? '').trim() || '(sin título)'
 
+  // URL de la app: configurable por env, con default a producción (es una URL
+  // pública, no un secreto, así que el default está bien).
+  const appUrl = process.env.APP_URL ?? 'https://matecode-task-manager.vercel.app'
+
   // --- Texto plano: para clientes de correo que no renderizan HTML ---
+  // Cada línea muestra el título y, si la tarea tiene vencimiento, la fecha/hora.
+  const lineOf = (t: TaskSummary) =>
+    `- ${titleOf(t)}${t.dueDate ? ` (vence: ${t.dueDate})` : ''}`
+
   const text = [
     'Tu resumen de tareas',
     '',
     `Pendientes (${pending.length}):`,
-    ...(pending.length ? pending.map((t) => `- ${titleOf(t)}`) : ['  (ninguna)']),
+    ...(pending.length ? pending.map(lineOf) : ['  (ninguna)']),
     '',
     `Completadas (${completed.length}):`,
-    ...(completed.length
-      ? completed.map((t) => `- ${titleOf(t)}`)
-      : ['  (ninguna)']),
+    ...(completed.length ? completed.map(lineOf) : ['  (ninguna)']),
+    '',
+    `Abrí tus tareas en MateCode: ${appUrl}`,
   ].join('\n')
 
   // --- HTML simple ---
   const list = (items: TaskSummary[]) =>
     items.length
-      ? `<ul>${items.map((t) => `<li>${escapeHtml(titleOf(t))}</li>`).join('')}</ul>`
+      ? `<ul>${items
+          .map((t) => {
+            const due = t.dueDate
+              ? ` <span style="color: #666;">(vence: ${escapeHtml(t.dueDate)})</span>`
+              : ''
+            return `<li>${escapeHtml(titleOf(t))}${due}</li>`
+          })
+          .join('')}</ul>`
       : '<p><em>(ninguna)</em></p>'
 
   const html = `
@@ -130,6 +149,13 @@ function buildSummary(pending: TaskSummary[], completed: TaskSummary[]) {
       ${list(pending)}
       <h3>Completadas (${completed.length})</h3>
       ${list(completed)}
+      <p style="margin-top: 24px;">
+        <a href="${escapeHtml(appUrl)}"
+           style="display: inline-block; padding: 10px 18px; background: #1a1a1a;
+                  color: #fff; text-decoration: none; border-radius: 6px;">
+          Abrir MateCode
+        </a>
+      </p>
     </div>
   `.trim()
 

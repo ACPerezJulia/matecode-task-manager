@@ -1,3 +1,4 @@
+import { formatDate } from '../utils/format'
 import type { Task } from '../types'
 
 /**
@@ -9,11 +10,19 @@ import type { Task } from '../types'
  * @param tasks Tareas a resumir. Mandamos solo lo que el email necesita.
  */
 export async function sendTaskSummary(to: string, tasks: Task[]): Promise<void> {
-  // Reducimos cada Task a { title, completed }: no tiene sentido mandar
-  // Timestamps, ids ni userId al endpoint del email.
+  // Reducimos cada Task a { title, completed, dueDate }: no tiene sentido mandar
+  // ids ni userId al endpoint del email.
+  // OJO con la zona horaria: formateamos dueDate ACÁ (cliente) y mandamos el
+  // string ya listo. NO mandamos el Timestamp para que lo formatee la function,
+  // porque la Vercel Function corre en UTC y mostraría la hora corrida. El
+  // cliente conoce la zona del usuario, así que la hora sale bien.
   const payload = {
     to,
-    tasks: tasks.map((t) => ({ title: t.title, completed: t.completed })),
+    tasks: tasks.map((t) => ({
+      title: t.title,
+      completed: t.completed,
+      dueDate: t.dueDate ? formatDate(t.dueDate) : undefined,
+    })),
   }
 
   const res = await fetch('/api/send-email', {
