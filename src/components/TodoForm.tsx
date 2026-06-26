@@ -104,6 +104,9 @@ export function TodoForm({ userId }: TodoFormProps) {
             <option value="medium">Media</option>
             <option value="high">Alta</option>
           </select>
+          <small className="field-hint">
+            Opcional. Elegí alta, media o baja según la urgencia.
+          </small>
         </div>
 
         <div>
@@ -115,6 +118,9 @@ export function TodoForm({ userId }: TodoFormProps) {
             value={form.dueDate ?? ''}
             onChange={handleChange}
           />
+          <small className="field-hint">
+            Opcional. El día y, si corresponde, la hora de la actividad.
+          </small>
         </div>
       </div>
 
