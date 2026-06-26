@@ -1,27 +1,45 @@
 import { Timestamp } from 'firebase/firestore'
 
+/** ¿La tarea tiene una hora puntual (distinta de 00:00)? */
+function hasTime(date: Date): boolean {
+  return date.getHours() !== 0 || date.getMinutes() !== 0
+}
+
+/** Hora en formato 24hs "HH:mm" (hour12:false para no obtener "2:00 p.m."). */
+function formatTime(date: Date): string {
+  return date.toLocaleTimeString('es-AR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  })
+}
+
 /**
- * Formatea un Timestamp como fecha legible. Si la tarea tiene una hora puntual
- * (distinta de 00:00) la incluye; si es medianoche, asumimos que el usuario
- * solo eligió un día y mostramos solo la fecha.
- * Ej: "26/06/2026 15:00" (con hora) o "26/06/2026" (solo día).
+ * Fecha para la UI (cards y lista): "dd/mm" + hora si corresponde, SIN año
+ * (las tareas son de corto plazo, el año es ruido en pantalla).
+ * Ej: "26/06" o "27/06 12:00". A las 00:00 mostramos solo el día.
  */
 export function formatDate(timestamp: Timestamp): string {
   const date = timestamp.toDate()
   const fecha = date.toLocaleDateString('es-AR', {
     day: '2-digit',
     month: '2-digit',
-    year: 'numeric',
   })
-  // 00:00 = no se fijó una hora puntual -> mostramos solo la fecha.
-  if (date.getHours() === 0 && date.getMinutes() === 0) {
-    return fecha
-  }
-  const hora = date.toLocaleTimeString('es-AR', {
-    hour: '2-digit',
-    minute: '2-digit',
+  return hasTime(date) ? `${fecha} ${formatTime(date)}` : fecha
+}
+
+/**
+ * Fecha para el email: "dd/mm/aa" + hora si corresponde. Lleva el año (corto)
+ * porque el email se lee fuera de contexto. Ej: "01/07/26" o "01/07/26 14:00".
+ */
+export function formatDateForEmail(timestamp: Timestamp): string {
+  const date = timestamp.toDate()
+  const fecha = date.toLocaleDateString('es-AR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
   })
-  return `${fecha} ${hora}`
+  return hasTime(date) ? `${fecha} ${formatTime(date)}` : fecha
 }
 
 /**

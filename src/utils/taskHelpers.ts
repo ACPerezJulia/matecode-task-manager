@@ -1,3 +1,4 @@
+import type { Timestamp } from 'firebase/firestore'
 import type { Task, TaskFilter, TaskSort } from '../types'
 
 /** Etiqueta legible para cada prioridad (para mostrar en la UI). */
@@ -5,6 +6,58 @@ export const priorityLabel: Record<NonNullable<Task['priority']>, string> = {
   low: 'baja',
   medium: 'media',
   high: 'alta',
+}
+
+/** Estado de una fecha relativo a hoy, para el color semántico del chip/barra. */
+export type DueStatus = 'overdue' | 'soon' | 'later'
+
+/**
+ * Devuelve el estado de la fecha de una tarea:
+ * - 'overdue': fecha pasada y la tarea NO está completada (urgente → rojo)
+ * - 'soon':    vence hoy o mañana (→ amarillo)
+ * - 'later':   más de 2 días, o tarea completada (→ gris)
+ *
+ * Compara por DÍA (ignora la hora) en zona horaria local: "hoy" es hoy aunque
+ * ya hayan pasado las horas. Una tarea completada nunca es urgente.
+ */
+export function getDueStatus(dueDate: Timestamp, completed: boolean): DueStatus {
+  if (completed) return 'later'
+
+  const due = dueDate.toDate()
+  const dueDay = new Date(due.getFullYear(), due.getMonth(), due.getDate())
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+
+  const msPerDay = 1000 * 60 * 60 * 24
+  const diffDays = Math.round((dueDay.getTime() - today.getTime()) / msPerDay)
+
+  if (diffDays < 0) return 'overdue'
+  if (diffDays <= 1) return 'soon' // hoy (0) o mañana (1)
+  return 'later'
+}
+
+/** Tono de color de la barra superior de una card del grid. */
+export type BarTone = 'red' | 'yellow' | 'green' | 'grey'
+
+/**
+ * Color de la barra superior de la card:
+ * - si hay prioridad, manda la prioridad (alta=rojo, media=amarillo, baja=verde)
+ * - si no hay prioridad pero sí fecha, toma el color del estado de la fecha
+ * - si no hay ni prioridad ni fecha, gris
+ */
+export function getCardBarTone(task: Task): BarTone {
+  if (task.priority) {
+    if (task.priority === 'high') return 'red'
+    if (task.priority === 'medium') return 'yellow'
+    return 'green'
+  }
+  if (task.dueDate) {
+    const status = getDueStatus(task.dueDate, task.completed)
+    if (status === 'overdue') return 'red'
+    if (status === 'soon') return 'yellow'
+    return 'grey'
+  }
+  return 'grey'
 }
 
 // Peso de cada prioridad para ordenar: high primero.
