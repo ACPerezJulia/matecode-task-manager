@@ -19,14 +19,17 @@
   padding: 2px var(--space-2);
   border-radius: 999px;
 }
+
 .badge--low {
   color: var(--prio-low);
   background: var(--prio-low-bg);
 }
+
 .badge--medium {
   color: var(--prio-medium);
   background: var(--prio-medium-bg);
 }
+
 .badge--high {
   color: var(--prio-high);
   background: var(--prio-high-bg);
@@ -37,4 +40,88 @@
   color: var(--text);
   text-align: center;
   padding: var(--space-5) 0;
+}
+
+/* --- Check circular (reemplaza al checkbox nativo) ---
+   Un <input type="checkbox"> al que le sacamos la apariencia nativa y lo
+   redibujamos como un círculo que se llena de verde con un ✓ al completar.
+   Lo usan tanto la lista como el grid. */
+/* all: unset borra TODA la hoja de estilo del navegador para el input,
+   incluyendo las reglas de sizing que causan el óvalo. */
+.task-check {
+  all: unset;
+  box-sizing: border-box;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  min-height: 16px;
+  flex-shrink: 0;
+  align-self: center;
+  border: 1.5px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.task-check:not(:disabled):hover {
+  border-color: var(--prio-low);
+}
+
+.task-check:checked {
+  background: var(--prio-low);
+  border-color: var(--prio-low);
+}
+
+.task-check:checked::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  width: 4px;
+  height: 7px;
+  border: solid #fff;
+  border-width: 0 1.5px 1.5px 0;
+}
+
+.task-check:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* --- Chip de fecha con color semántico ---
+   Rojo (vencida), amarillo (hoy/mañana) o gris (lejana). Lleva un ícono
+   (reloj o calendario). Se usa en lista y grid. */
+.due-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 2px var(--space-2);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.due-chip svg {
+  width: 13px;
+  height: 13px;
+}
+
+.due-chip--red {
+  color: var(--prio-high);
+  background: var(--prio-high-bg);
+}
+
+.due-chip--yellow {
+  color: var(--prio-medium);
+  background: var(--prio-medium-bg);
+}
+
+.due-chip--grey {
+  color: var(--text);
+  background: var(--code-bg);
 }
