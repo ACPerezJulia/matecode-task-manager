@@ -80,6 +80,10 @@ export function TaskItem({ task }: TaskItemProps) {
       toast.error('La tarea necesita un título.')
       return
     }
+    if (!description.trim()) {
+      toast.error('La tarea necesita una descripción.')
+      return
+    }
     setBusy(true)
     try {
       await updateTask(task.id, {

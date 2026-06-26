@@ -42,6 +42,11 @@ export function TodoForm({ userId }: TodoFormProps) {
       return
     }
 
+    if (!form.description.trim()) {
+      toast.error('La tarea necesita una descripción.')
+      return
+    }
+
     setSubmitting(true)
     try {
       await createTask(userId, {
