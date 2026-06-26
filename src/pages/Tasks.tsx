@@ -5,8 +5,11 @@ import { useAuth } from '../hooks/useAuth'
 import { useTasks } from '../hooks/useTasks'
 import { TodoForm } from '../components/TodoForm'
 import { TodoList } from '../components/TodoList'
+import { TaskGrid } from '../components/TaskGrid'
+import { ViewToggle } from '../components/ViewToggle'
 import { TaskListSkeleton } from '../components/Skeleton'
 import { TyrionChat } from '../components/TyrionChat'
+import { useViewMode } from '../hooks/useViewMode'
 import { filterTasks, sortTasks } from '../utils/taskHelpers'
 import { sendTaskSummary } from '../services/emailService'
 import type { TaskFilter, TaskSort } from '../types'
@@ -18,6 +21,8 @@ export default function Tasks() {
 
   const [filter, setFilter] = useState<TaskFilter>('all')
   const [sort, setSort] = useState<TaskSort>('recent')
+  // Vista lista/grid, persistida en localStorage.
+  const { view, setView } = useViewMode()
   // Bloquea el botón de "enviar resumen" mientras la request está en curso.
   const [sending, setSending] = useState(false)
 
@@ -105,6 +110,8 @@ export default function Tasks() {
             >
               Completadas
             </button>
+            {/* Toggle Lista/Grid: el CSS lo empuja al extremo derecho. */}
+            <ViewToggle view={view} onChange={setView} />
           </div>
 
           <div className="controls">
@@ -120,7 +127,11 @@ export default function Tasks() {
             </select>
           </div>
 
-          <TodoList tasks={visibleTasks} />
+          {view === 'grid' ? (
+            <TaskGrid tasks={visibleTasks} />
+          ) : (
+            <TodoList tasks={visibleTasks} />
+          )}
         </>
       )}
 

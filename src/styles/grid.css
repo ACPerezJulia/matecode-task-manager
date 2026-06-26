@@ -1,0 +1,160 @@
+/* grid.css — Vista grid de tareas (cards) y el toggle Lista/Grid.
+   La vista lista usa tasks.css; acá va solo lo específico del grid. */
+
+/* --- Toggle Lista / Grid (va a la derecha de la barra de filtros) --- */
+.view-toggle {
+  display: inline-flex;
+  margin-left: auto; /* empuja el toggle al extremo derecho de .controls */
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.view-toggle__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: var(--space-1) var(--space-3);
+  border: none;
+  background: transparent;
+  color: var(--text);
+}
+.view-toggle__btn svg {
+  width: 15px;
+  height: 15px;
+}
+.view-toggle__btn.is-active {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+/* --- Secciones (Pendientes / Completadas) con línea divisoria --- */
+.task-grid-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.task-section__title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text);
+  margin: var(--space-4) 0 var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+}
+
+/* --- Grilla responsiva: 1 columna en mobile, 2 a partir de 600px --- */
+.task-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
+@media (min-width: 600px) {
+  .task-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* --- Card --- */
+.task-card {
+  position: relative;
+  overflow: hidden; /* recorta la barra superior a las esquinas redondeadas */
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+}
+.task-card.is-completed {
+  opacity: 0.6;
+}
+
+/* Barra de color superior: prioridad, o color de la fecha si no hay prioridad.
+   Se dibuja con ::before para no agregar un elemento extra al markup. */
+.task-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+.task-card--bar-red::before {
+  background: var(--prio-high);
+}
+.task-card--bar-yellow::before {
+  background: var(--prio-medium);
+}
+.task-card--bar-green::before {
+  background: var(--prio-low);
+}
+.task-card--bar-grey::before {
+  background: var(--border);
+}
+
+.task-card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.task-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+/* Badge de prioridad en el header: empujado a la derecha, en mayúsculas. */
+.task-card__priority-badge {
+  margin-left: auto;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+}
+
+/* Descripción en la card: truncada a 2 líneas por defecto. */
+.task-card__desc {
+  font-size: 0.82rem;
+  color: var(--text);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.task-card__desc.is-expanded {
+  display: block;
+  overflow: visible;
+  cursor: pointer; /* clic para colapsar */
+}
+/* Solo muestra cursor de clic cuando hay más texto del que cabe */
+.task-card__desc--expandable {
+  cursor: pointer;
+}
+.task-card__desc-more {
+  margin-left: 3px;
+  font-size: 0.72rem;
+  color: var(--accent);
+  font-style: italic;
+}
+
+/* Acciones (editar/eliminar): visibles solo al pasar el mouse por la card.
+   En dispositivos táctiles (sin hover) quedan siempre visibles para no
+   esconderlas donde no hay cursor. */
+@media (hover: hover) {
+  .task-card .task-actions {
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .task-card:hover .task-actions,
+  .task-card:focus-within .task-actions {
+    opacity: 1;
+  }
+}
+
