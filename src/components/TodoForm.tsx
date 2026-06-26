@@ -107,11 +107,11 @@ export function TodoForm({ userId }: TodoFormProps) {
         </div>
 
         <div>
-          <label htmlFor="dueDate">Fecha de vencimiento</label>
+          <label htmlFor="dueDate">Fecha y hora de vencimiento</label>
           <input
             id="dueDate"
             name="dueDate"
-            type="date"
+            type="datetime-local"
             value={form.dueDate ?? ''}
             onChange={handleChange}
           />

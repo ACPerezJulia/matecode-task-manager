@@ -140,13 +140,13 @@ export function TaskItem({ task }: TaskItemProps) {
               </select>
             </div>
             <div>
-              <label htmlFor={`edit-due-${task.id}`}>Fecha de vencimiento</label>
+              <label htmlFor={`edit-due-${task.id}`}>Fecha y hora de vencimiento</label>
               <input
                 id={`edit-due-${task.id}`}
-                type="date"
+                type="datetime-local"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                aria-label="Fecha de vencimiento"
+                aria-label="Fecha y hora de vencimiento"
               />
             </div>
           </div>
