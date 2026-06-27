@@ -66,16 +66,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const accentShadow = ACCENT_SHADOW[theme ?? ''] ?? ACCENT_SHADOW.classic
   const appUrl       = process.env.APP_URL ?? 'https://matecode-task-manager.vercel.app'
 
-  const { html, text } = generateSummaryEmail({
-    name:        name ?? to.split('@')[0],
-    tasks,
-    accentColor,
-    accentShadow,
-    appUrl,
-    todayDate:   todayAR(),
-  })
-
   try {
+    const { html, text } = generateSummaryEmail({
+      name:        name ?? to.split('@')[0],
+      tasks,
+      accentColor,
+      accentShadow,
+      appUrl,
+      todayDate:   todayAR(),
+    })
+
     await ses.send(
       new SendEmailCommand({
         Source:      fromEmail,
@@ -91,7 +91,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     )
     return res.status(200).json({ ok: true })
   } catch (err) {
-    console.error('Error al enviar email con SES:', err)
+    console.error('Error al enviar email:', err)
     return res.status(502).json({ error: 'No se pudo enviar el email.' })
   }
 }
