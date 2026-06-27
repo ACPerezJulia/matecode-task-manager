@@ -1,105 +1,89 @@
-/* EmailSendAnimation — estados idle / sending / success / error */
+/* EmailSendAnimation — Pantalla completa overlay animada */
 
-.email-send-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-width: 7.5rem;       /* evita salto de ancho entre estados */
-  justify-content: center;
-}
-
-.email-send-btn__icon {
+.email-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: rgba(5, 8, 22, 0.88);
+  backdrop-filter: blur(10px);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  flex-shrink: 0;
+  justify-content: center;
+  gap: 28px;
+  animation: emailFadeIn 0.3s ease;
 }
 
-.email-send-btn__label {
-  display: inline-flex;
+.email-envelope {
+  font-size: 88px;
+  line-height: 1;
+  animation: emailFly 2.8s ease-in-out forwards;
+}
+
+.email-overlay__title {
+  color: #fff;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.email-overlay__subtitle {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 15px;
+}
+
+.email-dots {
+  display: flex;
+  gap: 10px;
   align-items: center;
-  gap: 2px;
 }
 
-.email-icon {
-  width: 1em;
-  height: 1em;
-}
-
-/* ── Sending ─────────────────────────────────────── */
-
-.email-icon--sending {
-  animation: envelope-float 1.2s ease-in-out infinite;
-  transform-origin: center;
-}
-
-@keyframes envelope-float {
-  0%, 100% { transform: translateY(0)   rotate(-5deg); }
-  50%       { transform: translateY(-3px) rotate(5deg); }
-}
-
-.dot-pulse {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  margin-left: 1px;
-}
-
-.dot-pulse__dot {
-  width: 3px;
-  height: 3px;
+.email-dots__dot {
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background: currentColor;
-  animation: dot-pulse 1.2s ease-in-out infinite;
+  background: #5c7cfa;
 }
 
-.dot-pulse__dot:nth-child(2) { animation-delay: 0.2s; }
-.dot-pulse__dot:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes dot-pulse {
-  0%, 60%, 100% { opacity: 0.25; transform: scale(0.75); }
-  30%           { opacity: 1;    transform: scale(1); }
+.email-dots__dot--1 {
+  animation: emailDotPulse 1.1s ease infinite;
 }
 
-/* ── Success ─────────────────────────────────────── */
-
-.email-send-btn--success {
-  background:   #16a34a !important;
-  border-color: #16a34a !important;
-  color: #fff !important;
+.email-dots__dot--2 {
+  animation: emailDotPulse 1.1s ease 0.22s infinite;
 }
 
-.email-icon--check {
-  animation: check-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+.email-dots__dot--3 {
+  animation: emailDotPulse 1.1s ease 0.44s infinite;
 }
 
-@keyframes check-pop {
-  from { transform: scale(0) rotate(-20deg); opacity: 0; }
-  to   { transform: scale(1) rotate(0deg);  opacity: 1; }
+/* Animaciones */
+
+@keyframes emailFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-/* ── Error ───────────────────────────────────────── */
-
-.email-send-btn--error {
-  border-color: var(--danger) !important;
-  color: var(--danger) !important;
-  animation: error-shake 0.4s ease;
+@keyframes emailFly {
+  0%   { transform: scale(0.2) rotate(-15deg); opacity: 0; }
+  25%  { transform: scale(1.15) rotate(5deg); opacity: 1; }
+  60%  { transform: scale(1) rotate(0deg) translate(0, 0); opacity: 1; }
+  100% { transform: scale(0.2) rotate(20deg) translate(300px, -260px); opacity: 0; }
 }
 
-@keyframes error-shake {
-  0%, 100% { transform: translateX(0); }
-  20%      { transform: translateX(-5px); }
-  40%      { transform: translateX(5px); }
-  60%      { transform: translateX(-3px); }
-  80%      { transform: translateX(3px); }
+@keyframes emailDotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.85); }
 }
 
-/* ── Accesibilidad ───────────────────────────────── */
+/* Accesibilidad */
 
 @media (prefers-reduced-motion: reduce) {
-  .email-icon--sending,
-  .dot-pulse__dot,
-  .email-icon--check,
-  .email-send-btn--error {
+  .email-envelope {
+    animation: none;
+  }
+  .email-dots__dot {
     animation: none;
   }
 }
