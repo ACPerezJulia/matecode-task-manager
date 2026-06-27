@@ -49,6 +49,7 @@ export function TaskItem({ task }: TaskItemProps) {
         )}
       </div>
       {task.description && <p className="task-desc">{task.description}</p>}
+      {task.label && <span className="label-chip">#{task.label}</span>}
       <TaskActions
         onEdit={item.startEditing}
         onDelete={item.remove}

@@ -1,42 +1,40 @@
-/* grid.css — Vista grid de tareas (cards) y el toggle Lista/Grid.
-   La vista lista usa tasks.css; acá va solo lo específico del grid. */
+/* grid.css — Vista grid de tareas (cards). */
 
-/* --- Toggle Lista / Grid (va a la derecha de la barra de filtros) --- */
-.view-toggle {
-  display: inline-flex;
-  margin-left: auto; /* empuja el toggle al extremo derecho de .controls */
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  overflow: hidden;
-  background: var(--surface);
-}
-.view-toggle__btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font: inherit;
-  font-size: 0.85rem;
-  cursor: pointer;
-  padding: var(--space-1) var(--space-3);
-  border: none;
-  background: transparent;
-  color: var(--text);
-}
-.view-toggle__btn svg {
-  width: 15px;
-  height: 15px;
-}
-.view-toggle__btn.is-active {
-  background: var(--accent);
-  color: var(--accent-contrast);
+/* ── Animación de entrada ────────────────────────────────────── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* --- Secciones (Pendientes / Completadas) con línea divisoria --- */
+/* ── Grilla responsiva ───────────────────────────────────────── */
+.task-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
+
+@media (min-width: 600px) {
+  .task-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 860px) {
+  .task-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── Secciones (Pendientes / Completadas) ────────────────────── */
 .task-grid-wrap {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
+
 .task-section__title {
   font-size: 0.8rem;
   font-weight: 700;
@@ -48,79 +46,132 @@
   border-bottom: 1px solid var(--border);
 }
 
-/* --- Grilla responsiva: 1 columna en mobile, 2 a partir de 600px --- */
-.task-grid {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-3);
-}
-@media (min-width: 600px) {
-  .task-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* --- Card --- */
+/* ── Card ────────────────────────────────────────────────────── */
 .task-card {
   position: relative;
-  overflow: hidden; /* recorta la barra superior a las esquinas redondeadas */
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  padding: var(--space-3);
-}
-.task-card.is-completed {
-  opacity: 0.6;
+  padding: 18px 20px;
+  border-radius: 22px;
+  animation: slideUp 0.4s ease;
 }
 
-/* Barra de color superior: prioridad, o color de la fecha si no hay prioridad.
-   Se dibuja con ::before para no agregar un elemento extra al markup. */
+.task-card.is-completed {
+  opacity: 0.62;
+}
+
+/* Barra de color en el lado IZQUIERDO — fina, con las esquinas redondeadas del card */
 .task-card::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  height: 4px;
-}
-.task-card--bar-red::before {
-  background: var(--prio-high);
-}
-.task-card--bar-yellow::before {
-  background: var(--prio-medium);
-}
-.task-card--bar-green::before {
-  background: var(--prio-low);
-}
-.task-card--bar-grey::before {
-  background: var(--border);
+  bottom: 0;
+  width: 3px;
+  border-radius: 22px 0 0 22px;
 }
 
+.task-card--bar-red::before    { background: var(--prio-high); }
+.task-card--bar-yellow::before { background: var(--prio-medium); }
+.task-card--bar-green::before  { background: var(--prio-low); }
+.task-card--bar-grey::before   { background: var(--border); }
+
+/* ── Head: checkbox + columna de contenido ───────────────────── */
 .task-card__head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-2);
-}
-.task-card__meta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-/* Badge de prioridad en el header: empujado a la derecha, en mayúsculas. */
-.task-card__priority-badge {
-  margin-left: auto;
-  flex-shrink: 0;
-  text-transform: uppercase;
-  font-size: 0.68rem;
-  letter-spacing: 0.05em;
+  /* padding-right para que el contenido no quede detrás de los botones absolutos */
+  padding-right: 56px;
 }
 
-/* Descripción en la card: truncada a 2 líneas por defecto. */
+/* Columna que contiene título Y descripción — ambos alineados al mismo nivel */
+.task-card__content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Título: más grande y bold para jerarquía visual clara */
+.task-card .task-title {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+/* ── Botones de acción: × arriba, ✏ abajo — esquina superior derecha ── */
+.task-card__actions {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  z-index: 1;
+}
+
+/* En dispositivos con hover real: ocultar hasta que se pase el cursor */
+@media (hover: hover) {
+  .task-card__actions {
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .task-card:hover .task-card__actions,
+  .task-card:focus-within .task-card__actions {
+    opacity: 1;
+  }
+}
+
+.task-card__btn {
+  all: unset;
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  color: var(--text);
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.task-card__btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+.task-card__btn:hover {
+  background: var(--border);
+  color: var(--text-h);
+}
+
+.task-card__btn--del {
+  color: var(--danger);
+  background: var(--danger-bg);
+  border-color: transparent;
+  font-size: 1.1rem;
+}
+
+.task-card__btn--del:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
+/* ── Descripción expandable ──────────────────────────────────── */
 .task-card__desc {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--text);
   line-height: 1.4;
   display: -webkit-box;
@@ -128,15 +179,17 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
 .task-card__desc.is-expanded {
   display: block;
   overflow: visible;
-  cursor: pointer; /* clic para colapsar */
+  cursor: pointer;
 }
-/* Solo muestra cursor de clic cuando hay más texto del que cabe */
+
 .task-card__desc--expandable {
   cursor: pointer;
 }
+
 .task-card__desc-more {
   margin-left: 3px;
   font-size: 0.72rem;
@@ -144,17 +197,54 @@
   font-style: italic;
 }
 
-/* Acciones (editar/eliminar): visibles solo al pasar el mouse por la card.
-   En dispositivos táctiles (sin hover) quedan siempre visibles para no
-   esconderlas donde no hay cursor. */
-@media (hover: hover) {
-  .task-card .task-actions {
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
-  .task-card:hover .task-actions,
-  .task-card:focus-within .task-actions {
-    opacity: 1;
-  }
+/* ── Footer: prioridad · fecha · hora · etiqueta ─────────────── */
+.task-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: auto;
 }
 
+/* Badge con dot de color — texto capitalizado */
+.badge--dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px var(--space-2);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.badge--dot::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.badge--dot.badge--low    { color: var(--prio-low);    background: var(--prio-low-bg); }
+.badge--dot.badge--low::before    { background: var(--prio-low); }
+
+.badge--dot.badge--medium { color: var(--prio-medium); background: var(--prio-medium-bg); }
+.badge--dot.badge--medium::before { background: var(--prio-medium); }
+
+.badge--dot.badge--high   { color: var(--prio-high);   background: var(--prio-high-bg); }
+.badge--dot.badge--high::before   { background: var(--prio-high); }
+
+/* ── Chip de hora (separado del chip de fecha) ───────────────── */
+.time-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px var(--space-2);
+  border-radius: 999px;
+  white-space: nowrap;
+  color: var(--text);
+  background: var(--code-bg);
+}

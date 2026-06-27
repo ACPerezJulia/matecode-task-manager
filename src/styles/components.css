@@ -11,6 +11,12 @@
   box-shadow: var(--shadow);
 }
 
+/* En vibrante las cards son frosted glass sobre el gradient */
+[data-theme="gradient"] .card {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
 /* Badge de prioridad (low / medium / high) */
 .badge {
   display: inline-block;
@@ -52,39 +58,40 @@
   all: unset;
   box-sizing: border-box;
   display: inline-block;
-  width: 16px;
-  height: 16px;
-  min-width: 16px;
-  min-height: 16px;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  min-height: 22px;
   flex-shrink: 0;
-  align-self: center;
-  border: 1.5px solid var(--border);
+  align-self: flex-start;
+  margin-top: 2px;
+  border: 2px solid var(--border);
   border-radius: 50%;
-  background: var(--surface);
+  background: transparent;
   cursor: pointer;
   position: relative;
   transition: background 0.15s, border-color 0.15s;
 }
 
 .task-check:not(:disabled):hover {
-  border-color: var(--prio-low);
+  border-color: var(--accent);
 }
 
 .task-check:checked {
-  background: var(--prio-low);
-  border-color: var(--prio-low);
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 .task-check:checked::after {
   content: '';
   position: absolute;
   left: 50%;
-  top: 45%;
+  top: 44%;
   transform: translate(-50%, -50%) rotate(45deg);
-  width: 4px;
-  height: 7px;
-  border: solid #fff;
-  border-width: 0 1.5px 1.5px 0;
+  width: 5px;
+  height: 9px;
+  border: solid var(--accent-contrast);
+  border-width: 0 2px 2px 0;
 }
 
 .task-check:disabled {
@@ -124,4 +131,19 @@
 .due-chip--grey {
   color: var(--text);
   background: var(--code-bg);
+}
+
+/* --- Chip de etiqueta (#tag) ---
+   Usa el acento violeta para ser visualmente distinto al badge de prioridad. */
+.label-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px var(--space-2);
+  border-radius: 999px;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  white-space: nowrap;
 }
