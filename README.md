@@ -2,7 +2,14 @@
 
 SPA de gestión de tareas desarrollada como proyecto integrador del Módulo 4 de Soy Henry. Permite crear, organizar y hacer seguimiento de tareas con soporte de prioridades, fechas de vencimiento, etiquetas y resumen por email.
 
-**URL de producción:** https://matecode-task-manager.vercel.app
+[![React](https://img.shields.io/badge/React-19.0-61DAFB?logo=react&logoColor=black&style=flat-spiky)](#)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](#)
+[![Firebase](https://img.shields.io/badge/Firebase-Auth%20%26%20Firestore-FFCA28?logo=firebase&logoColor=black)](#)
+[![AWS SES](https://img.shields.io/badge/AWS%20SES-Email%20Service-232F3E?logo=amazon-aws&logoColor=white)](#)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployment%20%26%20Serverless-000000?logo=vercel&logoColor=white)](#)
+[![Vitest](https://img.shields.io/badge/Vitest-Testing-6E9F18?logo=vitest&logoColor=white)](#)
+
+**URL de producción:** [https://matecode-task-manager.vercel.app](https://matecode-task-manager.vercel.app)
 
 ---
 
@@ -104,6 +111,34 @@ En Vercel, las variables con prefijo `VITE_` se configuran como variables de ent
 
 ## Arquitectura y decisiones técnicas
 
+### Diagrama de Arquitectura del Sistema
+
+```mermaid
+graph TD
+    subgraph Cliente [Frontend - React & Vite]
+        UI[Componentes de React] -->|Usa| Hooks[Hooks de Lógica: useTasks, useTheme...]
+        Hooks -->|Suscripción Tiempo Real| FirestoreSDK[Firestore SDK]
+        Hooks -->|Autenticación| AuthSDK[Firebase Auth SDK]
+        UI -->|Petición POST| EmailClient[emailService.ts]
+        UI -->|Chat / Consejos| ChatUI[Chat Asistente IA]
+    end
+
+    subgraph Servidor [Vercel Serverless Backend]
+        EmailClient -->|POST /api/send-email| SendEmailFunc[Serverless Function: send-email.ts]
+        ChatUI -->|POST /api/chat| ChatFunc[Serverless Function: chat.ts]
+    end
+
+    subgraph Servicios Externos
+        FirestoreSDK <-->|onSnapshot / Lectura & Escritura| Firestore[Google Cloud Firestore]
+        SendEmailFunc -->|AWS SDK| SES[Amazon AWS SES]
+        ChatFunc -->|Google AI SDK| Gemini[Gemini API]
+    end
+
+    style Cliente fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
+    style Servidor fill:#efebe9,stroke:#5d4037,stroke-width:2px
+    style Servicios Externos fill:#efebe9,stroke:#37474f,stroke-width:2px
+```
+
 ### Separación de responsabilidades
 
 Los componentes solo describen qué se muestra. La lógica de negocio vive en hooks (`useTasks`, `useTaskItem`, `useAuth`, `useTheme`) y la comunicación con servicios externos en `src/services/`. Esta separación hace que cada parte del código tenga una razón única para cambiar y facilita el testing de la lógica sin depender del DOM.
@@ -114,6 +149,7 @@ src/
 ├── hooks/        # Lógica reutilizable: useTasks, useTaskItem, useAuth, useTheme
 ├── services/     # Firebase, Firestore, emailService
 ├── pages/        # Vistas: Login, Register, Tasks
+├── routes/       # Enrutamiento y rutas protegidas (ProtectedRoute, PublicOnlyRoute)
 ├── styles/       # Variables CSS globales, temas, estilos base
 ├── utils/        # Helpers: format.ts, taskHelpers.ts
 └── types/        # Interfaces compartidas: Task, TaskFormValues, Theme...
@@ -186,34 +222,33 @@ Cobertura actual: 15 tests en 4 archivos.
 
 - `emailService.test.ts`: verifica que el payload se construye correctamente, que las fechas se formatean en el cliente, y el manejo de errores del serverless
 - `_emailTemplate.test.ts`: verifica la generación del HTML sin depender de AWS
-- Mocks de Firebase para evitar llamadas reales en tests
 
 ---
 
-## Uso de IA en el desarrollo
+## Desarrollo Asistido por IA & Ingeniería de Prompts
 
-Este proyecto fue desarrollado con asistencia puntual de **Claude** (Anthropic) como herramienta de consulta y debugging, de forma similar a como se usaría Stack Overflow o la documentación oficial.
+Este proyecto se desarrolló adoptando metodologías modernas de **Desarrollo Asistido por IA (AI-Assisted Engineering)**, utilizando modelos de lenguaje (principalmente Claude) como un "copiloto de desarrollo" (Peer Programming) enfocado en maximizar la productividad, agilizar el debugging y asegurar la calidad del código.
 
-### Cómo se usó
+### Liderazgo y Toma de Decisiones (Mi Rol como Arquitecto)
+La IA actuó como un optimizador de procesos, mientras que el diseño conceptual, la arquitectura y las decisiones tecnológicas clave fueron de mi exclusiva autoría:
+- **Arquitectura de Software y UI Limpia**: Decisión de implementar CSS Puro con variables dinámicas para evitar dependencias innecesarias (como Tailwind o bibliotecas de componentes), asegurando un control absoluto del performance, los tres temas visuales (Classic/Midnight/Vívido) y transiciones fluidas.
+- **Estructura del Sistema**: Diseño y desacoplamiento de la lógica de negocio mediante Hooks personalizados (`useTasks`, `useTheme`, `useAuth`), separándola por completo de la capa de visualización de React.
+- **Definición de Producto**: Elección de features premium (como la persistencia multi-dispositivo de temas visuales mediante Firestore, la hora de vencimiento independiente de la fecha, y la agrupación de tareas por estado en el reporte por mail).
+- **Seguridad y Cloud**: Diseño del modelo de datos en Firestore y redacción de las reglas de seguridad a nivel de base de datos para restringir el acceso a documentos específicos según el UID del usuario.
 
-Claude se consultó para resolver dudas específicas durante el desarrollo:
+### El Rol de la IA como Copiloto de Productividad
+El modelo se integró en el flujo de trabajo para resolver cuellos de botella específicos:
+- **Micro-Debugging Eficiente**: Diagnóstico ágil de colisiones de especificidad en CSS (como la visibilidad de checkboxes personalizados frente a selectores globales) y exploración de soluciones idiomáticas utilizando pseudoclases como `:not()`.
+- **Validación de Patrones y Buenas Prácticas**: Consultas sobre el comportamiento interno de React 19, como la sincronización preventiva de atributos en el DOM usando `useLayoutEffect` en lugar de `useEffect` para evitar flashes visuales de tema (FOUC).
+- **Brainstorming de Casos de Prueba**: Generación de hipótesis de error para robustecer la suite de tests en Vitest (por ejemplo, validando el comportamiento del formateo de fechas en zona horaria local vs. el servidor Vercel en UTC).
 
-- **Debugging**: diagnóstico del bug del checkbox invisible (conflicto de especificidad CSS entre `input[type='checkbox']` y `.task-check`) y discusión del fix con `:not([type='checkbox'])`
-- **Preguntas técnicas puntuales**: comportamiento de `useLayoutEffect` vs `useEffect` para la sincronización del tema, manejo de zona horaria en el servidor (Vercel corre en UTC), convenciones de cancelación de `onSnapshot`
-- **Revisión de código**: consultas sobre si un patrón específico era idiomático en React + TypeScript
+### Integración de IA como Feature (Asistente Tyrion)
+La aplicación integra **Gemini API** para dar vida a **Tyrion**, un asistente virtual integrado que ayuda al usuario a priorizar y redactar sus tareas con un tono de voz y personalidad consistentes (basado en el personaje de *Game of Thrones*).
 
-### Qué decidí y construí yo
+- **Proxy Seguro**: La conexión se realiza a través de una Serverless Function (`api/chat.ts`) que actúa como proxy. Esto mantiene la API Key de Gemini del lado del servidor de forma 100% segura, evitando su exposición en el cliente.
+- **Ingeniería de Prompts**: Se estructuró un *System Prompt* robusto que limita el comportamiento de Tyrion para que actúe exclusivamente como consultor y priorizador, asegurando que no pueda manipular directamente la base de datos de Firestore por cuestiones de integridad del sistema.
 
-- Diseño visual completo: dashboard con saludo, estadísticas y barra de progreso, paleta de colores de los tres temas (Classic/Midnight/Vívido), sistema de chips semánticos, toggle lista/grilla
-- Tyrion Lannister como personaje del asistente IA, su tono, su system prompt y sus límites de comportamiento
-- No usar librerías de UI (Tailwind, shadcn, etc.) — CSS puro con variables como decisión de aprendizaje
-- Estructura de carpetas, convenciones de commits semánticos y organización general del proyecto
-- Mantener el drag & drop fuera del scope para no comprometer la estabilidad del CRUD
-- Evaluar e descartar el toggle lista/grilla: se priorizó una vista única de cards bien ejecutada por sobre agregar complejidad de UI sin impacto en la funcionalidad central
-- Elección de features extras: etiquetas, hora separada de la fecha, resumen por estado en el email, temas por usuario
-
-### Asistente Tyrion (Gemini en la app)
-
-El chat de IA dentro de la app usa **Gemini API** (via `api/chat.ts`) con un system prompt que define a Tyrion Lannister como personaje. Su rol es consultivo: ayuda a redactar y priorizar tareas, pero no puede crearlas ni modificarlas directamente.
-
-La API key de Gemini es una variable de entorno del servidor (`GEMINI_API_KEY`, sin prefijo `VITE_`) y nunca llega al bundle del frontend.
+### Vista Previa y Capturas de Pantalla
+*(Añade aquí capturas de pantalla de la aplicación en modo claro, oscuro y el formato del mail responsive)*
+- **Dashboard Principal (Tema Nocturno)**: `![Dashboard](ruta-a-imagen-o-gif)`
+- **Interacción con Asistente Tyrion**: `![Tyrion Chat](ruta-a-imagen-o-gif)`
