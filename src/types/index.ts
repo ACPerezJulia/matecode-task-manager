@@ -9,6 +9,7 @@ export interface Task {
   createdAt: Timestamp
   dueDate?: Timestamp
   priority?: 'low' | 'medium' | 'high'
+  label?: string
 }
 
 export interface TaskFormValues {
@@ -16,6 +17,7 @@ export interface TaskFormValues {
   description: string
   dueDate?: string // string en el form, se convierte a Timestamp al guardar
   priority?: 'low' | 'medium' | 'high'
+  label?: string
 }
 
 export interface AuthFormValues {
@@ -33,4 +35,4 @@ export type TaskFilter = 'all' | 'pending' | 'completed'
 
 export type TaskSort = 'recent' | 'priority' | 'dueDate'
 
-export type Theme = 'light' | 'dark'
+export type Theme = 'classic' | 'midnight' | 'gradient'

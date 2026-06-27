@@ -1,14 +1,21 @@
 /* base.css — Estilos de ELEMENTOS HTML (sin clases).
-   Reset suave, layout raíz, tipografía y controles de formulario nativos.
-   Acá va lo que aplica a etiquetas (body, h1, input...), no a componentes. */
+   Reset suave, layout raíz, tipografía y controles de formulario nativos. */
 
 * {
   box-sizing: border-box;
 }
 
+/* overflow-x: clip corta el desbordamiento horizontal sin crear un scroll
+   container (a diferencia de hidden), así position: sticky sigue funcionando. */
+html {
+  overflow-x: clip;
+}
+
 body {
   margin: 0;
-  font: 16px/1.5 var(--sans);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
   letter-spacing: 0.1px;
   color-scheme: light dark;
   color: var(--text);
@@ -19,20 +26,18 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Contenedor central de toda la app: fluido, centrado, con aire lateral.
-   Reemplaza el #root de ancho fijo (1126px) de la plantilla de Vite. */
+/* Contenedor central. --page-pad se define en tokens.css y es responsivo. */
 #root {
-  max-width: 720px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: var(--space-5) var(--space-4);
+  padding: var(--space-5) var(--page-pad);
   min-height: 100svh;
 }
 
 /* --- Tipografía --- */
-h1,
-h2 {
+h1, h2 {
   font-family: var(--heading);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-h);
   line-height: 1.2;
 }
@@ -66,42 +71,56 @@ code {
 }
 
 /* --- Controles de formulario nativos --- */
-input,
+/* :not([type='checkbox']) evita que el checkbox herede width:100% y border,
+   que piearían a .task-check por mayor especificidad de input[type='checkbox']. */
+input:not([type='checkbox']),
 textarea,
 select {
   width: 100%;
-  font: inherit;
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  font-weight: 500;
   color: var(--text-h);
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: var(--space-2) var(--space-3);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 13px 15px;
+  transition: border-color 0.2s;
 }
 
 textarea {
   min-height: 72px;
   resize: vertical;
+  line-height: 1.5;
 }
 
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
+  outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
 }
 
-/* El checkbox de "completada" no debe estirarse al 100% */
+/* Solo accent-color para checkboxes nativos; .task-check maneja todo lo demás. */
 input[type='checkbox'] {
-  width: auto;
   accent-color: var(--accent);
+}
+
+/* Inputs de fecha/hora: mismo estilo que el text pero con ajuste de padding
+   para que el ícono nativo del browser no quede aplastado. */
+input[type='date'],
+input[type='time'] {
+  padding: 11px 13px;
 }
 
 label {
   display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-h);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text);
   margin-bottom: var(--space-1);
 }
 

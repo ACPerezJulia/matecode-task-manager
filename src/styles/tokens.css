@@ -1,34 +1,31 @@
-/* tokens.css — Design tokens (variables CSS).
-   Es la "fuente de verdad" de colores, espaciados y radios.
-   Todo lo demás referencia estas variables con var(--...), así el
-   dark mode (más abajo) cambia toda la app sin tocar cada regla. */
+/* tokens.css — Design tokens.
+   Tema via data-theme en <html>: classic / midnight / gradient.
+   useTheme.ts aplica el atributo con useLayoutEffect (sin flash). */
 
-:root {
-  /* --- Paleta (modo claro) --- */
-  --text: #5b5566;
-  --text-h: #08060d;
-  --bg: #faf9fb; /* fondo de la página */
-  --surface: #ffffff; /* fondo de tarjetas/inputs, contrasta con --bg */
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --accent-contrast: #ffffff; /* texto sobre fondo accent */
-  --danger: #d4373a;
-  --danger-bg: rgba(212, 55, 58, 0.1);
-  --shadow:
-    rgba(0, 0, 0, 0.08) 0 8px 16px -6px, rgba(0, 0, 0, 0.04) 0 2px 4px -2px;
+/* ── Tema clásico (default) ────────────────────────────────── */
+:root,
+[data-theme="classic"] {
+  --bg: #eef2ff;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --code-bg: #f8faff;
+  --text: #4f5882;
+  --text-h: #1e2140;
+  --accent: #4f6ef7;
+  --accent-bg: rgba(79, 110, 247, 0.1);
+  --accent-border: rgba(79, 110, 247, 0.3);
+  --accent-contrast: #ffffff;
+  --danger: #dc2626;
+  --danger-bg: rgba(220, 38, 38, 0.1);
+  --shadow: 0 4px 24px rgba(79, 110, 247, 0.14), 0 1px 4px rgba(0, 0, 0, 0.06);
 
-  /* Colores de los badges de prioridad */
-  --prio-low: #2f8f5b;
-  --prio-low-bg: rgba(47, 143, 91, 0.12);
-  --prio-medium: #b97309;
-  --prio-medium-bg: rgba(185, 115, 9, 0.12);
-  --prio-high: #d4373a;
-  --prio-high-bg: rgba(212, 55, 58, 0.12);
+  --prio-high: #dc2626;
+  --prio-high-bg: #fef2f2;
+  --prio-medium: #d97706;
+  --prio-medium-bg: #fffbeb;
+  --prio-low: #16a34a;
+  --prio-low-bg: #f0fdf4;
 
-  /* Escala de espaciado y radios (para mantener consistencia) */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -36,35 +33,96 @@
   --space-5: 24px;
   --space-6: 32px;
   --radius: 10px;
+  --page-pad: var(--space-4);
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --sans: 'Outfit', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: 'Outfit', system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 }
 
-/* --- Modo oscuro: solo redefinimos los tokens de color --- */
-@media (prefers-color-scheme: dark) {
+@media (min-width: 640px) {
   :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #111217;
-    --surface: #1c1d24;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --accent-contrast: #1a1320;
-    --danger: #f06a6c;
-    --danger-bg: rgba(240, 106, 108, 0.14);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 8px 16px -6px, rgba(0, 0, 0, 0.25) 0 2px 4px -2px;
+    --page-pad: var(--space-6);
+  }
+}
 
-    --prio-low: #5fcf8f;
-    --prio-low-bg: rgba(95, 207, 143, 0.14);
-    --prio-medium: #e0a64a;
-    --prio-medium-bg: rgba(224, 166, 74, 0.14);
-    --prio-high: #f06a6c;
-    --prio-high-bg: rgba(240, 106, 108, 0.14);
+/* ── Tema nocturno (midnight) ───────────────────────────────── */
+[data-theme="midnight"] {
+  --bg: #0d0f1a;
+  --surface: #161929;
+  --border: #252848;
+  --code-bg: #1e2240;
+  --text: #7986cb;
+  --text-h: #e8eaf6;
+  --accent: #5c7cfa;
+  --accent-bg: #1a1f3a;
+  --accent-border: rgba(92, 124, 250, 0.5);
+  --accent-contrast: #ffffff;
+  --danger: #f87171;
+  --danger-bg: rgba(248, 113, 113, 0.15);
+  --shadow: 0 4px 20px rgba(92, 124, 250, 0.18), 0 1px 4px rgba(0, 0, 0, 0.4);
+
+  --prio-high: #f87171;
+  --prio-high-bg: #3d0e0e;
+  --prio-medium: #fbbf24;
+  --prio-medium-bg: #3d2a06;
+  --prio-low: #4ade80;
+  --prio-low-bg: #0a2a14;
+}
+
+/* ── Tema degradado (gradient) ──────────────────────────────── */
+[data-theme="gradient"] {
+  --bg: linear-gradient(145deg, #1e2f9e 0%, #4f6ef7 52%, #7c3aed 100%);
+  --surface: rgba(255, 255, 255, 0.1);
+  --border: rgba(255, 255, 255, 0.16);
+  --code-bg: rgba(255, 255, 255, 0.08);
+  --text: rgba(255, 255, 255, 0.72);
+  --text-h: #ffffff;
+  --accent: #ffffff;
+  --accent-bg: rgba(255, 255, 255, 0.12);
+  --accent-border: rgba(255, 255, 255, 0.4);
+  --accent-contrast: #4f6ef7;
+  --danger: #fca5a5;
+  --danger-bg: rgba(252, 165, 165, 0.18);
+  --shadow: 0 6px 28px rgba(0, 0, 0, 0.25), 0 1px 4px rgba(0, 0, 0, 0.15);
+
+  --prio-high: #fca5a5;
+  --prio-high-bg: rgba(239, 68, 68, 0.2);
+  --prio-medium: #fde68a;
+  --prio-medium-bg: rgba(245, 158, 11, 0.2);
+  --prio-low: #6ee7b7;
+  --prio-low-bg: rgba(16, 185, 129, 0.2);
+}
+
+/* El gradient no debe scrollear con el contenido */
+[data-theme="gradient"] body {
+  color-scheme: dark;
+  background-attachment: fixed;
+}
+
+/* Fallback OS: usa midnight si el sistema prefiere dark
+   y el usuario nunca eligió un tema manualmente. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #0d0f1a;
+    --surface: #161929;
+    --border: #252848;
+    --code-bg: #1e2240;
+    --text: #7986cb;
+    --text-h: #e8eaf6;
+    --accent: #5c7cfa;
+    --accent-bg: #1a1f3a;
+    --accent-border: rgba(92, 124, 250, 0.5);
+    --accent-contrast: #ffffff;
+    --danger: #f87171;
+    --danger-bg: rgba(248, 113, 113, 0.15);
+    --shadow: 0 4px 20px rgba(92, 124, 250, 0.18), 0 1px 4px rgba(0, 0, 0, 0.4);
+
+    --prio-high: #f87171;
+    --prio-high-bg: #3d0e0e;
+    --prio-medium: #fbbf24;
+    --prio-medium-bg: #3d2a06;
+    --prio-low: #4ade80;
+    --prio-low-bg: #0a2a14;
   }
 }

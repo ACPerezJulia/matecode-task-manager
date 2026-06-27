@@ -1,9 +1,8 @@
-/* buttons.css — Sistema de botones reutilizable.
-   .btn (con variantes --primary/--ghost/--danger) para botones con texto,
-   .icon-btn para botones de solo ícono (editar, eliminar). */
+/* buttons.css — Sistema de botones reutilizable. */
 
 .btn {
-  font: inherit;
+  font-family: var(--sans);
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   padding: var(--space-2) var(--space-4);
@@ -23,6 +22,11 @@
 .btn--primary {
   background: var(--accent);
   color: var(--accent-contrast);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: -0.3px;
+  padding: 13px var(--space-5);
+  border-radius: 14px;
 }
 .btn--primary:not(:disabled):hover {
   box-shadow: var(--shadow);
@@ -51,8 +55,7 @@
   outline-offset: 2px;
 }
 
-/* Botón de solo ícono (ej: tacho de eliminar). Discreto por defecto:
-   sin fondo, el ícono coloreado; el fondo aparece recién al hover. */
+/* Botón de solo ícono */
 .icon-btn {
   display: inline-flex;
   align-items: center;
@@ -82,8 +85,6 @@
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
-/* Hover por defecto (ej: editar): resalta con el acento.
-   La variante --danger lo pisa con su propio hover rojo (más específico). */
 .icon-btn:not(:disabled):hover {
   color: var(--accent);
   background: var(--accent-bg);
