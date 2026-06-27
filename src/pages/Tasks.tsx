@@ -8,6 +8,8 @@ import { TaskModal } from '../components/TaskModal'
 import { TaskGrid } from '../components/TaskGrid'
 import { TaskListSkeleton } from '../components/Skeleton'
 import { TyrionChat } from '../components/TyrionChat'
+import { EmailSendAnimation } from '../components/EmailSendAnimation'
+import type { SendStatus } from '../components/EmailSendAnimation'
 import { filterTasks, sortTasks } from '../utils/taskHelpers'
 import { sendTaskSummary } from '../services/emailService'
 import { saveUserProfile } from '../services/firestoreService'
@@ -21,7 +23,7 @@ export default function Tasks() {
 
   const [filter, setFilter] = useState<TaskFilter>('all')
   const [sort, setSort] = useState<TaskSort>('recent')
-  const [sending, setSending] = useState(false)
+  const [sendStatus, setSendStatus] = useState<SendStatus>('idle')
   const [showModal, setShowModal] = useState(false)
 
   const visibleTasks = sortTasks(filterTasks(tasks, filter), sort)
@@ -47,20 +49,16 @@ export default function Tasks() {
 
   async function handleSendSummary() {
     if (!user?.email) return
-    setSending(true)
+    setSendStatus('sending')
     try {
-      await toast.promise(
-        sendTaskSummary(user.email, tasks, { name: firstName, theme }),
-        {
-          loading: 'Enviando resumen...',
-          success: 'Resumen enviado a tu email.',
-          error: (err: Error) => err.message,
-        },
-      )
-    } catch {
-      // toast.promise ya mostró el error
+      await sendTaskSummary(user.email, tasks, { name: firstName, theme })
+      toast.success('Resumen enviado a tu email.')
+      setSendStatus('success')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al enviar el resumen')
+      setSendStatus('error')
     } finally {
-      setSending(false)
+      setTimeout(() => setSendStatus('idle'), 2000)
     }
   }
 
@@ -94,14 +92,11 @@ export default function Tasks() {
           >✨</button>
         </div>
 
-        <button
-          type="button"
-          className="btn btn--ghost"
+        <EmailSendAnimation
+          status={sendStatus}
           onClick={handleSendSummary}
-          disabled={sending || tasks.length === 0}
-        >
-          {sending ? 'Enviando...' : '📧 Resumen'}
-        </button>
+          disabled={tasks.length === 0}
+        />
 
         <div className="app-header__avatar" title={user?.displayName ?? user?.email ?? ''}>
           {avatarInitial}
