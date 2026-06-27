@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  setDoc,
   addDoc,
   updateDoc,
   deleteDoc,
@@ -73,6 +74,17 @@ export async function toggleTaskCompleted(taskId: string, completed: boolean) {
 /** Elimina una tarea por su id. */
 export async function deleteTask(taskId: string) {
   await deleteDoc(doc(db, 'tasks', taskId))
+}
+
+/**
+ * Guarda preferencias del usuario (actualmente solo el tema) en
+ * users/{uid}. Usa merge:true para no pisar otros campos del documento.
+ *
+ * Requiere la regla de Firestore:
+ *   match /users/{uid} { allow read, write: if request.auth.uid == uid; }
+ */
+export async function saveUserProfile(uid: string, data: { theme?: string }): Promise<void> {
+  await setDoc(doc(db, 'users', uid), data, { merge: true })
 }
 
 /**

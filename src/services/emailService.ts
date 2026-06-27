@@ -1,5 +1,4 @@
 import { formatDateForEmail } from '../utils/format'
-import { getDueStatus } from '../utils/taskHelpers'
 import type { Task } from '../types'
 
 /**
@@ -8,25 +7,27 @@ import type { Task } from '../types'
  * solo conoce este endpoint propio, y las credenciales viven en el servidor.
  *
  * @param to    Email de destino (en sandbox debe ser una dirección verificada).
- * @param tasks Tareas a resumir. Mandamos solo lo que el email necesita.
+ * @param tasks Tareas a resumir.
+ * @param opts  Nombre del usuario y tema actual para personalizar el email.
  */
-export async function sendTaskSummary(to: string, tasks: Task[]): Promise<void> {
-  // Reducimos cada Task a { title, completed, dueDate }: no tiene sentido mandar
-  // ids ni userId al endpoint del email.
+export async function sendTaskSummary(
+  to: string,
+  tasks: Task[],
+  opts?: { name?: string; theme?: string },
+): Promise<void> {
   // OJO con la zona horaria: formateamos dueDate ACÁ (cliente) y mandamos el
-  // string ya listo. NO mandamos el Timestamp para que lo formatee la function,
-  // porque la Vercel Function corre en UTC y mostraría la hora corrida. El
-  // cliente conoce la zona del usuario, así que la hora sale bien.
+  // string ya listo. La Vercel Function corre en UTC y mostraría la hora corrida.
   const payload = {
     to,
+    name:  opts?.name,
+    theme: opts?.theme,
     tasks: tasks.map((t) => ({
-      title: t.title,
+      title:     t.title,
       description: t.description || undefined,
       completed: t.completed,
-      priority: t.priority,
-      dueDate: t.dueDate ? formatDateForEmail(t.dueDate) : undefined,
-      // status lo calcula el cliente (conoce la zona horaria); el servidor no.
-      status: t.dueDate && !t.completed ? getDueStatus(t.dueDate, t.completed) : undefined,
+      priority:  t.priority,
+      dueDate:   t.dueDate ? formatDateForEmail(t.dueDate) : undefined,
+      label:     t.label   || undefined,
     })),
   }
 

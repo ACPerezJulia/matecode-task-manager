@@ -10,7 +10,8 @@ import { TaskListSkeleton } from '../components/Skeleton'
 import { TyrionChat } from '../components/TyrionChat'
 import { filterTasks, sortTasks } from '../utils/taskHelpers'
 import { sendTaskSummary } from '../services/emailService'
-import type { TaskFilter, TaskSort } from '../types'
+import { saveUserProfile } from '../services/firestoreService'
+import type { TaskFilter, TaskSort, Theme } from '../types'
 
 export default function Tasks() {
   const { user, logout } = useAuth()
@@ -37,15 +38,25 @@ export default function Tasks() {
     navigate('/login')
   }
 
+  function handleThemeChange(t: Theme) {
+    setTheme(t)
+    if (user) {
+      saveUserProfile(user.uid, { theme: t }).catch(console.error)
+    }
+  }
+
   async function handleSendSummary() {
     if (!user?.email) return
     setSending(true)
     try {
-      await toast.promise(sendTaskSummary(user.email, tasks), {
-        loading: 'Enviando resumen...',
-        success: 'Resumen enviado a tu email.',
-        error: (err: Error) => err.message,
-      })
+      await toast.promise(
+        sendTaskSummary(user.email, tasks, { name: firstName, theme }),
+        {
+          loading: 'Enviando resumen...',
+          success: 'Resumen enviado a tu email.',
+          error: (err: Error) => err.message,
+        },
+      )
     } catch {
       // toast.promise ya mostró el error
     } finally {
@@ -66,19 +77,19 @@ export default function Tasks() {
           <button
             type="button"
             className={`theme-toggle__btn${theme === 'classic' ? ' is-active' : ''}`}
-            onClick={() => setTheme('classic')}
+            onClick={() => handleThemeChange('classic')}
             title="Clásico"
           >☀️</button>
           <button
             type="button"
             className={`theme-toggle__btn${theme === 'midnight' ? ' is-active' : ''}`}
-            onClick={() => setTheme('midnight')}
+            onClick={() => handleThemeChange('midnight')}
             title="Nocturno"
           >🌙</button>
           <button
             type="button"
             className={`theme-toggle__btn${theme === 'gradient' ? ' is-active' : ''}`}
-            onClick={() => setTheme('gradient')}
+            onClick={() => handleThemeChange('gradient')}
             title="Vívido"
           >✨</button>
         </div>
