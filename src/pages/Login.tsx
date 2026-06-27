@@ -25,10 +25,7 @@ export default function Login() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const error = validate()
-    if (error) {
-      toast.error(error)
-      return
-    }
+    if (error) { toast.error(error); return }
     setLoading(true)
     try {
       await signInWithEmailAndPassword(auth, form.email, form.password)
@@ -58,46 +55,59 @@ export default function Login() {
 
   return (
     <main className="auth">
-      <h1>Iniciar sesión</h1>
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Contraseña</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            value={form.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit" className="btn btn--primary" disabled={loading}>
-          {loading ? 'Cargando...' : 'Ingresar'}
+      <div className="auth-header">
+        <div className="auth-logo">MC</div>
+        <h1>Mate Code App</h1>
+        <p>Organizá tu trabajo, task a task ✦</p>
+      </div>
+
+      <div className="auth-card">
+        <h2>Iniciá sesión</h2>
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="tu@email.com"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="password">Contraseña</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="••••••••"
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn--primary" disabled={loading}>
+            {loading ? 'Cargando...' : 'Ingresar →'}
+          </button>
+        </form>
+
+        <div className="auth-divider">o</div>
+
+        <button
+          type="button"
+          className="btn btn--ghost"
+          onClick={handleGoogle}
+          disabled={loading}
+        >
+          Continuar con Google
         </button>
-      </form>
-      <div className="auth-divider">o</div>
-      <button
-        type="button"
-        className="btn btn--ghost"
-        onClick={handleGoogle}
-        disabled={loading}
-      >
-        Continuar con Google
-      </button>
-      <p className="auth-alt">
-        ¿No tenés cuenta? <Link to="/register">Registrate</Link>
-      </p>
+
+        <p className="auth-alt">
+          ¿No tenés cuenta? <Link to="/register">Registrate</Link>
+        </p>
+      </div>
     </main>
   )
 }

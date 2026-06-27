@@ -26,16 +26,10 @@ export default function Register() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const error = validate()
-    if (error) {
-      toast.error(error)
-      return
-    }
+    if (error) { toast.error(error); return }
     setLoading(true)
     try {
       const { user } = await createUserWithEmailAndPassword(auth, form.email, form.password)
-      // Guardamos el nombre en el perfil de Firebase Auth para que esté
-      // disponible en user.displayName en toda la app (igual que Google lo hace
-      // automáticamente con su perfil).
       await updateProfile(user, { displayName: form.name.trim() })
       toast.success('Cuenta creada. ¡Bienvenido/a!')
       navigate('/tasks')
@@ -49,49 +43,61 @@ export default function Register() {
 
   return (
     <main className="auth">
-      <h1>Crear cuenta</h1>
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="name">Nombre completo</label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            value={form.name}
-            onChange={handleChange}
-            autoComplete="name"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Contraseña</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            value={form.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit" className="btn btn--primary" disabled={loading}>
-          {loading ? 'Cargando...' : 'Crear cuenta'}
-        </button>
-      </form>
-      <p className="auth-alt">
-        ¿Ya tenés cuenta? <Link to="/login">Ingresá</Link>
-      </p>
+      <div className="auth-header">
+        <div className="auth-logo">MC</div>
+        <h1>Mate Code App</h1>
+        <p>Creá tu cuenta y empezá ahora</p>
+      </div>
+
+      <div className="auth-card">
+        <h2>Crear cuenta</h2>
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="name">Nombre completo</label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              value={form.name}
+              onChange={handleChange}
+              placeholder="Ana García"
+              autoComplete="name"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="tu@email.com"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="password">Contraseña</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="Mínimo 6 caracteres"
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn--primary" disabled={loading}>
+            {loading ? 'Cargando...' : 'Crear cuenta →'}
+          </button>
+        </form>
+
+        <p className="auth-alt">
+          ¿Ya tenés cuenta? <Link to="/login">Ingresá</Link>
+        </p>
+      </div>
     </main>
   )
 }
