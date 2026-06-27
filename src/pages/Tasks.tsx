@@ -9,7 +9,6 @@ import { TaskGrid } from '../components/TaskGrid'
 import { TaskListSkeleton } from '../components/Skeleton'
 import { TyrionChat } from '../components/TyrionChat'
 import { EmailSendAnimation } from '../components/EmailSendAnimation'
-import type { SendStatus } from '../components/EmailSendAnimation'
 import { filterTasks, sortTasks } from '../utils/taskHelpers'
 import { sendTaskSummary } from '../services/emailService'
 import { saveUserProfile } from '../services/firestoreService'
@@ -23,8 +22,9 @@ export default function Tasks() {
 
   const [filter, setFilter] = useState<TaskFilter>('all')
   const [sort, setSort] = useState<TaskSort>('recent')
-  const [sendStatus, setSendStatus] = useState<SendStatus>('idle')
+  const [isSendingEmail, setIsSendingEmail] = useState(false)
   const [showModal, setShowModal] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const visibleTasks = sortTasks(filterTasks(tasks, filter), sort)
 
@@ -49,16 +49,21 @@ export default function Tasks() {
 
   async function handleSendSummary() {
     if (!user?.email) return
-    setSendStatus('sending')
+    setIsSendingEmail(true)
+
+    // Promesa de tiempo mínimo para que se complete la animación del sobre volando
+    const minAnimationTimer = new Promise((resolve) => setTimeout(resolve, 2900))
+
+    // Petición real al backend
+    const emailRequest = sendTaskSummary(user.email, tasks, { name: firstName, theme })
+
     try {
-      await sendTaskSummary(user.email, tasks, { name: firstName, theme })
-      toast.success('Resumen enviado a tu email.')
-      setSendStatus('success')
+      await Promise.all([minAnimationTimer, emailRequest])
+      toast.success('¡Resumen enviado! Revisá tu email 📬')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Error al enviar el resumen')
-      setSendStatus('error')
     } finally {
-      setTimeout(() => setSendStatus('idle'), 2000)
+      setIsSendingEmail(false)
     }
   }
 
@@ -71,40 +76,60 @@ export default function Tasks() {
           <span className="app-header__name">Mate Code App</span>
         </div>
 
-        <div className="theme-toggle">
-          <button
-            type="button"
-            className={`theme-toggle__btn${theme === 'classic' ? ' is-active' : ''}`}
-            onClick={() => handleThemeChange('classic')}
-            title="Clásico"
-          >☀️</button>
-          <button
-            type="button"
-            className={`theme-toggle__btn${theme === 'midnight' ? ' is-active' : ''}`}
-            onClick={() => handleThemeChange('midnight')}
-            title="Nocturno"
-          >🌙</button>
-          <button
-            type="button"
-            className={`theme-toggle__btn${theme === 'gradient' ? ' is-active' : ''}`}
-            onClick={() => handleThemeChange('gradient')}
-            title="Vívido"
-          >✨</button>
-        </div>
+        <div className={`header-secondary${menuOpen ? ' is-open' : ''}`}>
+          <div className="theme-toggle">
+            <button
+              type="button"
+              className={`theme-toggle__btn${theme === 'classic' ? ' is-active' : ''}`}
+              onClick={() => handleThemeChange('classic')}
+              title="Clásico"
+            >☀️</button>
+            <button
+              type="button"
+              className={`theme-toggle__btn${theme === 'midnight' ? ' is-active' : ''}`}
+              onClick={() => handleThemeChange('midnight')}
+              title="Nocturno"
+            >🌙</button>
+            <button
+              type="button"
+              className={`theme-toggle__btn${theme === 'gradient' ? ' is-active' : ''}`}
+              onClick={() => handleThemeChange('gradient')}
+              title="Vívido"
+            >✨</button>
+          </div>
 
-        <EmailSendAnimation
-          status={sendStatus}
-          onClick={handleSendSummary}
-          disabled={tasks.length === 0}
-        />
+          <button
+            type="button"
+            className="btn btn--ghost"
+            onClick={handleSendSummary}
+            disabled={tasks.length === 0 || isSendingEmail}
+            title="Recibir un resumen de tareas por email"
+          >
+            📧 Resumen
+          </button>
+
+          <button type="button" className="btn btn--ghost" onClick={handleLogout}>
+            Cerrar sesión
+          </button>
+        </div>
 
         <div className="app-header__avatar" title={user?.displayName ?? user?.email ?? ''}>
           {avatarInitial}
         </div>
 
-        <button type="button" className="btn btn--ghost" onClick={handleLogout}>
-          Cerrar sesión
+        <button
+          type="button"
+          className="header-hamburger"
+          onClick={() => setMenuOpen(m => !m)}
+          aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+          aria-expanded={menuOpen}
+        >
+          {menuOpen ? '✕' : '☰'}
         </button>
+
+        {menuOpen && (
+          <div className="header-overlay" onClick={() => setMenuOpen(false)} aria-hidden="true" />
+        )}
       </header>
 
       {/* ── Bienvenida + stats ── */}
@@ -154,9 +179,11 @@ export default function Tasks() {
 
           <div className="controls-bar__sep" />
 
-          <button type="button" className="chip" disabled={sort === 'recent'} onClick={() => setSort('recent')}>Recientes</button>
-          <button type="button" className="chip" disabled={sort === 'priority'} onClick={() => setSort('priority')}>Prioridad</button>
-          <button type="button" className="chip" disabled={sort === 'dueDate'} onClick={() => setSort('dueDate')}>Fecha</button>
+          <div className="controls-bar__sort">
+            <button type="button" className="chip" disabled={sort === 'recent'} onClick={() => setSort('recent')}>Recientes</button>
+            <button type="button" className="chip" disabled={sort === 'priority'} onClick={() => setSort('priority')}>Prioridad</button>
+            <button type="button" className="chip" disabled={sort === 'dueDate'} onClick={() => setSort('dueDate')}>Fecha</button>
+          </div>
 
           <div className="controls-bar__end">
             <button
@@ -202,6 +229,8 @@ export default function Tasks() {
       )}
 
       <TyrionChat />
+
+      {isSendingEmail && <EmailSendAnimation />}
     </main>
   )
 }

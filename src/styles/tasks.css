@@ -551,21 +551,102 @@
 
 .task-actions { display: flex; gap: var(--space-2); }
 
+/* ── Header secondary (theme + email + logout) ──────────────── */
+
+/* Desktop: elementos inline en el header */
+.header-secondary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Botón hamburguesa: oculto en desktop */
+.header-hamburger {
+  display: none;
+}
+
+/* Overlay invisible que cierra el menú al tocar fuera */
+.header-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 98;
+}
+
+/* Separador de sort chips */
+.controls-bar__sort {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 /* ── Responsive mobile ──────────────────────────────────────── */
 @media (max-width: 600px) {
   .app-header {
     gap: var(--space-2);
   }
+
   .app-header__name {
     display: none;
   }
-  .app-header .btn {
-    padding: var(--space-1) var(--space-2);
-    font-size: 0.8rem;
+
+  /* Dropdown del menú hamburguesa */
+  .header-secondary {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: var(--space-3) var(--page-pad);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    z-index: 99;
   }
-  .theme-toggle__btn {
-    padding: 5px 8px;
+
+  .header-secondary.is-open {
+    display: flex;
   }
+
+  /* Botones del dropdown: ancho completo */
+  .header-secondary .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Toggle de tema: centrado en el dropdown */
+  .header-secondary .theme-toggle {
+    align-self: center;
+  }
+
+  /* Hamburguesa visible en mobile */
+  .header-hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    all: unset;
+    box-sizing: border-box;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    color: var(--text-h);
+    font-size: 1.1rem;
+    transition: background 0.15s;
+  }
+
+  .header-hamburger:hover {
+    background: var(--accent-bg);
+  }
+}
+
+[data-theme="gradient"] .header-secondary {
+  background: var(--surface);
+  border-top-color: rgba(255, 255, 255, 0.1);
 }
 
 @media (max-width: 480px) {
@@ -582,18 +663,33 @@
 }
 
 @media (max-width: 540px) {
+  /* Barra de controles en columna, centrada */
+  .controls-bar {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .filter-group {
+    justify-content: center;
+  }
+
+  .controls-bar__sort {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
   .controls-bar__sep {
     display: none;
   }
+
+  /* "Nueva tarea" pasa a ancho completo */
   .controls-bar__end {
+    width: 100%;
     margin-left: 0;
-    flex-basis: 100%;
   }
+
   .controls-bar__end .btn {
     width: 100%;
     text-align: center;
-  }
-  .filter-group {
-    flex-wrap: wrap;
   }
 }
