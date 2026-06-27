@@ -3,13 +3,11 @@ import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useTasks } from '../hooks/useTasks'
-import { TodoForm } from '../components/TodoForm'
-import { TodoList } from '../components/TodoList'
+import { useTheme } from '../hooks/useTheme'
+import { TaskModal } from '../components/TaskModal'
 import { TaskGrid } from '../components/TaskGrid'
-import { ViewToggle } from '../components/ViewToggle'
 import { TaskListSkeleton } from '../components/Skeleton'
 import { TyrionChat } from '../components/TyrionChat'
-import { useViewMode } from '../hooks/useViewMode'
 import { filterTasks, sortTasks } from '../utils/taskHelpers'
 import { sendTaskSummary } from '../services/emailService'
 import type { TaskFilter, TaskSort } from '../types'
@@ -18,16 +16,20 @@ export default function Tasks() {
   const { user, logout } = useAuth()
   const { tasks, loading } = useTasks(user?.uid)
   const navigate = useNavigate()
+  const { theme, setTheme } = useTheme()
 
   const [filter, setFilter] = useState<TaskFilter>('all')
   const [sort, setSort] = useState<TaskSort>('recent')
-  // Vista lista/grid, persistida en localStorage.
-  const { view, setView } = useViewMode()
-  // Bloquea el botón de "enviar resumen" mientras la request está en curso.
   const [sending, setSending] = useState(false)
+  const [showModal, setShowModal] = useState(false)
 
-  // Filtrado y orden en cliente: sobre las tareas ya traídas, en memoria.
   const visibleTasks = sortTasks(filterTasks(tasks, filter), sort)
+
+  const firstName = user?.displayName?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'tú'
+  const avatarInitial = (user?.displayName?.[0] ?? user?.email?.[0] ?? '?').toUpperCase()
+  const completedCount = tasks.filter((t) => t.completed).length
+  const pendingCount = tasks.length - completedCount
+  const progressPct = tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0
 
   async function handleLogout() {
     await logout()
@@ -39,16 +41,13 @@ export default function Tasks() {
     if (!user?.email) return
     setSending(true)
     try {
-      // toast.promise muestra los 3 estados (cargando/éxito/error) en una
-      // sola llamada. El mensaje de error sale del Error que lanza el service.
       await toast.promise(sendTaskSummary(user.email, tasks), {
         loading: 'Enviando resumen...',
         success: 'Resumen enviado a tu email.',
         error: (err: Error) => err.message,
       })
     } catch {
-      // toast.promise ya mostró el error; el catch solo evita el
-      // "unhandled promise rejection" cuando el envío falla.
+      // toast.promise ya mostró el error
     } finally {
       setSending(false)
     }
@@ -56,86 +55,146 @@ export default function Tasks() {
 
   return (
     <main>
+      {/* ── Header sticky ── */}
       <header className="app-header">
-        <h1>Mis tareas</h1>
+        <div className="app-header__brand">
+          <span className="app-header__logo">MC</span>
+          <span className="app-header__name">Mate Code App</span>
+        </div>
+
+        <div className="theme-toggle">
+          <button
+            type="button"
+            className={`theme-toggle__btn${theme === 'classic' ? ' is-active' : ''}`}
+            onClick={() => setTheme('classic')}
+            title="Clásico"
+          >☀️</button>
+          <button
+            type="button"
+            className={`theme-toggle__btn${theme === 'midnight' ? ' is-active' : ''}`}
+            onClick={() => setTheme('midnight')}
+            title="Nocturno"
+          >🌙</button>
+          <button
+            type="button"
+            className={`theme-toggle__btn${theme === 'gradient' ? ' is-active' : ''}`}
+            onClick={() => setTheme('gradient')}
+            title="Vívido"
+          >✨</button>
+        </div>
+
         <button
           type="button"
           className="btn btn--ghost"
           onClick={handleSendSummary}
           disabled={sending || tasks.length === 0}
         >
-          {sending ? 'Enviando...' : 'Enviarme el resumen'}
+          {sending ? 'Enviando...' : '📧 Resumen'}
         </button>
+
+        <div className="app-header__avatar" title={user?.displayName ?? user?.email ?? ''}>
+          {avatarInitial}
+        </div>
+
         <button type="button" className="btn btn--ghost" onClick={handleLogout}>
           Cerrar sesión
         </button>
-        <p className="app-header__user">
-          Hola, <strong>{user?.displayName?.split(' ')[0] ?? user?.email}</strong> 👋
-        </p>
       </header>
 
-      {/* user existe siempre acá: Tasks vive dentro de ProtectedRoute */}
-      {user && <TodoForm userId={user.uid} />}
+      {/* ── Bienvenida + stats ── */}
+      <section className="welcome-section">
+        <h1>Hola, {firstName} 👋</h1>
+        <p className="welcome-section__sub">
+          {pendingCount} pendientes · {completedCount} completadas
+        </p>
+        {tasks.length > 0 && (
+          <div className="stats-cards">
+            <div className="stat-card stat-card--pending">
+              <span className="stat-card__value">{pendingCount}</span>
+              <span className="stat-card__label">Pendientes</span>
+            </div>
+            <div className="stat-card stat-card--done">
+              <span className="stat-card__value">{completedCount}</span>
+              <span className="stat-card__label">Completadas</span>
+            </div>
+            <div className="stat-card stat-card--progress">
+              <span className="stat-card__value">{progressPct}%</span>
+              <span className="stat-card__label">Progreso</span>
+            </div>
+          </div>
+        )}
+        {tasks.length > 0 && (
+          <div
+            className="progress-bar"
+            role="progressbar"
+            aria-valuenow={progressPct}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <div className="progress-bar__fill" style={{ width: `${progressPct}%` }} />
+          </div>
+        )}
+      </section>
 
+      {/* ── Barra de filtros + orden + nueva tarea ── */}
+      {!loading && tasks.length > 0 && (
+        <div className="controls-bar">
+          {/* Filtros en grupo pill */}
+          <div className="filter-group">
+            <button type="button" className="chip" disabled={filter === 'pending'} onClick={() => setFilter('pending')}>Pendientes</button>
+            <button type="button" className="chip" disabled={filter === 'completed'} onClick={() => setFilter('completed')}>Completadas</button>
+            <button type="button" className="chip" disabled={filter === 'all'} onClick={() => setFilter('all')}>Todas</button>
+          </div>
+
+          <div className="controls-bar__sep" />
+
+          <button type="button" className="chip" disabled={sort === 'recent'} onClick={() => setSort('recent')}>Recientes</button>
+          <button type="button" className="chip" disabled={sort === 'priority'} onClick={() => setSort('priority')}>Prioridad</button>
+          <button type="button" className="chip" disabled={sort === 'dueDate'} onClick={() => setSort('dueDate')}>Fecha</button>
+
+          <div className="controls-bar__end">
+            <button
+              type="button"
+              className="btn btn--primary"
+              onClick={() => setShowModal(true)}
+            >
+              + Nueva tarea
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Contenido principal ── */}
       {loading ? (
         <TaskListSkeleton />
       ) : tasks.length === 0 ? (
-        // Caso "no hay ninguna tarea": invitamos a crear la primera.
-        <p className="empty">Todavía no tenés tareas. Creá la primera arriba.</p>
-      ) : (
         <>
-          <div className="controls">
-            <span>Filtrar: </span>
-            <button
-              type="button"
-              className="chip"
-              onClick={() => setFilter('all')}
-              disabled={filter === 'all'}
-            >
-              Todas
+          <p className="empty">Todavía no tenés tareas. ¡Creá la primera!</p>
+          <div style={{ textAlign: 'center', marginTop: 'var(--space-3)' }}>
+            <button type="button" className="btn btn--primary" onClick={() => setShowModal(true)}>
+              + Nueva tarea
             </button>
-            <button
-              type="button"
-              className="chip"
-              onClick={() => setFilter('pending')}
-              disabled={filter === 'pending'}
-            >
-              Pendientes
-            </button>
-            <button
-              type="button"
-              className="chip"
-              onClick={() => setFilter('completed')}
-              disabled={filter === 'completed'}
-            >
-              Completadas
-            </button>
-            {/* Toggle Lista/Grid: el CSS lo empuja al extremo derecho. */}
-            <ViewToggle view={view} onChange={setView} />
           </div>
-
-          <div className="controls">
-            <label htmlFor="sort">Ordenar por: </label>
-            <select
-              id="sort"
-              value={sort}
-              onChange={(e) => setSort(e.target.value as TaskSort)}
-            >
-              <option value="recent">Más recientes</option>
-              <option value="priority">Prioridad</option>
-              <option value="dueDate">Fecha</option>
-            </select>
-          </div>
-
-          {view === 'grid' ? (
-            <TaskGrid tasks={visibleTasks} />
-          ) : (
-            <TodoList tasks={visibleTasks} />
-          )}
         </>
+      ) : (
+        <TaskGrid tasks={visibleTasks} />
       )}
 
-      {/* Asistente Tyrion: panel flotante, fijo en la esquina */}
+      {/* FAB: acceso rápido cuando se scrolleó lejos de los controles */}
+      <button
+        type="button"
+        className="fab"
+        onClick={() => setShowModal(true)}
+        aria-label="Nueva tarea"
+      >
+        +
+      </button>
+
+      {/* Modal para crear tarea */}
+      {user && showModal && (
+        <TaskModal userId={user.uid} onClose={() => setShowModal(false)} />
+      )}
+
       <TyrionChat />
     </main>
   )

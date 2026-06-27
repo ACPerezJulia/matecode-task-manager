@@ -1,71 +1,494 @@
-/* tasks.css — Layout específico de la vista de tareas.
-   Header de la app, barra de filtros/orden y la lista de tareas. */
+/* tasks.css — Layout específico de la vista de tareas. */
 
-/* --- Header (título + email + logout) --- */
+/* ── Animaciones ─────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUpModal {
+  from { opacity: 0; transform: translateY(48px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header sticky ─────────────────────────────────────────── */
 .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  min-height: 62px;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
+  margin-top: calc(-1 * var(--space-5));
+  margin-left: calc(-1 * var(--page-pad));
+  margin-right: calc(-1 * var(--page-pad));
+  padding: var(--space-3) var(--page-pad);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08);
   margin-bottom: var(--space-5);
 }
 
-.app-header h1 {
-  margin: 0;
-  flex: 1 1 auto;
+/* Degradado: frosted glass header */
+[data-theme="gradient"] .app-header {
+  background: rgba(255, 255, 255, 0.08);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
 }
 
-.app-header__user {
-  flex-basis: 100%;
+/* Cuadro logo "MC" */
+.app-header__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-right: auto;
+}
+
+.app-header__logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+  box-shadow: var(--shadow);
+}
+
+.app-header__name {
   font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-h);
+  white-space: nowrap;
+}
+
+/* Avatar con inicial */
+.app-header__avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--accent-bg);
+  border: 1.5px solid var(--accent-border);
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* ── Toggle de tema (☀️ 🌙 ✨) ─────────────────────────────── */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--code-bg);
+}
+
+[data-theme="gradient"] .theme-toggle {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-toggle__btn {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  padding: 5px 10px;
+  font-size: 0.88rem;
+  line-height: 1;
+  color: var(--text);
+  transition: background 0.15s, color 0.15s;
+}
+
+.theme-toggle__btn:hover {
+  background: var(--accent-bg);
+}
+
+.theme-toggle__btn.is-active {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+/* ── Sección de bienvenida ──────────────────────────────────── */
+.welcome-section {
+  margin-bottom: var(--space-5);
+}
+
+.welcome-section h1 {
+  margin: 0 0 var(--space-1) 0;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+}
+
+.welcome-section__sub {
+  margin: 0 0 var(--space-4) 0;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+/* ── Stat cards ─────────────────────────────────────────────── */
+.stats-cards {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 20px;
+  flex: 1;
+  min-width: 90px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: var(--shadow);
+}
+
+[data-theme="gradient"] .stat-card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.stat-card__value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.stat-card__label {
+  font-size: 0.75rem;
+  font-weight: 500;
   color: var(--text);
 }
 
-/* --- Barra de filtros y orden --- */
-.controls {
+.stat-card--pending .stat-card__value  { color: var(--accent); }
+.stat-card--done .stat-card__value     { color: var(--prio-low); }
+.stat-card--progress .stat-card__value { color: var(--text-h); }
+
+/* ── Barra de progreso ──────────────────────────────────────── */
+.progress-bar {
+  height: 8px;
+  background: var(--accent-bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: var(--space-4);
+}
+
+.progress-bar__fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.8s ease;
+  min-width: 0;
+}
+
+[data-theme="gradient"] .progress-bar {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: transparent;
+}
+
+[data-theme="gradient"] .progress-bar__fill {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* ── Barra unificada de filtros + orden ─────────────────────── */
+.controls-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
-.controls > label,
-.controls > span {
-  margin: 0;
+/* Grupo de filtros: contenedor tipo pill con botones internos */
+.filter-group {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 2px;
+  box-shadow: var(--shadow);
+}
+
+[data-theme="gradient"] .filter-group {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Chips dentro del grupo: sin borde propio, fondo transparente */
+.filter-group .chip {
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  padding: 8px 15px;
   font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text);
+  font-weight: 400;
 }
 
-.controls select {
-  width: auto;
+.filter-group .chip:disabled {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: transparent;
+  font-weight: 700;
 }
 
-/* "chips" de filtro (Todas / Pendientes / Completadas).
-   El filtro activo usa el atributo disabled -> lo mostramos resaltado,
-   no apagado. */
+.filter-group .chip:not(:disabled):hover {
+  background: var(--accent-bg);
+  border-color: transparent;
+}
+
+/* Separador visual entre grupos */
+.controls-bar__sep {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+/* Acción derecha: botón nueva tarea */
+.controls-bar__end {
+  margin-left: auto;
+}
+
+/* Chips de orden (standalone, fuera del filter-group) */
 .chip {
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   cursor: pointer;
   padding: var(--space-1) var(--space-3);
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
+  white-space: nowrap;
+  transition: border-color 0.15s, background 0.15s;
 }
+
+[data-theme="gradient"] .chip {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .chip:not(:disabled):hover {
   border-color: var(--accent-border);
 }
+
 .chip:disabled {
   cursor: default;
   background: var(--accent-bg);
   border-color: var(--accent-border);
   color: var(--accent);
+  font-weight: 600;
 }
 
-/* --- Lista de tareas --- */
+/* ── FAB ────────────────────────────────────────────────────── */
+.fab {
+  all: unset;
+  box-sizing: border-box;
+  position: fixed;
+  bottom: 24px;
+  left: 24px; /* izquierda para no pisar al asistente Tyrion (bottom-right) */
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 1.8rem;
+  font-weight: 300;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.28);
+  z-index: 90;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.fab:hover { transform: scale(1.08); }
+
+/* ── Modal bottom sheet — Nueva tarea ──────────────────────── */
+.task-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(0, 0, 0, 0.62);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 0.25s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.task-modal {
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  padding: 28px 24px 44px;
+  box-shadow: 0 -8px 48px rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  animation: slideUpModal 0.35s ease;
+}
+
+[data-theme="gradient"] .task-modal {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.task-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.task-modal__title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-h);
+  letter-spacing: -0.4px;
+  margin: 0 0 2px;
+}
+
+.task-modal__hint {
+  font-size: 0.75rem;
+  color: var(--text);
+  margin: 0;
+}
+
+.task-modal__close {
+  all: unset;
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent-bg);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.task-modal__close:hover {
+  background: var(--border);
+  color: var(--text-h);
+}
+
+.task-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.task-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.task-modal__field label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text);
+  margin-bottom: 0;
+}
+
+.task-modal__row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.task-modal__row .task-modal__field {
+  flex: 1;
+  min-width: 130px;
+}
+
+.task-modal__submit {
+  width: 100%;
+  padding: 15px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+/* ── Botones de prioridad (dentro del modal) ─────────────────── */
+.pri-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.pri-btn {
+  all: unset;
+  box-sizing: border-box;
+  flex: 1;
+  padding: 9px 10px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--accent-bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+
+.pri-btn--high.is-active {
+  border-color: var(--prio-high);
+  background: var(--prio-high-bg);
+  color: var(--prio-high);
+  font-weight: 700;
+}
+
+.pri-btn--medium.is-active {
+  border-color: var(--prio-medium);
+  background: var(--prio-medium-bg);
+  color: var(--prio-medium);
+  font-weight: 700;
+}
+
+.pri-btn--low.is-active {
+  border-color: var(--prio-low);
+  background: var(--prio-low-bg);
+  color: var(--prio-low);
+  font-weight: 700;
+}
+
+/* ── Contenido heredado (lista — mantenido por compatibilidad) ── */
 .task-list {
   list-style: none;
   padding: 0;
@@ -82,18 +505,13 @@
   flex-direction: column;
   gap: var(--space-2);
 }
-/* Tarea completada: atenuada (el título además va tachado, ver .task-title). */
-.task-item.is-completed {
-  opacity: 0.6;
-}
 
-/* Barra de color izquierda: misma lógica que la barra superior del grid. */
+.task-item.is-completed { opacity: 0.62; }
+
 .task-item::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
+  top: 0; left: 0; bottom: 0;
   width: 4px;
 }
 .task-item--bar-red::before    { background: var(--prio-high); }
@@ -108,8 +526,9 @@
 }
 
 .task-title {
-  flex: 1; /* ocupa el espacio libre, empuja chip y badge a la derecha */
-  font-size: 1.05rem;
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 600;
   color: var(--text-h);
 }
 .task-title.is-completed {
@@ -119,7 +538,7 @@
 
 .task-desc {
   color: var(--text);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .task-meta {
@@ -130,7 +549,51 @@
   font-size: 0.85rem;
 }
 
-.task-actions {
-  display: flex;
-  gap: var(--space-2);
+.task-actions { display: flex; gap: var(--space-2); }
+
+/* ── Responsive mobile ──────────────────────────────────────── */
+@media (max-width: 600px) {
+  .app-header {
+    gap: var(--space-2);
+  }
+  .app-header__name {
+    display: none;
+  }
+  .app-header .btn {
+    padding: var(--space-1) var(--space-2);
+    font-size: 0.8rem;
+  }
+  .theme-toggle__btn {
+    padding: 5px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .stat-card--progress {
+    grid-column: 1 / -1;
+  }
+  .stat-card__value {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 540px) {
+  .controls-bar__sep {
+    display: none;
+  }
+  .controls-bar__end {
+    margin-left: 0;
+    flex-basis: 100%;
+  }
+  .controls-bar__end .btn {
+    width: 100%;
+    text-align: center;
+  }
+  .filter-group {
+    flex-wrap: wrap;
+  }
 }
