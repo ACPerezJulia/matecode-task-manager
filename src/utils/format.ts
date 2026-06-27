@@ -42,6 +42,21 @@ export function formatDateForEmail(timestamp: Timestamp): string {
   return hasTime(date) ? `${fecha} ${formatTime(date)}` : fecha
 }
 
+const MONTH_SHORT = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']
+
+/** Fecha legible para chips de card: "5 jun", "29 dic", etc. Sin hora. */
+export function formatDateOnly(timestamp: Timestamp): string {
+  const date = timestamp.toDate()
+  return `${date.getDate()} ${MONTH_SHORT[date.getMonth()]}`
+}
+
+/** Hora "HH:mm" si la hay, null si es medianoche (sin hora significativa). */
+export function formatTimeOnly(timestamp: Timestamp): string | null {
+  const date = timestamp.toDate()
+  if (date.getHours() === 0 && date.getMinutes() === 0) return null
+  return formatTime(date)
+}
+
 /**
  * Convierte un Timestamp a string "aaaa-mm-ddThh:mm" para usar en
  * <input type="datetime-local">. Usa las partes locales de la fecha (no

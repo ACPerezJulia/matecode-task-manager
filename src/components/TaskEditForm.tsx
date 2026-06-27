@@ -46,13 +46,36 @@ export function TaskEditForm({ edit }: TaskEditFormProps) {
           </select>
         </div>
         <div>
-          <label htmlFor={`edit-due-${edit.taskId}`}>Fecha y hora</label>
+          <label htmlFor={`edit-label-${edit.taskId}`}>Etiqueta</label>
           <input
-            id={`edit-due-${edit.taskId}`}
-            type="datetime-local"
-            value={edit.dueDate}
-            onChange={(e) => edit.setDueDate(e.target.value)}
-            aria-label="Fecha y hora"
+            id={`edit-label-${edit.taskId}`}
+            type="text"
+            value={edit.label}
+            onChange={(e) => edit.setLabel(e.target.value)}
+            placeholder="Trabajo, Personal, Dev..."
+            aria-label="Etiqueta"
+          />
+        </div>
+      </div>
+      <div className="form-row">
+        <div>
+          <label htmlFor={`edit-date-${edit.taskId}`}>Fecha (opcional)</label>
+          <input
+            id={`edit-date-${edit.taskId}`}
+            type="date"
+            value={edit.dueDateStr}
+            onChange={(e) => edit.setDueDateStr(e.target.value)}
+            aria-label="Fecha"
+          />
+        </div>
+        <div>
+          <label htmlFor={`edit-time-${edit.taskId}`}>Hora (opcional)</label>
+          <input
+            id={`edit-time-${edit.taskId}`}
+            type="time"
+            value={edit.dueTimeStr}
+            onChange={(e) => edit.setDueTimeStr(e.target.value)}
+            aria-label="Hora"
           />
         </div>
       </div>

@@ -37,6 +37,7 @@ export async function createTask(userId: string, values: TaskFormValues) {
       ? { dueDate: dateStringToTimestamp(values.dueDate) }
       : {}),
     ...(values.priority ? { priority: values.priority } : {}),
+    ...(values.label ? { label: values.label } : {}),
   })
 }
 
@@ -57,6 +58,7 @@ export async function updateTask(taskId: string, values: TaskFormValues) {
     dueDate: values.dueDate
       ? dateStringToTimestamp(values.dueDate)
       : deleteField(),
+    label: values.label || deleteField(),
   })
 }
 

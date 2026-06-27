@@ -21,7 +21,9 @@ export function useTaskItem(task: Task) {
   const [priority, setPriority] = useState<TaskFormValues['priority']>(
     task.priority,
   )
-  const [dueDate, setDueDate] = useState('') // "aaaa-mm-ddThh:mm" o ""
+  const [dueDateStr, setDueDateStr] = useState('') // "aaaa-mm-dd" o ""
+  const [dueTimeStr, setDueTimeStr] = useState('') // "hh:mm" o ""
+  const [label, setLabel] = useState(task.label ?? '')
   // busy bloquea los botones mientras hay una operación en curso (evita doble click).
   const [busy, setBusy] = useState(false)
 
@@ -61,7 +63,11 @@ export function useTaskItem(task: Task) {
     setTitle(task.title)
     setDescription(task.description)
     setPriority(task.priority)
-    setDueDate(task.dueDate ? toDateInputValue(task.dueDate) : '')
+    const rawDate = task.dueDate ? toDateInputValue(task.dueDate) : ''
+    const [datePart = '', timePart = ''] = rawDate.split('T')
+    setDueDateStr(datePart)
+    setDueTimeStr(timePart)
+    setLabel(task.label ?? '')
     setEditing(true)
   }
 
@@ -90,7 +96,8 @@ export function useTaskItem(task: Task) {
         title: title.trim(),
         description: description.trim(),
         priority,
-        dueDate: dueDate || undefined,
+        dueDate: dueDateStr ? `${dueDateStr}T${dueTimeStr || '00:00'}` : undefined,
+        label: label.trim() || undefined,
       })
       toast.success('Tarea actualizada.')
       setEditing(false)
@@ -117,8 +124,12 @@ export function useTaskItem(task: Task) {
       setDescription,
       priority,
       onPriorityChange,
-      dueDate,
-      setDueDate,
+      dueDateStr,
+      setDueDateStr,
+      dueTimeStr,
+      setDueTimeStr,
+      label,
+      setLabel,
       save,
       cancel: cancelEditing,
       busy,

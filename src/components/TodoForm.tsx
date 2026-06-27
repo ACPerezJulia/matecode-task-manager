@@ -5,6 +5,7 @@ import type { TaskFormValues } from '../types'
 
 interface TodoFormProps {
   userId: string
+  onSuccess?: () => void
 }
 
 const emptyForm: TaskFormValues = {
@@ -12,9 +13,10 @@ const emptyForm: TaskFormValues = {
   description: '',
   priority: undefined,
   dueDate: '',
+  label: '',
 }
 
-export function TodoForm({ userId }: TodoFormProps) {
+export function TodoForm({ userId, onSuccess }: TodoFormProps) {
   const [form, setForm] = useState<TaskFormValues>(emptyForm)
   const [submitting, setSubmitting] = useState(false)
 
@@ -53,11 +55,12 @@ export function TodoForm({ userId }: TodoFormProps) {
         title: form.title.trim(),
         description: form.description.trim(),
         priority: form.priority,
-        // "" -> undefined para no guardar una fecha vacía
         dueDate: form.dueDate || undefined,
+        label: form.label?.trim() || undefined,
       })
       toast.success('Tarea creada.')
       setForm(emptyForm)
+      onSuccess?.()
     } catch (err) {
       console.error('Error al crear tarea:', err)
       toast.error('No se pudo crear la tarea.')
@@ -122,6 +125,18 @@ export function TodoForm({ userId }: TodoFormProps) {
             Opcional. El día y, si corresponde, la hora de la actividad.
           </small>
         </div>
+      </div>
+
+      <div>
+        <label htmlFor="label">Etiqueta</label>
+        <input
+          id="label"
+          name="label"
+          type="text"
+          value={form.label ?? ''}
+          onChange={handleChange}
+          placeholder="Trabajo, Personal, Dev..."
+        />
       </div>
 
       <button type="submit" className="btn btn--primary" disabled={submitting}>
