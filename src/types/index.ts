@@ -23,6 +23,12 @@ export interface AuthFormValues {
   password: string
 }
 
+export interface RegisterFormValues {
+  name: string
+  email: string
+  password: string
+}
+
 export type TaskFilter = 'all' | 'pending' | 'completed'
 
 export type TaskSort = 'recent' | 'priority' | 'dueDate'

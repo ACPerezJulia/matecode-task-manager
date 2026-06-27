@@ -70,7 +70,7 @@ export default function Tasks() {
           Cerrar sesión
         </button>
         <p className="app-header__user">
-          Sesión iniciada como: <strong>{user?.email}</strong>
+          Hola, <strong>{user?.displayName?.split(' ')[0] ?? user?.email}</strong> 👋
         </p>
       </header>
 
