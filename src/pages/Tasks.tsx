@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
@@ -25,6 +25,16 @@ export default function Tasks() {
   const [isSendingEmail, setIsSendingEmail] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !showModal) {
+        setShowModal(true)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [showModal])
 
   const visibleTasks = sortTasks(filterTasks(tasks, filter), sort)
 
