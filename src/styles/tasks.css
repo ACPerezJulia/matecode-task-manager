@@ -85,6 +85,15 @@
   justify-content: center;
   flex-shrink: 0;
   user-select: none;
+  overflow: hidden;
+}
+
+.app-header__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--accent-border);
 }
 
 /* ── Toggle de tema (☀️ 🌙 ✨) ─────────────────────────────── */

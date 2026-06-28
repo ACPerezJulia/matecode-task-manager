@@ -138,7 +138,9 @@ export default function Tasks() {
         </div>
 
         <div className="app-header__avatar" title={user?.displayName ?? user?.email ?? ''}>
-          {avatarInitial}
+          {user?.photoURL
+            ? <img src={user.photoURL} alt={user.displayName ?? 'Avatar'} className="app-header__avatar-img" referrerPolicy="no-referrer" />
+            : avatarInitial}
         </div>
 
         <button
@@ -289,6 +291,10 @@ export default function Tasks() {
 
 
       {isSendingEmail && <EmailSendAnimation />}
+
+      <footer className="app-footer">
+        <p>© {new Date().getFullYear()} Desarrollado por Analía Pérez Juliá · Todos los derechos reservados</p>
+      </footer>
     </main>
   )
 }
