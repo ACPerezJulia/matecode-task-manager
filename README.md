@@ -20,7 +20,6 @@ SPA de gestión de tareas desarrollada como proyecto integrador del Módulo 4 de
 | Frontend | React 19 + TypeScript, Vite |
 | Auth + DB | Firebase Authentication + Firestore |
 | Email | AWS SES via Vercel Function |
-| IA en app | Gemini API (asistente Tyrion) |
 | Tests | Vitest + React Testing Library |
 | Deploy | Vercel (frontend + serverless functions) |
 
@@ -39,7 +38,6 @@ SPA de gestión de tareas desarrollada como proyecto integrador del Módulo 4 de
 - Orden: más recientes / por prioridad / por fecha
 - Tres temas visuales: Clásico (☀️), Nocturno (🌙), Vívido (✨) — seleccionables por el usuario, persistidos en localStorage y Firestore para sincronizar entre dispositivos
 - Resumen de tareas por email con diseño responsive, agrupado por estado y formato de fecha dd/mm/aa 24hs
-- Asistente Tyrion Lannister (Gemini) para redactar y priorizar tareas
 - Loading skeletons y toast notifications en todas las acciones
 
 ---
@@ -61,7 +59,7 @@ cp .env.example .env
 # 4. Iniciar en desarrollo
 npm run dev
 
-# 5. Para probar las Vercel Functions localmente (email, chat IA)
+# 5. Para probar las Vercel Functions localmente (email)
 npx vercel dev
 ```
 
@@ -96,9 +94,6 @@ AWS_SECRET_ACCESS_KEY=
 AWS_REGION=
 SES_FROM_EMAIL=
 
-# Gemini — SIN prefijo VITE_: solo la usa el servidor
-GEMINI_API_KEY=
-
 # URL pública de la app (usada en el email de resumen)
 APP_URL=https://matecode-task-manager.vercel.app
 ```
@@ -120,18 +115,15 @@ graph TD
         Hooks -->|Suscripción Tiempo Real| FirestoreSDK[Firestore SDK]
         Hooks -->|Autenticación| AuthSDK[Firebase Auth SDK]
         UI -->|Petición POST| EmailClient[emailService.ts]
-        UI -->|Chat / Consejos| ChatUI[Chat Asistente IA]
     end
 
     subgraph Servidor [Vercel Serverless Backend]
         EmailClient -->|POST /api/send-email| SendEmailFunc[Serverless Function: send-email.ts]
-        ChatUI -->|POST /api/chat| ChatFunc[Serverless Function: chat.ts]
     end
 
     subgraph Servicios Externos
         FirestoreSDK <-->|onSnapshot / Lectura & Escritura| Firestore[Google Cloud Firestore]
         SendEmailFunc -->|AWS SDK| SES[Amazon AWS SES]
-        ChatFunc -->|Google AI SDK| Gemini[Gemini API]
     end
 
     style Cliente fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
@@ -156,8 +148,7 @@ src/
 
 api/
 ├── send-email.ts       # Vercel Function: recibe payload, llama a SES
-├── _emailTemplate.ts   # Template HTML + generateSummaryEmail() — testeable sin SES
-└── chat.ts             # Vercel Function: proxy para Gemini API
+└── _emailTemplate.ts   # Template HTML + generateSummaryEmail() — testeable sin SES
 ```
 
 ### Tiempo real con onSnapshot
@@ -242,13 +233,14 @@ El modelo se integró en el flujo de trabajo para resolver cuellos de botella es
 - **Validación de Patrones y Buenas Prácticas**: Consultas sobre el comportamiento interno de React 19, como la sincronización preventiva de atributos en el DOM usando `useLayoutEffect` en lugar de `useEffect` para evitar flashes visuales de tema (FOUC).
 - **Brainstorming de Casos de Prueba**: Generación de hipótesis de error para robustecer la suite de tests en Vitest (por ejemplo, validando el comportamiento del formateo de fechas en zona horaria local vs. el servidor Vercel en UTC).
 
-### Integración de IA como Feature (Asistente Tyrion)
-La aplicación integra **Gemini API** para dar vida a **Tyrion**, un asistente virtual integrado que ayuda al usuario a priorizar y redactar sus tareas con un tono de voz y personalidad consistentes (basado en el personaje de *Game of Thrones*).
+### Decisión de alcance: asistente de IA descartado
 
-- **Proxy Seguro**: La conexión se realiza a través de una Serverless Function (`api/chat.ts`) que actúa como proxy. Esto mantiene la API Key de Gemini del lado del servidor de forma 100% segura, evitando su exposición en el cliente.
-- **Ingeniería de Prompts**: Se estructuró un *System Prompt* robusto que limita el comportamiento de Tyrion para que actúe exclusivamente como consultor y priorizador, asegurando que no pueda manipular directamente la base de datos de Firestore por cuestiones de integridad del sistema.
+La guía del Proyecto Integrador M4 incluía un asistente conversacional integrado en la app (basado en Gemini API). Al investigar el origen de ese requerimiento, quedó claro que era un componente que había migrado sin revisión desde la guía del Módulo 3 y no formaba parte del alcance real del M4.
+
+Lo intenté integrar de todas formas — llegué a tener la serverless function, el proxy y el system prompt funcionando — pero la evaluación fue clara: la feature agregaba complejidad de mantenimiento, dependía de una API key adicional, y el resultado final no estaba a la altura del resto de la aplicación en términos de UX ni de valor para el usuario. Mantenerla habría comprometido el tiempo y la calidad de las funcionalidades centrales (CRUD, email, responsive, temas).
+
+La decisión de descartarla fue deliberada y responde a un criterio de producto: es preferible tener menos features bien ejecutadas que muchas a medias. El código fue removido en su totalidad del repositorio.
 
 ### Vista Previa y Capturas de Pantalla
 *(Añade aquí capturas de pantalla de la aplicación en modo claro, oscuro y el formato del mail responsive)*
 - **Dashboard Principal (Tema Nocturno)**: `![Dashboard](ruta-a-imagen-o-gif)`
-- **Interacción con Asistente Tyrion**: `![Tyrion Chat](ruta-a-imagen-o-gif)`
