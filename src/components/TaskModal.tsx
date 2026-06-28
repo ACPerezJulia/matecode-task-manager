@@ -48,6 +48,10 @@ export function TaskModal({ userId, onClose }: TaskModalProps) {
       toast.error('La tarea necesita un título.')
       return
     }
+    if (!form.description.trim()) {
+      toast.error('La tarea necesita una descripción.')
+      return
+    }
     setSubmitting(true)
     try {
       const dueDate = form.date
@@ -103,28 +107,24 @@ export function TaskModal({ userId, onClose }: TaskModalProps) {
         </div>
 
         <div className="task-modal__body">
-          <div className="task-modal__field">
-            <label htmlFor="modal-title">Título *</label>
-            <input
-              id="modal-title"
-              ref={titleRef}
-              type="text"
-              value={form.title}
-              onChange={(e) => set('title', e.target.value)}
-              placeholder="¿Qué tenés que hacer?"
-            />
-          </div>
+          <input
+            id="modal-title"
+            ref={titleRef}
+            type="text"
+            value={form.title}
+            onChange={(e) => set('title', e.target.value)}
+            placeholder="¿Qué tenés que hacer?"
+          />
 
-          <div className="task-modal__field">
-            <label htmlFor="modal-desc">Descripción (opcional)</label>
-            <textarea
-              id="modal-desc"
-              rows={2}
-              value={form.description}
-              onChange={(e) => set('description', e.target.value)}
-              placeholder="Más detalle..."
-            />
-          </div>
+          <textarea
+            id="modal-desc"
+            rows={2}
+            value={form.description}
+            onChange={(e) => set('description', e.target.value)}
+            placeholder="Descripción... ¡dame más detalles!"
+          />
+
+          <p className="task-modal__optional-label">Opcionales</p>
 
           <div className="task-modal__field">
             <label>Prioridad</label>
@@ -153,9 +153,9 @@ export function TaskModal({ userId, onClose }: TaskModalProps) {
             </div>
           </div>
 
-          <div className="task-modal__row">
+          <div className="task-modal__meta-grid">
             <div className="task-modal__field">
-              <label htmlFor="modal-date">Fecha (opcional)</label>
+              <label htmlFor="modal-date">Fecha</label>
               <input
                 id="modal-date"
                 type="date"
@@ -164,7 +164,7 @@ export function TaskModal({ userId, onClose }: TaskModalProps) {
               />
             </div>
             <div className="task-modal__field">
-              <label htmlFor="modal-time">Hora (opcional)</label>
+              <label htmlFor="modal-time">Hora</label>
               <input
                 id="modal-time"
                 type="time"
@@ -172,17 +172,16 @@ export function TaskModal({ userId, onClose }: TaskModalProps) {
                 onChange={(e) => set('time', e.target.value)}
               />
             </div>
-          </div>
-
-          <div className="task-modal__field">
-            <label htmlFor="modal-label">Etiqueta (opcional)</label>
-            <input
-              id="modal-label"
-              type="text"
-              value={form.label ?? ''}
-              onChange={(e) => set('label', e.target.value)}
-              placeholder="Trabajo, Personal, Dev..."
-            />
+            <div className="task-modal__field">
+              <label htmlFor="modal-label">Etiqueta</label>
+              <input
+                id="modal-label"
+                type="text"
+                value={form.label ?? ''}
+                onChange={(e) => set('label', e.target.value)}
+                placeholder="Trabajo, Personal, Dev..."
+              />
+            </div>
           </div>
 
           <button

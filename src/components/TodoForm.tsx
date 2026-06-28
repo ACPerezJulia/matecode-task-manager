@@ -6,18 +6,27 @@ import type { TaskFormValues } from '../types'
 interface TodoFormProps {
   userId: string
   onSuccess?: () => void
+  onCancel?: () => void
 }
 
-const emptyForm: TaskFormValues = {
+type TodoFormState = Omit<TaskFormValues, 'priority'> & {
+  priority: TaskFormValues['priority'] | ''
+  date: string
+  time: string
+}
+
+const emptyForm = (): TodoFormState => ({
   title: '',
   description: '',
-  priority: undefined,
+  priority: '',
   dueDate: '',
   label: '',
-}
+  date: '',
+  time: '',
+})
 
-export function TodoForm({ userId, onSuccess }: TodoFormProps) {
-  const [form, setForm] = useState<TaskFormValues>(emptyForm)
+export function TodoForm({ userId, onSuccess, onCancel }: TodoFormProps) {
+  const [form, setForm] = useState<TodoFormState>(emptyForm)
   const [submitting, setSubmitting] = useState(false)
 
   function handleChange(
@@ -27,18 +36,14 @@ export function TodoForm({ userId, onSuccess }: TodoFormProps) {
   }
 
   function handlePriorityChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    // "" en el select significa "sin prioridad" -> lo guardamos como undefined
-    // para que el campo opcional no exista en Firestore.
     const value = e.target.value
     setForm((prev) => ({
       ...prev,
-      priority: value === '' ? undefined : (value as TaskFormValues['priority']),
+      priority: value as TaskFormValues['priority'] | '',
     }))
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-
+  async function handleSubmit() {
     if (!form.title.trim()) {
       toast.error('La tarea necesita un título.')
       return
@@ -51,15 +56,18 @@ export function TodoForm({ userId, onSuccess }: TodoFormProps) {
 
     setSubmitting(true)
     try {
+      const dueDate = form.date
+        ? `${form.date}T${form.time || '00:00'}`
+        : undefined
       await createTask(userId, {
         title: form.title.trim(),
         description: form.description.trim(),
-        priority: form.priority,
-        dueDate: form.dueDate || undefined,
+        priority: form.priority || undefined,
+        dueDate,
         label: form.label?.trim() || undefined,
       })
       toast.success('Tarea creada.')
-      setForm(emptyForm)
+      setForm(emptyForm())
       onSuccess?.()
     } catch (err) {
       console.error('Error al crear tarea:', err)
@@ -70,34 +78,36 @@ export function TodoForm({ userId, onSuccess }: TodoFormProps) {
   }
 
   return (
-    <form className="card task-form" onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="title">Título</label>
-        <input
-          id="title"
-          name="title"
-          type="text"
-          value={form.title}
-          onChange={handleChange}
-        />
-      </div>
+    <form className="card task-panel" onSubmit={(e) => { e.preventDefault(); void handleSubmit() }}>
+      <p className="task-panel__heading">Nueva tarea</p>
 
-      <div>
-        <label htmlFor="description">Descripción</label>
-        <textarea
-          id="description"
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-        />
-      </div>
+      <label htmlFor="title" className="sr-only">Título</label>
+      <input
+        id="title"
+        name="title"
+        type="text"
+        value={form.title}
+        onChange={handleChange}
+        placeholder="¿Qué tenés que hacer?"
+        autoFocus
+      />
 
-      {/* Prioridad y fecha: apiladas en mobile, lado a lado en tablet+ */}
-      <div className="form-row">
+      <label htmlFor="description" className="sr-only">Descripción</label>
+      <textarea
+        id="description"
+        name="description"
+        value={form.description}
+        onChange={handleChange}
+        placeholder="Descripción"
+        rows={2}
+      />
+
+      <p className="task-panel__optional-label">Opcionales</p>
+      <div className="task-panel__meta">
         <div>
-          <label htmlFor="priority">Prioridad</label>
+          <label className="task-panel__field-label" htmlFor="tp-priority">Prioridad</label>
           <select
-            id="priority"
+            id="tp-priority"
             name="priority"
             value={form.priority ?? ''}
             onChange={handlePriorityChange}
@@ -107,41 +117,53 @@ export function TodoForm({ userId, onSuccess }: TodoFormProps) {
             <option value="medium">Media</option>
             <option value="high">Alta</option>
           </select>
-          <small className="field-hint">
-            Opcional. Elegí alta, media o baja según la urgencia.
-          </small>
         </div>
 
         <div>
-          <label htmlFor="dueDate">Fecha y hora</label>
+          <label className="task-panel__field-label" htmlFor="tp-date">Fecha</label>
           <input
-            id="dueDate"
-            name="dueDate"
-            type="datetime-local"
-            value={form.dueDate ?? ''}
+            id="tp-date"
+            name="date"
+            type="date"
+            value={form.date}
             onChange={handleChange}
           />
-          <small className="field-hint">
-            Opcional. El día y, si corresponde, la hora de la actividad.
-          </small>
+        </div>
+
+        <div>
+          <label className="task-panel__field-label" htmlFor="tp-time">Hora</label>
+          <input
+            id="tp-time"
+            name="time"
+            type="time"
+            value={form.time}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div>
+          <label className="task-panel__field-label" htmlFor="tp-label">Etiqueta</label>
+          <input
+            id="tp-label"
+            name="label"
+            type="text"
+            value={form.label ?? ''}
+            onChange={handleChange}
+            placeholder="#Dev, #Personal..."
+          />
         </div>
       </div>
 
-      <div>
-        <label htmlFor="label">Etiqueta</label>
-        <input
-          id="label"
-          name="label"
-          type="text"
-          value={form.label ?? ''}
-          onChange={handleChange}
-          placeholder="Trabajo, Personal, Dev..."
-        />
+      <div className="task-panel__actions">
+        {onCancel && (
+          <button type="button" className="btn btn--ghost" onClick={onCancel}>
+            Cancelar
+          </button>
+        )}
+        <button type="submit" className="btn btn--primary" disabled={submitting}>
+          {submitting ? 'Creando...' : 'Agregar tarea'}
+        </button>
       </div>
-
-      <button type="submit" className="btn btn--primary" disabled={submitting}>
-        {submitting ? 'Creando...' : 'Agregar tarea'}
-      </button>
     </form>
   )
 }
