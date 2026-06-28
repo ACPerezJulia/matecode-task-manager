@@ -7,7 +7,6 @@ import { useTheme } from '../hooks/useTheme'
 import { TaskModal } from '../components/TaskModal'
 import { TaskGrid } from '../components/TaskGrid'
 import { TaskListSkeleton } from '../components/Skeleton'
-import { TyrionChat } from '../components/TyrionChat'
 import { EmailSendAnimation } from '../components/EmailSendAnimation'
 import { filterTasks, sortTasks } from '../utils/taskHelpers'
 import { sendTaskSummary } from '../services/emailService'
@@ -238,7 +237,6 @@ export default function Tasks() {
         <TaskModal userId={user.uid} onClose={() => setShowModal(false)} />
       )}
 
-      <TyrionChat />
 
       {isSendingEmail && <EmailSendAnimation />}
     </main>

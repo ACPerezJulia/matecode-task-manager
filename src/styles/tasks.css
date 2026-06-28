@@ -305,7 +305,7 @@
   box-sizing: border-box;
   position: fixed;
   bottom: 24px;
-  left: 24px; /* izquierda para no pisar al asistente Tyrion (bottom-right) */
+  left: 24px;
   width: 60px;
   height: 60px;
   border-radius: 50%;
