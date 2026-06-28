@@ -17,9 +17,9 @@ import type { Task, TaskFormValues } from '../types'
 export function useTaskItem(task: Task) {
   const [editing, setEditing] = useState(false)
   const [title, setTitle] = useState(task.title)
-  const [description, setDescription] = useState(task.description)
-  const [priority, setPriority] = useState<TaskFormValues['priority']>(
-    task.priority,
+  const [description, setDescription] = useState(task.description ?? '')
+  const [priority, setPriority] = useState<TaskFormValues['priority'] | ''>(
+    task.priority ?? '',
   )
   const [dueDateStr, setDueDateStr] = useState('') // "aaaa-mm-dd" o ""
   const [dueTimeStr, setDueTimeStr] = useState('') // "hh:mm" o ""
@@ -61,8 +61,8 @@ export function useTaskItem(task: Task) {
     // Sincroniza el form con los valores actuales de la tarea (que pueden haber
     // cambiado por un update en tiempo real desde el montaje).
     setTitle(task.title)
-    setDescription(task.description)
-    setPriority(task.priority)
+    setDescription(task.description ?? '')
+    setPriority(task.priority ?? '')
     const rawDate = task.dueDate ? toDateInputValue(task.dueDate) : ''
     const [datePart = '', timePart = ''] = rawDate.split('T')
     setDueDateStr(datePart)
@@ -77,7 +77,7 @@ export function useTaskItem(task: Task) {
 
   function onPriorityChange(e: ChangeEvent<HTMLSelectElement>) {
     const value = e.target.value
-    setPriority(value === '' ? undefined : (value as TaskFormValues['priority']))
+    setPriority(value as TaskFormValues['priority'] | '')
   }
 
   async function save(e: FormEvent) {
@@ -95,7 +95,7 @@ export function useTaskItem(task: Task) {
       await updateTask(task.id, {
         title: title.trim(),
         description: description.trim(),
-        priority,
+        priority: priority || undefined,
         dueDate: dueDateStr ? `${dueDateStr}T${dueTimeStr || '00:00'}` : undefined,
         label: label.trim() || undefined,
       })

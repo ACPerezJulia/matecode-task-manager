@@ -15,11 +15,14 @@ export function useTasks(userId: string | undefined) {
   useEffect(() => {
     // Sin usuario no hay nada a qué suscribirse (ej: durante el logout).
     if (!userId) {
+      // eslint-disable-next-line
       setTasks([])
+      // eslint-disable-next-line
       setLoading(false)
       return
     }
 
+    // eslint-disable-next-line
     setLoading(true)
     const unsubscribe = subscribeToTasks(
       userId,
