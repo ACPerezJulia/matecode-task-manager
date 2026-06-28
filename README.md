@@ -30,15 +30,18 @@ SPA de gestión de tareas desarrollada como proyecto integrador del Módulo 4 de
 - Registro y login con email/password y Google
 - Sesión persistente con redirección automática
 - Rutas protegidas (sin acceso sin autenticación)
+- Avatar en el navbar: foto de perfil de Google cuando el usuario se autentica con Google; inicial del nombre en caso contrario
 - CRUD completo de tareas con sincronización en tiempo real (Firestore `onSnapshot`)
-- Dashboard con saludo personalizado, estadísticas de tareas y barra de progreso
+- Dashboard con saludo personalizado, estadísticas de tareas y barra de progreso con degradado
 - Campos por tarea: título, descripción, prioridad (baja/media/alta), fecha y hora de vencimiento, etiqueta
 - Cards con chips semánticos de prioridad y estado
 - Filtros: todas / pendientes / completadas
 - Orden: más recientes / por prioridad / por fecha
 - Tres temas visuales: Clásico (☀️), Nocturno (🌙), Vívido (✨) — seleccionables por el usuario, persistidos en localStorage y Firestore para sincronizar entre dispositivos
+- Diseño mobile-first: en pantallas ≤767px la vista se fuerza a grid, la toolbar se reduce a una fila con filtros y orden, y la creación de tareas se centraliza en el FAB flotante
 - Resumen de tareas por email con diseño responsive, agrupado por estado y formato de fecha dd/mm/aa 24hs
 - Loading skeletons y toast notifications en todas las acciones
+- Footer con créditos de autoría
 
 ---
 
@@ -159,6 +162,10 @@ api/
 
 El tema se aplica con `data-theme` en `<html>`. Un script inline en `index.html` lee `localStorage` antes del primer render de React para evitar el flash de tema incorrecto. `useLayoutEffect` sincroniza el atributo en cada cambio. El tema también se persiste en `users/{uid}` en Firestore para sincronizar entre dispositivos.
 
+### Diseño mobile-first
+
+En pantallas ≤767px, un hook `matchMedia` detecta el breakpoint y deriva el valor `effectiveView` que fuerza la vista a grid independientemente de la preferencia guardada. La toolbar colapsa a una sola fila con filtros y selector de orden; el botón de nueva tarea desaparece y se reemplaza por un FAB flotante. El CSS usa clases modificadoras BEM (`--view`, `--filters`, `--sort`, `--action`) para controlar la visibilidad sin lógica condicional en el JSX.
+
 ### Credenciales AWS siempre en el servidor
 
 El frontend nunca habla con AWS directamente. Llama a `POST /api/send-email` (Vercel Function), que tiene acceso a las credenciales en variables de entorno del servidor. Las variables sin prefijo `VITE_` no llegan nunca al bundle del cliente.
@@ -171,7 +178,7 @@ El frontend nunca habla con AWS directamente. Llama a `POST /api/send-email` (Ve
 
 ## Flujo de email de resumen
 
-1. El usuario hace clic en **📧 Resumen** en el header de la app
+1. El usuario hace clic en **✉️ Resumen** en el header de la app
 2. `Tasks.tsx` llama a `sendTaskSummary(email, tasks, { name, theme })`
 3. `emailService.ts` formatea las fechas en zona horaria local (el servidor corre en UTC) y hace `POST /api/send-email`
 4. La Vercel Function mapea el tema del usuario a un color de acento (`classic` → `#4F6EF7`, `midnight` → `#5c7cfa`)
@@ -188,12 +195,30 @@ Cada usuario solo puede leer y escribir sus propias tareas. Las reglas validan `
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Cada tarea pertenece a un único usuario (campo userId).
+    // El aislamiento entre usuarios se garantiza acá: nadie puede
+    // leer ni escribir una tarea cuyo userId no sea su propio uid.
     match /tasks/{taskId} {
-      allow read, write: if request.auth != null
+      // Leer: solo si sos el dueño del documento existente.
+      // Aplica tanto a lecturas de un doc puntual como a queries
+      // (la query de useTasks filtra por userId == uid, así que
+      // todos los docs devueltos cumplen esta condición).
+      allow read: if request.auth != null
         && request.auth.uid == resource.data.userId;
+      // Crear: el userId del nuevo documento tiene que ser el tuyo.
+      // En create todavía no existe "resource", se usa request.resource.
       allow create: if request.auth != null
         && request.auth.uid == request.resource.data.userId;
+      // Actualizar: tenés que ser el dueño Y no podés reasignar la
+      // tarea a otro usuario (el userId no puede cambiar).
+      allow update: if request.auth != null
+        && request.auth.uid == resource.data.userId
+        && request.resource.data.userId == resource.data.userId;
+      // Borrar: solo el dueño.
+      allow delete: if request.auth != null
+        && request.auth.uid == resource.data.userId;
     }
+
     match /users/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
@@ -240,6 +265,22 @@ La guía del Proyecto Integrador M4 incluía un asistente conversacional integra
 Lo intenté integrar de todas formas — llegué a tener la serverless function, el proxy y el system prompt funcionando — pero la evaluación fue clara: la feature agregaba complejidad de mantenimiento, dependía de una API key adicional, y el resultado final no estaba a la altura del resto de la aplicación en términos de UX ni de valor para el usuario. Mantenerla habría comprometido el tiempo y la calidad de las funcionalidades centrales (CRUD, email, responsive, temas).
 
 La decisión de descartarla fue deliberada y responde a un criterio de producto: es preferible tener menos features bien ejecutadas que muchas a medias. El código fue removido en su totalidad del repositorio.
+
+### Patrones de uso: cómo integré la IA en mi flujo de trabajo
+
+La IA no fue una caja negra a la que le pedía código terminado. Fue una herramienta de consulta activa que integré con un proceso deliberado:
+
+- **Planificación estructurada desde el inicio.** Antes de escribir la primera línea de código, dividí el proyecto en 9 hitos siguiendo la guía del PI. Cada hito tenía un objetivo claro y se implementó en orden, cotejando contra el material de las lecturas del módulo para validar que el enfoque era el correcto antes de avanzar al siguiente. Eso permitió que cada decisión técnica tuviera contexto y que los problemas se detectaran temprano, sin acumulación de deuda técnica.
+
+- **Primero entender, después implementar.** Antes de escribir cualquier pieza de código, pedía que me explicara la lógica subyacente: por qué `useLayoutEffect` en lugar de `useEffect` para sincronizar el tema, cómo funciona internamente `onSnapshot` y por qué hay que cancelar la suscripción, qué diferencia hay entre `resource` y `request.resource` en las reglas de Firestore. Si no lo entendía, volvía a preguntar con otra formulación hasta que quedaba claro.
+
+- **Comparaciones y trade-offs antes de decidir.** Cuando había más de una forma de resolver algo, pedía que me mostrara las opciones con sus ventajas y limitaciones — y yo decidía cuál adoptar según el contexto del proyecto. Eso aplica a decisiones de arquitectura (separar el template de email del handler, el enfoque `data-theme` para los temas) y también a decisiones de CSS (`:not([type='checkbox'])` vs. otras alternativas para el bug de especificidad).
+
+- **Revisión manual antes de incorporar cualquier sugerencia.** Nada entraba al proyecto sin que yo lo leyera línea por línea y pudiera explicar qué hace y por qué. Si algo no me cerraba o no lo entendía del todo, lo rechazaba y lo rehacíamos desde otro ángulo.
+
+- **Iteración hasta que quedaba bien.** Varias features se implementaron, se descartaron y se rehacieron. No por errores técnicos, sino porque el resultado no estaba a la altura del resto de la app en términos de UX o de coherencia arquitectónica. La IA ayudó a explorar esas iteraciones rápido, pero la decisión de cuándo algo "estaba bien" siempre fue mía.
+
+- **Tests como validación real.** Usé los tests de Vitest para confirmar que lo implementado hacía lo que se esperaba — no para que pasaran, sino para detectar casos borde que no había contemplado (como el formateo de fechas en UTC vs. zona horaria local del cliente).
 
 ### Vista Previa y Capturas de Pantalla
 *(Añadir capturas de pantalla de la aplicación en modo claro, oscuro y el formato del mail responsive)*
