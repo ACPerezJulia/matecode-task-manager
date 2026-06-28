@@ -129,7 +129,7 @@ export default function Tasks() {
             disabled={tasks.length === 0 || isSendingEmail}
             title="Recibir un resumen de tareas por email"
           >
-            📧 Resumen
+            ✉️ Resumen
           </button>
 
           <button type="button" className="btn btn--ghost" onClick={handleLogout}>
