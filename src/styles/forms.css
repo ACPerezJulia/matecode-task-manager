@@ -45,6 +45,18 @@
   }
 }
 
+.task-form .form-row input,
+.task-form .form-row select,
+.task-form .task-panel__meta input,
+.task-form .task-panel__meta select {
+  text-align: center;
+}
+
+/* En grid las cards son angostas: 2 columnas en lugar de 4 */
+.task-card .task-panel__meta {
+  grid-template-columns: repeat(2, 1fr);
+}
+
 /* ── Panel inline de nueva tarea (modo lista) ─────────────────── */
 .task-panel {
   border-top: 4px solid var(--accent);

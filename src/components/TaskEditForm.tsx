@@ -30,7 +30,8 @@ export function TaskEditForm({ edit }: TaskEditFormProps) {
           aria-label="Descripción"
         />
       </div>
-      <div className="form-row">
+      <p className="task-panel__optional-label">Opcionales</p>
+      <div className="task-panel__meta">
         <div>
           <label htmlFor={`edit-prio-${edit.taskId}`}>Prioridad</label>
           <select
@@ -56,10 +57,8 @@ export function TaskEditForm({ edit }: TaskEditFormProps) {
             aria-label="Etiqueta"
           />
         </div>
-      </div>
-      <div className="form-row">
         <div>
-          <label htmlFor={`edit-date-${edit.taskId}`}>Fecha (opcional)</label>
+          <label htmlFor={`edit-date-${edit.taskId}`}>Fecha</label>
           <input
             id={`edit-date-${edit.taskId}`}
             type="date"
@@ -69,7 +68,7 @@ export function TaskEditForm({ edit }: TaskEditFormProps) {
           />
         </div>
         <div>
-          <label htmlFor={`edit-time-${edit.taskId}`}>Hora (opcional)</label>
+          <label htmlFor={`edit-time-${edit.taskId}`}>Hora</label>
           <input
             id={`edit-time-${edit.taskId}`}
             type="time"
