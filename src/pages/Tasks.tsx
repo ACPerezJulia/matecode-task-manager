@@ -4,8 +4,12 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useTasks } from '../hooks/useTasks'
 import { useTheme } from '../hooks/useTheme'
+import { useViewMode } from '../hooks/useViewMode'
 import { TaskModal } from '../components/TaskModal'
 import { TaskGrid } from '../components/TaskGrid'
+import { TodoList } from '../components/TodoList'
+import { TodoForm } from '../components/TodoForm'
+import { ViewToggle } from '../components/ViewToggle'
 import { TaskListSkeleton } from '../components/Skeleton'
 import { EmailSendAnimation } from '../components/EmailSendAnimation'
 import { filterTasks, sortTasks } from '../utils/taskHelpers'
@@ -19,22 +23,33 @@ export default function Tasks() {
   const navigate = useNavigate()
   const { theme, setTheme } = useTheme()
 
+  const { view, setView } = useViewMode()
   const [filter, setFilter] = useState<TaskFilter>('all')
   const [sort, setSort] = useState<TaskSort>('recent')
   const [isSendingEmail, setIsSendingEmail] = useState(false)
   const [showModal, setShowModal] = useState(false)
+  const [isFormOpen, setIsFormOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 767px)').matches)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)')
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !showModal) {
+      if (view === 'grid' && e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !showModal) {
         setShowModal(true)
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [showModal])
+  }, [showModal, view])
 
+  const effectiveView: 'list' | 'grid' = isMobile ? 'grid' : view
   const visibleTasks = sortTasks(filterTasks(tasks, filter), sort)
 
   const firstName = user?.displayName?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'tú'
@@ -160,79 +175,114 @@ export default function Tasks() {
             <div className="stat-card stat-card--progress">
               <span className="stat-card__value">{progressPct}%</span>
               <span className="stat-card__label">Progreso</span>
+              <div
+                className="progress-bar"
+                role="progressbar"
+                aria-valuenow={progressPct}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              >
+                <div className="progress-bar__fill" style={{ width: `${progressPct}%` }} />
+              </div>
             </div>
-          </div>
-        )}
-        {tasks.length > 0 && (
-          <div
-            className="progress-bar"
-            role="progressbar"
-            aria-valuenow={progressPct}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          >
-            <div className="progress-bar__fill" style={{ width: `${progressPct}%` }} />
           </div>
         )}
       </section>
 
-      {/* ── Barra de filtros + orden + nueva tarea ── */}
-      {!loading && tasks.length > 0 && (
+      {/* ── Toolbar: vista · filtros · orden · acción ── */}
+      {!loading && (
         <div className="controls-bar">
-          {/* Filtros en grupo pill */}
-          <div className="filter-group">
-            <button type="button" className="chip" disabled={filter === 'pending'} onClick={() => setFilter('pending')}>Pendientes</button>
-            <button type="button" className="chip" disabled={filter === 'completed'} onClick={() => setFilter('completed')}>Completadas</button>
-            <button type="button" className="chip" disabled={filter === 'all'} onClick={() => setFilter('all')}>Todas</button>
+          {/* Grupo 1: toggle de vista (oculto en mobile via CSS) */}
+          <div className="controls-bar__group controls-bar__group--view">
+            <ViewToggle view={view} onChange={setView} />
           </div>
 
-          <div className="controls-bar__sep" />
+          {/* Grupos 2 y 3: solo cuando hay tareas */}
+          {tasks.length > 0 && (
+            <>
+              <div className="controls-bar__group controls-bar__group--filters">
+                <div className="filter-group">
+                  <button type="button" className="chip" disabled={filter === 'pending'} onClick={() => setFilter('pending')}>Pendientes</button>
+                  <button type="button" className="chip" disabled={filter === 'completed'} onClick={() => setFilter('completed')}>Completadas</button>
+                  <button type="button" className="chip" disabled={filter === 'all'} onClick={() => setFilter('all')}>Todas</button>
+                </div>
+                <select
+                  className="filter-select"
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value as TaskFilter)}
+                >
+                  <option value="all">Todas</option>
+                  <option value="pending">Pendientes</option>
+                  <option value="completed">Completadas</option>
+                </select>
+              </div>
 
-          <div className="controls-bar__sort">
-            <button type="button" className="chip" disabled={sort === 'recent'} onClick={() => setSort('recent')}>Recientes</button>
-            <button type="button" className="chip" disabled={sort === 'priority'} onClick={() => setSort('priority')}>Prioridad</button>
-            <button type="button" className="chip" disabled={sort === 'dueDate'} onClick={() => setSort('dueDate')}>Fecha</button>
-          </div>
+              <div className="controls-bar__group controls-bar__group--sort">
+                <div className="sort-group">
+                  <span className="sort-group__label">Ordenar por</span>
+                  <select
+                    className="sort-group__select"
+                    value={sort}
+                    onChange={(e) => setSort(e.target.value as TaskSort)}
+                  >
+                    <option value="recent">Recientes</option>
+                    <option value="priority">Prioridad</option>
+                    <option value="dueDate">Fecha</option>
+                  </select>
+                </div>
+              </div>
+            </>
+          )}
 
-          <div className="controls-bar__end">
+          {/* Grupo 4: acción siempre visible */}
+          <div className="controls-bar__group controls-bar__group--action">
             <button
               type="button"
-              className="btn btn--primary"
-              onClick={() => setShowModal(true)}
+              className={`btn ${isFormOpen && effectiveView === 'list' ? 'btn--ghost' : 'btn--primary'}`}
+              onClick={() => {
+                if (effectiveView === 'grid') setShowModal(true)
+                else setIsFormOpen((f) => !f)
+              }}
             >
-              + Nueva tarea
+              {isFormOpen && effectiveView === 'list' ? '× Cancelar' : 'Nueva tarea'}
             </button>
           </div>
         </div>
       )}
 
+      {/* ── Panel inline de nueva tarea (modo lista) ── */}
+      {!loading && effectiveView === 'list' && isFormOpen && user && (
+        <TodoForm
+          userId={user.uid}
+          onSuccess={() => setIsFormOpen(false)}
+          onCancel={() => setIsFormOpen(false)}
+        />
+      )}
+
       {/* ── Contenido principal ── */}
       {loading ? (
         <TaskListSkeleton />
+      ) : effectiveView === 'list' ? (
+        <TodoList tasks={visibleTasks} />
       ) : tasks.length === 0 ? (
-        <>
-          <p className="empty">Todavía no tenés tareas. ¡Creá la primera!</p>
-          <div style={{ textAlign: 'center', marginTop: 'var(--space-3)' }}>
-            <button type="button" className="btn btn--primary" onClick={() => setShowModal(true)}>
-              + Nueva tarea
-            </button>
-          </div>
-        </>
+        <p className="empty">Todavía no tenés tareas. ¡Usá "Nueva tarea" para crear la primera!</p>
       ) : (
         <TaskGrid tasks={visibleTasks} />
       )}
 
-      {/* FAB: acceso rápido cuando se scrolleó lejos de los controles */}
-      <button
-        type="button"
-        className="fab"
-        onClick={() => setShowModal(true)}
-        aria-label="Nueva tarea"
-      >
-        +
-      </button>
+      {/* FAB: solo en modo grid, acceso rápido al scrollear lejos de los controles */}
+      {effectiveView === 'grid' && (
+        <button
+          type="button"
+          className="fab"
+          onClick={() => setShowModal(true)}
+          aria-label="Nueva tarea"
+        >
+          +
+        </button>
+      )}
 
-      {/* Modal para crear tarea */}
+      {/* Modal para crear tarea (solo modo grid) */}
       {user && showModal && (
         <TaskModal userId={user.uid} onClose={() => setShowModal(false)} />
       )}

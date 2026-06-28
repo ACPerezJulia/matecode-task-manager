@@ -183,6 +183,12 @@
 .stat-card--progress .stat-card__value { color: var(--text-h); }
 
 /* ── Barra de progreso ──────────────────────────────────────── */
+
+/* Cuando la barra vive dentro de una stat-card no necesita margen externo */
+.stat-card .progress-bar {
+  margin: var(--space-2) 0 0;
+}
+
 .progress-bar {
   height: 8px;
   background: var(--accent-bg);
@@ -194,7 +200,7 @@
 
 .progress-bar__fill {
   height: 100%;
-  background: var(--accent);
+  background: linear-gradient(to right, #6c6bff, #9796ff);
   border-radius: 999px;
   transition: width 0.8s ease;
   min-width: 0;
@@ -206,16 +212,42 @@
 }
 
 [data-theme="gradient"] .progress-bar__fill {
-  background: rgba(255, 255, 255, 0.9);
+  background: linear-gradient(to right, #a78bfa, #f472b6);
+  box-shadow: 0 0 10px rgba(167, 139, 250, 0.65);
 }
 
 /* ── Barra unificada de filtros + orden ─────────────────────── */
 .controls-bar {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-2);
+  gap: 0;
   margin-bottom: var(--space-4);
+}
+
+/* Cada grupo ocupa 1 fracción igual del ancho total */
+.controls-bar__group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-3);
+}
+
+/* Primer grupo: contenido pegado a la izquierda */
+.controls-bar__group:first-child {
+  padding-left: 0;
+  justify-content: flex-start;
+}
+
+/* Último grupo: contenido pegado a la derecha */
+.controls-bar__group:last-child {
+  padding-right: 0;
+  justify-content: flex-end;
+}
+
+/* Línea divisoria entre grupos (reemplaza los <div class="sep">) */
+.controls-bar__group + .controls-bar__group {
+  border-left: 1px solid var(--border);
 }
 
 /* Grupo de filtros: contenedor tipo pill con botones internos */
@@ -253,6 +285,50 @@
 .filter-group .chip:not(:disabled):hover {
   background: var(--accent-bg);
   border-color: transparent;
+}
+
+/* ── Grupo de ordenamiento (label + select) ─────────────────── */
+.sort-group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sort-group__label {
+  font-size: 0.82rem;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.sort-group__select,
+.filter-select {
+  font: inherit;
+  font-size: 0.82rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 12px;
+  color: var(--text-h);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: center;
+}
+
+[data-theme="gradient"] .sort-group__select,
+[data-theme="gradient"] .filter-select {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* El filter-select es solo para mobile — oculto por defecto */
+.filter-select {
+  display: none;
+}
+
+/* Spacer flexible que empuja el botón "+ Nueva tarea" a la derecha */
+.controls-bar__spacer {
+  flex: 1;
 }
 
 /* Separador visual entre grupos */
@@ -293,10 +369,71 @@
 
 .chip:disabled {
   cursor: default;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: transparent;
+  font-weight: 700;
+}
+
+/* ── Toggle de vista (Lista / Grid) ─────────────────────────── */
+.view-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 2px;
+  box-shadow: var(--shadow);
+  flex-shrink: 0;
+}
+
+[data-theme="gradient"] .view-toggle {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.view-toggle__btn {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.view-toggle__btn svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.view-toggle__btn:not(.is-active):hover {
   background: var(--accent-bg);
-  border-color: var(--accent-border);
-  color: var(--accent);
-  font-weight: 600;
+}
+
+.view-toggle__btn.is-active {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 700;
+}
+
+/* Separador de sección "Opcionales" dentro del modal */
+.task-modal__optional-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+  opacity: 0.55;
+  margin: 0;
 }
 
 /* ── FAB ────────────────────────────────────────────────────── */
@@ -354,7 +491,9 @@
 }
 
 [data-theme="gradient"] .task-modal {
-  background: rgba(12, 10, 35, 0.97);
+  background: rgba(22, 16, 68, 0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 }
 
 .task-modal__header {
@@ -433,6 +572,19 @@
   min-width: 130px;
 }
 
+/* Grilla de 3 columnas: Fecha · Hora · Etiqueta */
+.task-modal__meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .task-modal__meta-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .task-modal__submit {
   width: 100%;
   padding: 15px;
@@ -487,6 +639,14 @@
   font-weight: 700;
 }
 
+/* En modo lista los botones de acción son siempre visibles (no se ocultan al hover
+   como en el grid, donde el espacio es más limitado). */
+@media (hover: hover) {
+  .task-item .task-card__actions {
+    opacity: 1;
+  }
+}
+
 /* ── Contenido heredado (lista — mantenido por compatibilidad) ── */
 .task-list {
   list-style: none;
@@ -503,6 +663,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  border-radius: 22px;
 }
 
 .task-item.is-completed { opacity: 0.62; }
@@ -527,7 +688,9 @@
 .task-title {
   flex: 1;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
+  line-height: 1.35;
+  word-break: break-word;
   color: var(--text-h);
 }
 .task-title.is-completed {
@@ -666,34 +829,57 @@
   }
 }
 
-@media (max-width: 540px) {
-  /* Barra de controles en columna, centrada */
-  .controls-bar {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .filter-group {
-    justify-content: center;
-  }
-
-  .controls-bar__sort {
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .controls-bar__sep {
+@media (max-width: 767px) {
+  /* Ocultar toggle de vista y botón de crear — en mobile el FAB cubre la creación */
+  .controls-bar__group--view,
+  .controls-bar__group--action {
     display: none;
   }
 
-  /* "Nueva tarea" pasa a ancho completo */
-  .controls-bar__end {
-    width: 100%;
-    margin-left: 0;
+  /* Filtros: chips compactos en mobile ≥321px */
+  .controls-bar__group--filters {
+    flex: 1;
+    justify-content: flex-start;
+    padding: 0;
+    border-left: none;
+    min-width: 0;
   }
 
-  .controls-bar__end .btn {
-    width: 100%;
-    text-align: center;
+  .controls-bar__group--filters .filter-group .chip {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+  }
+
+  /* Sort: ancho natural del select (flex: none = 0 0 auto, no colapsa a 0) */
+  .controls-bar__group--sort {
+    flex: none;
+    padding: 0;
+    border-left: none;
+  }
+
+  .controls-bar__group--sort .sort-group__label {
+    display: none;
+  }
+
+
+  /* Anula el border-left del desktop (especificidad 0,2,0 — igual que la regla de origen) */
+  .controls-bar__group + .controls-bar__group {
+    border-left: none;
+  }
+}
+
+/* Pantallas muy pequeñas (320px): chips → select para evitar overflow */
+@media (max-width: 320px) {
+  .controls-bar__group--filters {
+    flex: none;
+    margin-right: auto;
+  }
+
+  .controls-bar__group--filters .filter-group {
+    display: none;
+  }
+
+  .controls-bar__group--filters .filter-select {
+    display: block;
   }
 }
