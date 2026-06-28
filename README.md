@@ -242,5 +242,5 @@ Lo intenté integrar de todas formas — llegué a tener la serverless function,
 La decisión de descartarla fue deliberada y responde a un criterio de producto: es preferible tener menos features bien ejecutadas que muchas a medias. El código fue removido en su totalidad del repositorio.
 
 ### Vista Previa y Capturas de Pantalla
-*(Añade aquí capturas de pantalla de la aplicación en modo claro, oscuro y el formato del mail responsive)*
+*(Añadir capturas de pantalla de la aplicación en modo claro, oscuro y el formato del mail responsive)*
 - **Dashboard Principal (Tema Nocturno)**: `![Dashboard](ruta-a-imagen-o-gif)`
