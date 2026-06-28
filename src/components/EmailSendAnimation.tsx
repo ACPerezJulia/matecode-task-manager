@@ -11,7 +11,7 @@ export function EmailSendAnimation() {
           Enviando tu resumen...
         </p>
         <p className="email-overlay__subtitle">
-          Recibirás un email con tus tareas pendientes
+          Recibirás un email con tus tareas pendientes... Revisá SPAM por las dudas!
         </p>
       </div>
       <div className="email-dots" aria-hidden="true">

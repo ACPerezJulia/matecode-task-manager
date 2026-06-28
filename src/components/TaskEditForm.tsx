@@ -52,7 +52,7 @@ export function TaskEditForm({ edit }: TaskEditFormProps) {
             type="text"
             value={edit.label}
             onChange={(e) => edit.setLabel(e.target.value)}
-            placeholder="Trabajo, Personal, Dev..."
+            placeholder="#Trabajo, #Personal, #Dev..."
             aria-label="Etiqueta"
           />
         </div>

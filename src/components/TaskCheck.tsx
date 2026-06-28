@@ -6,7 +6,7 @@ interface TaskCheckProps {
 
 /**
  * Check circular: un checkbox nativo (accesible) estilado como un círculo que
- * se llena de verde con un ✓ al completar. El estilo vive en components.css
+ * se llena de color con un ✓ al completar. El estilo vive en components.css
  * (.task-check). Lo usan lista y grid.
  */
 export function TaskCheck({ checked, onChange, disabled }: TaskCheckProps) {

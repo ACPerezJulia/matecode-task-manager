@@ -98,7 +98,7 @@ export function TodoForm({ userId, onSuccess, onCancel }: TodoFormProps) {
         name="description"
         value={form.description}
         onChange={handleChange}
-        placeholder="Descripción"
+        placeholder="Descripción... ¡dame más detalles!"
         rows={2}
       />
 

@@ -179,7 +179,7 @@ export function TaskModal({ userId, onClose }: TaskModalProps) {
                 type="text"
                 value={form.label ?? ''}
                 onChange={(e) => set('label', e.target.value)}
-                placeholder="Trabajo, Personal, Dev..."
+                placeholder="#Trabajo, #Personal, Dev..."
               />
             </div>
           </div>
