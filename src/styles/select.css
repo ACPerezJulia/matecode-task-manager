@@ -1,0 +1,118 @@
+/* select.css — CustomSelect: dropdown propio que respeta los temas via CSS variables.
+   El <select> nativo renderiza el dropdown en el SO y no lee variables CSS,
+   por eso lo reemplazamos con este componente. */
+
+.custom-select {
+  position: relative;
+  display: inline-block;
+}
+
+/* Botón que muestra el valor seleccionado */
+.custom-select__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 13px 15px;
+  color: var(--text-h);
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  white-space: nowrap;
+}
+
+.custom-select__trigger:hover,
+.custom-select.is-open .custom-select__trigger {
+  border-color: var(--accent-border);
+}
+
+.custom-select__arrow {
+  font-size: 0.65rem;
+  opacity: 0.5;
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+
+.custom-select.is-open .custom-select__arrow {
+  transform: rotate(180deg);
+}
+
+/* Lista desplegable */
+.custom-select__dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 100%;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  z-index: 200;
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+}
+
+/* Sort: está en el lado derecho, el dropdown se abre hacia la izquierda */
+.sort-group__select .custom-select__dropdown {
+  left: auto;
+  right: 0;
+}
+
+.custom-select__option {
+  padding: 9px 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-h);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.custom-select__option:hover {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.custom-select__option.is-selected {
+  color: var(--accent);
+  font-weight: 700;
+  background: var(--accent-bg);
+}
+
+/* ── Contexto: sort-group y filter-select (toolbar) ─────────── */
+/* Override del tamaño para que se vea como el chip de ordenamiento */
+.sort-group__select .custom-select__trigger,
+.filter-select .custom-select__trigger {
+  font-size: 0.82rem;
+  border-radius: var(--radius);
+  padding: 6px 12px;
+  border-width: 1px;
+  box-shadow: var(--shadow);
+}
+
+[data-theme="gradient"] .sort-group__select .custom-select__trigger,
+[data-theme="gradient"] .filter-select .custom-select__trigger {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="gradient"] .custom-select__dropdown {
+  background: rgba(22, 16, 68, 0.53);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* ── Contexto: meta-grid de formularios (prioridad) ─────────── */
+.task-form .task-panel__meta .custom-select {
+  display: block;
+  width: 100%;
+}

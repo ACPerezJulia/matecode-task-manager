@@ -1,3 +1,4 @@
+import { CustomSelect } from './CustomSelect'
 import type { TaskEditState } from '../hooks/useTaskItem'
 
 interface TaskEditFormProps {
@@ -33,18 +34,17 @@ export function TaskEditForm({ edit }: TaskEditFormProps) {
       <p className="task-panel__optional-label">Opcionales</p>
       <div className="task-panel__meta">
         <div>
-          <label htmlFor={`edit-prio-${edit.taskId}`}>Prioridad</label>
-          <select
-            id={`edit-prio-${edit.taskId}`}
+          <label>Prioridad</label>
+          <CustomSelect
             value={edit.priority ?? ''}
             onChange={edit.onPriorityChange}
-            aria-label="Prioridad"
-          >
-            <option value="">Sin prioridad</option>
-            <option value="low">Baja</option>
-            <option value="medium">Media</option>
-            <option value="high">Alta</option>
-          </select>
+            options={[
+              { value: '', label: 'Sin prioridad' },
+              { value: 'low', label: 'Baja' },
+              { value: 'medium', label: 'Media' },
+              { value: 'high', label: 'Alta' },
+            ]}
+          />
         </div>
         <div>
           <label htmlFor={`edit-label-${edit.taskId}`}>Etiqueta</label>

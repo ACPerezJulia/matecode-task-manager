@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { createTask } from '../services/firestoreService'
+import { CustomSelect } from './CustomSelect'
 import type { TaskFormValues } from '../types'
 
 interface TodoFormProps {
@@ -35,8 +36,7 @@ export function TodoForm({ userId, onSuccess, onCancel }: TodoFormProps) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  function handlePriorityChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const value = e.target.value
+  function handlePriorityChange(value: string) {
     setForm((prev) => ({
       ...prev,
       priority: value as TaskFormValues['priority'] | '',
@@ -105,18 +105,17 @@ export function TodoForm({ userId, onSuccess, onCancel }: TodoFormProps) {
       <p className="task-panel__optional-label">Opcionales</p>
       <div className="task-panel__meta">
         <div>
-          <label className="task-panel__field-label" htmlFor="tp-priority">Prioridad</label>
-          <select
-            id="tp-priority"
-            name="priority"
+          <label className="task-panel__field-label">Prioridad</label>
+          <CustomSelect
             value={form.priority ?? ''}
             onChange={handlePriorityChange}
-          >
-            <option value="">Sin prioridad</option>
-            <option value="low">Baja</option>
-            <option value="medium">Media</option>
-            <option value="high">Alta</option>
-          </select>
+            options={[
+              { value: '', label: 'Sin prioridad' },
+              { value: 'low', label: 'Baja' },
+              { value: 'medium', label: 'Media' },
+              { value: 'high', label: 'Alta' },
+            ]}
+          />
         </div>
 
         <div>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { ChangeEvent, FormEvent } from 'react'
+import type { FormEvent } from 'react'
 import toast from 'react-hot-toast'
 import {
   updateTask,
@@ -75,8 +75,7 @@ export function useTaskItem(task: Task) {
     setEditing(false)
   }
 
-  function onPriorityChange(e: ChangeEvent<HTMLSelectElement>) {
-    const value = e.target.value
+  function onPriorityChange(value: string) {
     setPriority(value as TaskFormValues['priority'] | '')
   }
 

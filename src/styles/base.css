@@ -88,6 +88,13 @@ select {
   transition: border-color 0.2s;
 }
 
+/* Las <option> las renderiza el SO: no leen CSS variables ni heredan el tema.
+   Forzamos colores neutros hardcodeados para que sean legibles en todos los temas. */
+select option {
+  background-color: #ffffff;
+  color: #1e2140;
+}
+
 textarea {
   min-height: 72px;
   resize: vertical;
