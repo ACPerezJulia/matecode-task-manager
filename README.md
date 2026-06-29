@@ -28,20 +28,26 @@ SPA de gestión de tareas desarrollada como proyecto integrador del Módulo 4 de
 ## Funcionalidades
 
 - Registro y login con email/password y Google
+- Validación estricta de contraseña en el registro: mínimo 6 caracteres, una mayúscula, una minúscula y un número
+- Recuperación de contraseña via email (Firebase Password Reset) desde la pantalla de login
 - Sesión persistente con redirección automática
 - Rutas protegidas (sin acceso sin autenticación)
 - Avatar en el navbar: foto de perfil de Google cuando el usuario se autentica con Google; inicial del nombre en caso contrario
 - CRUD completo de tareas con sincronización en tiempo real (Firestore `onSnapshot`)
+- Eliminación individual con patrón **undo**: la tarea desaparece al instante y un toast ofrece "Deshacer" durante 5 segundos; si no se usa, el borrado se confirma en Firestore
+- Eliminación masiva de tareas completadas con botón 🧹 y confirmación inline (sin dialogs del sistema)
 - Dashboard con saludo personalizado, estadísticas de tareas y barra de progreso con degradado
 - Campos por tarea: título, descripción, prioridad (baja/media/alta), fecha y hora de vencimiento, etiqueta
 - Cards con chips semánticos de prioridad y estado
 - Filtros: todas / pendientes / completadas
 - Orden: más recientes / por prioridad / por fecha
 - Tres temas visuales: Clásico (☀️), Nocturno (🌙), Vívido (✨) — seleccionables por el usuario, persistidos en localStorage y Firestore para sincronizar entre dispositivos
+- Dropdowns de filtro y orden con componente `CustomSelect` a medida (reemplaza `<select>` nativo para mantener coherencia visual entre temas)
+- Toast notifications temáticas: el fondo y el texto se adaptan al tema activo mediante variables CSS
 - Diseño mobile-first: en pantallas ≤767px la vista se fuerza a grid, la toolbar se reduce a una fila con filtros y orden, y la creación de tareas se centraliza en el FAB flotante
-- Resumen de tareas por email con diseño responsive, agrupado por estado y formato de fecha dd/mm/aa 24hs
+- Resumen de tareas por email con diseño responsive, agrupado por prioridad, tareas en grid de 2 columnas y formato de fecha dd/mm/aa 24hs
 - Loading skeletons y toast notifications en todas las acciones
-- Footer con créditos de autoría
+- Footer con créditos de autoría y link al portfolio
 
 ---
 
@@ -140,13 +146,27 @@ Los componentes solo describen qué se muestra. La lógica de negocio vive en ho
 
 ```
 src/
-├── components/   # UI: TaskCard, TaskModal, TaskEditForm, DueChip, Dashboard...
+├── components/   # UI: TaskCard, TaskModal, TaskEditForm, CustomSelect, DueChip...
 ├── hooks/        # Lógica reutilizable: useTasks, useTaskItem, useAuth, useTheme
 ├── services/     # Firebase, Firestore, emailService
-├── pages/        # Vistas: Login, Register, Tasks
+├── pages/        # Vistas: Login, Register, ForgotPassword, Tasks
 ├── routes/       # Enrutamiento y rutas protegidas (ProtectedRoute, PublicOnlyRoute)
-├── styles/       # Variables CSS globales, temas, estilos base
-├── utils/        # Helpers: format.ts, taskHelpers.ts
+├── styles/
+│   ├── tokens.css    # Variables de diseño (colores, espaciado, radios por tema)
+│   ├── base.css      # Reset suave, tipografía, elementos HTML
+│   ├── components.css # Primitivas: .card, .badge, .empty
+│   ├── buttons.css   # Sistema de botones
+│   ├── forms.css     # Layout de formularios
+│   ├── select.css    # Componente CustomSelect
+│   ├── header.css    # Header sticky, avatar, theme toggle, hamburguesa
+│   ├── stats.css     # Sección de bienvenida, stat cards, barra de progreso
+│   ├── toolbar.css   # Controls bar, chips, filtros, toggle de vista
+│   ├── modal.css     # Animaciones, FAB, modal de nueva tarea
+│   ├── tasks.css     # Ítems de tarea, lista, confirmación de borrado
+│   ├── grid.css      # Vista de cuadrícula (TaskGrid, TaskCard)
+│   ├── auth.css      # Vistas de login/registro/recuperación
+│   └── skeleton.css  # Loading placeholders
+├── utils/        # Helpers: format.ts, taskHelpers.ts, firebaseErrors.ts
 └── types/        # Interfaces compartidas: Task, TaskFormValues, Theme...
 
 api/
@@ -182,7 +202,7 @@ El frontend nunca habla con AWS directamente. Llama a `POST /api/send-email` (Ve
 2. `Tasks.tsx` llama a `sendTaskSummary(email, tasks, { name, theme })`
 3. `emailService.ts` formatea las fechas en zona horaria local (el servidor corre en UTC) y hace `POST /api/send-email`
 4. La Vercel Function mapea el tema del usuario a un color de acento (`classic` → `#4F6EF7`, `midnight` → `#5c7cfa`)
-5. `generateSummaryEmail()` agrupa las tareas por estado, construye el HTML reemplazando los `{{PLACEHOLDERS}}` en el template, y genera el fallback en texto plano
+5. `generateSummaryEmail()` agrupa las tareas pendientes por prioridad (alta / media / baja), las renderiza en un grid de 2 columnas usando tablas anidadas (compatible con todos los clientes de email), construye el HTML reemplazando los `{{PLACEHOLDERS}}` y genera el fallback en texto plano
 6. AWS SES envía el email con ambas versiones (HTML + texto)
 
 ---
