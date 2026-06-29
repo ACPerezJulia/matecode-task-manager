@@ -36,6 +36,9 @@
 }
 
 .task-section__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -44,6 +47,21 @@
   margin: var(--space-4) 0 var(--space-3);
   padding-bottom: var(--space-2);
   border-bottom: 1px solid var(--border);
+}
+
+.section-clean-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 2px;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+  line-height: 1;
+}
+
+.section-clean-btn:hover {
+  opacity: 1;
 }
 
 /* ── Card ────────────────────────────────────────────────────── */

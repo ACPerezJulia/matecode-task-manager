@@ -6,6 +6,7 @@ import {
   updateDoc,
   deleteDoc,
   deleteField,
+  writeBatch,
   query,
   where,
   orderBy,
@@ -74,6 +75,17 @@ export async function toggleTaskCompleted(taskId: string, completed: boolean) {
 /** Elimina una tarea por su id. */
 export async function deleteTask(taskId: string) {
   await deleteDoc(doc(db, 'tasks', taskId))
+}
+
+/**
+ * Elimina todas las tareas completadas de una vez usando writeBatch.
+ * Firestore permite hasta 500 operaciones por batch — más que suficiente
+ * para una app personal.
+ */
+export async function deleteCompletedTasks(taskIds: string[]): Promise<void> {
+  const batch = writeBatch(db)
+  taskIds.forEach((id) => batch.delete(doc(db, 'tasks', id)))
+  await batch.commit()
 }
 
 /**

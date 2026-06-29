@@ -14,6 +14,7 @@ import { TaskListSkeleton } from '../components/Skeleton'
 import { EmailSendAnimation } from '../components/EmailSendAnimation'
 import { filterTasks, sortTasks } from '../utils/taskHelpers'
 import { sendTaskSummary } from '../services/emailService'
+import { deleteCompletedTasks } from '../services/firestoreService'
 import { saveUserProfile } from '../services/firestoreService'
 import type { TaskFilter, TaskSort, Theme } from '../types'
 
@@ -69,6 +70,13 @@ export default function Tasks() {
     if (user) {
       saveUserProfile(user.uid, { theme: t }).catch(console.error)
     }
+  }
+
+  async function handleDeleteCompleted() {
+    const ids = tasks.filter((t) => t.completed).map((t) => t.id)
+    if (ids.length === 0) return
+    await deleteCompletedTasks(ids)
+    toast.success(`${ids.length} tarea${ids.length > 1 ? 's' : ''} eliminada${ids.length > 1 ? 's' : ''}.`)
   }
 
   async function handleSendSummary() {
@@ -265,11 +273,11 @@ export default function Tasks() {
       {loading ? (
         <TaskListSkeleton />
       ) : effectiveView === 'list' ? (
-        <TodoList tasks={visibleTasks} />
+        <TodoList tasks={visibleTasks} onDeleteCompleted={completedCount > 0 ? handleDeleteCompleted : undefined} />
       ) : tasks.length === 0 ? (
         <p className="empty">Todavía no tenés tareas. ¡Usá "Nueva tarea" para crear la primera!</p>
       ) : (
-        <TaskGrid tasks={visibleTasks} />
+        <TaskGrid tasks={visibleTasks} onDeleteCompleted={completedCount > 0 ? handleDeleteCompleted : undefined} />
       )}
 
       {/* FAB: solo en modo grid, acceso rápido al scrollear lejos de los controles */}

@@ -1,17 +1,30 @@
+import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { TaskCard } from './TaskCard'
 import type { Task } from '../types'
 
 interface TaskGridProps {
   tasks: Task[]
+  onDeleteCompleted?: () => Promise<void>
 }
 
-/**
- * Vista GRID: separa las tareas en Pendientes y Completadas, cada sección con
- * su título, contador y línea divisoria, y las muestra como cards en una
- * grilla responsiva. Cada sección se renderiza solo si tiene tareas.
- */
-export function TaskGrid({ tasks }: TaskGridProps) {
-  // Caso "sin resultados" (ej: un filtro que no matchea nada).
+export function TaskGrid({ tasks, onDeleteCompleted }: TaskGridProps) {
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  async function handleConfirm() {
+    if (!onDeleteCompleted) return
+    setIsDeleting(true)
+    try {
+      await onDeleteCompleted()
+      setShowConfirm(false)
+    } catch {
+      toast.error('No se pudieron eliminar las tareas.')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   if (tasks.length === 0) {
     return <p className="empty">No hay tareas que coincidan con el filtro.</p>
   }
@@ -34,7 +47,34 @@ export function TaskGrid({ tasks }: TaskGridProps) {
 
       {completed.length > 0 && (
         <section>
-          <h2 className="task-section__title">Completadas ({completed.length})</h2>
+          <h2 className="task-section__title">
+            Completadas ({completed.length})
+            {onDeleteCompleted && !showConfirm && (
+              <button
+                type="button"
+                className="section-clean-btn"
+                onClick={() => setShowConfirm(true)}
+                title="Eliminar todas las completadas"
+              >
+                🧹
+              </button>
+            )}
+          </h2>
+          {showConfirm && (
+            <div className="delete-confirm">
+              <span className="delete-confirm__text">
+                ¿Eliminar {completed.length} tarea{completed.length > 1 ? 's' : ''} completada{completed.length > 1 ? 's' : ''}? Esta acción no se puede deshacer.
+              </span>
+              <div className="delete-confirm__actions">
+                <button type="button" className="btn btn--danger btn--sm" onClick={handleConfirm} disabled={isDeleting}>
+                  {isDeleting ? 'Eliminando...' : 'Sí, eliminar'}
+                </button>
+                <button type="button" className="btn btn--ghost btn--sm" onClick={() => setShowConfirm(false)} disabled={isDeleting}>
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
           <ul className="task-grid">
             {completed.map((task) => (
               <TaskCard key={task.id} task={task} />
@@ -42,7 +82,6 @@ export function TaskGrid({ tasks }: TaskGridProps) {
           </ul>
         </section>
       )}
-
     </div>
   )
 }
