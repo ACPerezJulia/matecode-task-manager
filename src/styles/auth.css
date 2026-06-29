@@ -92,15 +92,53 @@
   background: var(--border);
 }
 
+/* ── Estado de éxito en ForgotPassword ── */
+.forgot-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-3);
+}
+
+.forgot-success__icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.forgot-success h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.forgot-success p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.forgot-success .btn {
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
+/* ── Hint debajo de un input ── */
+.input-hint {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: 0.72rem;
+  color: var(--text);
+  opacity: 0.65;
+  line-height: 1.4;
+}
+
 /* ── Link de alternativa (¿Ya tenés cuenta?) ── */
 .auth-alt {
   text-align: center;
   margin-top: var(--space-4);
   font-size: 0.9rem;
   color: var(--text);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
 }

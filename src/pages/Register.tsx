@@ -20,6 +20,9 @@ export default function Register() {
     if (form.name.trim().length < 2) return 'El nombre debe tener al menos 2 caracteres.'
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return 'El email no es válido.'
     if (form.password.length < 6) return 'La contraseña debe tener al menos 6 caracteres.'
+    if (!/[A-Z]/.test(form.password)) return 'La contraseña debe contener al menos una mayúscula.'
+    if (!/[a-z]/.test(form.password)) return 'La contraseña debe contener al menos una minúscula.'
+    if (!/[0-9]/.test(form.password)) return 'La contraseña debe contener al menos un número.'
     return null
   }
 
@@ -88,6 +91,9 @@ export default function Register() {
               placeholder="Mínimo 6 caracteres"
               required
             />
+            <small className="input-hint">
+              Mínimo 6 caracteres · una mayúscula · una minúscula · un número
+            </small>
           </div>
           <button type="submit" className="btn btn--primary" disabled={loading}>
             {loading ? 'Cargando...' : 'Crear cuenta →'}

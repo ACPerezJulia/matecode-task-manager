@@ -105,6 +105,9 @@ export default function Login() {
         </button>
 
         <p className="auth-alt">
+          <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
+        </p>
+        <p className="auth-alt">
           ¿No tenés cuenta? <Link to="/register">Registrate</Link>
         </p>
       </div>
