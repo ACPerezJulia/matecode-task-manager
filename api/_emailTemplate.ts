@@ -49,8 +49,8 @@ export function todayAR(): string {
   return `${ar.getUTCDate()} de ${MONTHS[ar.getUTCMonth()]} de ${ar.getUTCFullYear()}`
 }
 
-/** Una fila de tarea para usar dentro de una sección de prioridad. */
-function buildTaskCard(
+/** Contenido interno de una card de tarea (sin tabla envolvente). */
+function buildTaskCardContent(
   task: EmailTaskItem,
   cardBg: string,
   cardBorder: string,
@@ -60,29 +60,24 @@ function buildTaskCard(
   const title = escapeHtml(task.title.trim() || '(sin título)')
 
   const dateChip = task.dueDate
-    ? `<span style="font-size:11px;color:#6b7280;background:#f0f4ff;padding:2px 8px;border-radius:20px;border:1px solid #e2e8f0;margin-right:6px;">📅 ${escapeHtml(task.dueDate)}</span>`
+    ? `<span style="font-size:10px;color:#6b7280;background:#f0f4ff;padding:2px 7px;border-radius:20px;border:1px solid #e2e8f0;margin-right:5px;">📅 ${escapeHtml(task.dueDate)}</span>`
     : ''
 
   const labelChip = task.label
-    ? `<span style="font-size:11px;color:${accentColor};background:#eef2ff;padding:2px 8px;border-radius:20px;border:1px solid #c7d2fe;font-weight:600;">#${escapeHtml(task.label)}</span>`
+    ? `<span style="font-size:10px;color:${accentColor};background:#eef2ff;padding:2px 7px;border-radius:20px;border:1px solid #c7d2fe;font-weight:600;">#${escapeHtml(task.label)}</span>`
     : ''
 
   const chips = dateChip || labelChip
     ? `<div style="margin-top:5px;">${dateChip}${labelChip}</div>`
     : ''
 
-  return `
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;">
-  <tr>
-    <td style="background:${cardBg};border-radius:10px;border:1px solid ${cardBorder};padding:12px 14px;box-shadow:inset 4px 0 0 ${sideColor};">
-      <div style="font-size:14px;font-weight:600;color:#1e2140;">${title}</div>
-      ${chips}
-    </td>
-  </tr>
-</table>`
+  return `<div style="background:${cardBg};border-radius:10px;border:1px solid ${cardBorder};padding:10px 12px;box-shadow:inset 3px 0 0 ${sideColor};">
+    <div style="font-size:13px;font-weight:600;color:#1e2140;line-height:1.35;">${title}</div>
+    ${chips}
+  </div>`
 }
 
-/** Bloque HTML completo de una sección de prioridad (encabezado + cards). */
+/** Bloque HTML completo de una sección de prioridad (encabezado + grid de 2 columnas). */
 function buildPrioritySection(
   label: string,
   dotColor: string,
@@ -95,13 +90,26 @@ function buildPrioritySection(
 ): string {
   if (!tasks.length) return ''
 
-  const cards = tasks
-    .map(t => buildTaskCard(t, cardBg, cardBorder, sideColor, accentColor))
-    .join('')
+  // Agrupa de a 2 tareas por fila (grid 2 columnas vía tabla anidada)
+  const rows: string[] = []
+  for (let i = 0; i < tasks.length; i += 2) {
+    const left  = buildTaskCardContent(tasks[i],     cardBg, cardBorder, sideColor, accentColor)
+    const right = tasks[i + 1]
+      ? buildTaskCardContent(tasks[i + 1], cardBg, cardBorder, sideColor, accentColor)
+      : ''
+    rows.push(`
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;">
+  <tr>
+    <td width="49%" valign="top">${left}</td>
+    <td width="2%"></td>
+    <td width="49%" valign="top">${right}</td>
+  </tr>
+</table>`)
+  }
 
   return `
 <div style="margin-bottom:20px;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:10px;">
     <tr>
       <td style="vertical-align:middle;">
         <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${dotColor};margin-right:8px;vertical-align:middle;"></span>
@@ -109,7 +117,7 @@ function buildPrioritySection(
       </td>
     </tr>
   </table>
-  ${cards}
+  ${rows.join('')}
 </div>`
 }
 
@@ -165,35 +173,32 @@ const TEMPLATE = `<!DOCTYPE html>
 
               <div style="height:1px;background:#f0f4ff;margin:0 0 20px;"></div>
 
-              <!-- Stats -->
+              <!-- Stats: Pendientes + Completadas -->
               <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
                 <tr>
-                  <td width="32%" style="text-align:center;padding:14px 8px;background:#f5f7ff;border-radius:12px;border:1px solid #e2e8f0;">
-                    <div style="font-size:26px;font-weight:800;color:{{ACCENT_COLOR}};line-height:1;">{{PENDING_COUNT}}</div>
-                    <div style="font-size:11px;color:#9ca3af;margin-top:4px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Pendientes</div>
+                  <td width="6%"></td>
+                  <td width="41%" style="text-align:center;padding:16px 8px;background:#f5f7ff;border-radius:12px;border:1px solid #e2e8f0;">
+                    <div style="font-size:28px;font-weight:800;color:{{ACCENT_COLOR}};line-height:1;">{{PENDING_COUNT}}</div>
+                    <div style="font-size:11px;color:#9ca3af;margin-top:5px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;">Pendientes</div>
                   </td>
-                  <td width="4%"></td>
-                  <td width="32%" style="text-align:center;padding:14px 8px;background:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;">
-                    <div style="font-size:26px;font-weight:800;color:#16a34a;line-height:1;">{{COMPLETED_COUNT}}</div>
-                    <div style="font-size:11px;color:#9ca3af;margin-top:4px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Completadas</div>
+                  <td width="6%"></td>
+                  <td width="41%" style="text-align:center;padding:16px 8px;background:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;">
+                    <div style="font-size:28px;font-weight:800;color:#16a34a;line-height:1;">{{COMPLETED_COUNT}}</div>
+                    <div style="font-size:11px;color:#9ca3af;margin-top:5px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;">Completadas</div>
                   </td>
-                  <td width="4%"></td>
-                  <td width="32%" style="text-align:center;padding:14px 8px;background:#f5f7ff;border-radius:12px;border:1px solid #e2e8f0;">
-                    <div style="font-size:26px;font-weight:800;color:#1e2140;line-height:1;">{{PROGRESS}}%</div>
-                    <div style="font-size:11px;color:#9ca3af;margin-top:4px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Progreso</div>
-                  </td>
+                  <td width="6%"></td>
                 </tr>
               </table>
 
               <!-- Barra de progreso -->
               <div style="margin-bottom:24px;">
-                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;">
                   <tr>
                     <td style="font-size:12px;font-weight:600;color:#4f5882;">Progreso general</td>
-                    <td align="right" style="font-size:12px;font-weight:700;color:{{ACCENT_COLOR}};">{{PROGRESS}}%</td>
+                    <td align="right" style="font-size:13px;font-weight:800;color:{{ACCENT_COLOR}};">{{PROGRESS}}%</td>
                   </tr>
                 </table>
-                <div style="background:#eef2ff;border-radius:100px;height:8px;overflow:hidden;border:1px solid #e2e8f0;margin-top:8px;">
+                <div style="background:#eef2ff;border-radius:100px;height:10px;overflow:hidden;border:1px solid #e2e8f0;">
                   <div style="height:100%;background:linear-gradient(90deg,{{ACCENT_COLOR}},#7c3aed);width:{{PROGRESS}}%;border-radius:100px;"></div>
                 </div>
               </div>
@@ -223,7 +228,8 @@ const TEMPLATE = `<!DOCTYPE html>
                 <a href="{{APP_URL}}" style="color:#9ca3af;text-decoration:underline;">Ir a la app</a>
               </div>
               <div style="margin-top:12px;font-size:11px;color:#c4cce8;">
-                © 2026 Mate Code App · Hecho con ❤️ por el equipo MateCode
+                © 2026 Mate Code App · Desarrollado por
+                <a href="https://acperezjulia.github.io/" style="color:#a5b4fc;text-decoration:none;font-weight:600;">Analía Pérez Juliá</a>
               </div>
             </td>
           </tr>
