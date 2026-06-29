@@ -1,0 +1,223 @@
+/* toolbar.css — Barra de controles: filtros, ordenamiento y toggle de vista. */
+
+/* ── Barra unificada de filtros + orden ─────────────────────── */
+.controls-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: var(--space-4);
+}
+
+.controls-bar__group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-3);
+}
+
+.controls-bar__group:first-child {
+  padding-left: 0;
+  justify-content: flex-start;
+}
+
+.controls-bar__group:last-child {
+  padding-right: 0;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.controls-bar__group + .controls-bar__group {
+  border-left: 1px solid var(--border);
+}
+
+.controls-bar__sort {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ── Grupo de filtros ───────────────────────────────────────── */
+.filter-group {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 2px;
+  box-shadow: var(--shadow);
+}
+
+[data-theme="gradient"] .filter-group {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.filter-group .chip {
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  padding: 8px 15px;
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.filter-group .chip:disabled {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: transparent;
+  font-weight: 700;
+}
+
+.filter-group .chip:not(:disabled):hover {
+  background: var(--accent-bg);
+  border-color: transparent;
+}
+
+/* ── Grupo de ordenamiento ──────────────────────────────────── */
+.sort-group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sort-group__label {
+  font-size: 0.82rem;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* Mobile: oculto por defecto, reemplazado por CustomSelect */
+.filter-select {
+  display: none;
+}
+
+/* ── Chips ──────────────────────────────────────────────────── */
+.chip {
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  white-space: nowrap;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+[data-theme="gradient"] .chip {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.chip:not(:disabled):hover {
+  border-color: var(--accent-border);
+}
+
+.chip:disabled {
+  cursor: default;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: transparent;
+  font-weight: 700;
+}
+
+/* ── Toggle de vista (Lista / Grid) ─────────────────────────── */
+.view-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 2px;
+  box-shadow: var(--shadow);
+  flex-shrink: 0;
+}
+
+[data-theme="gradient"] .view-toggle {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.view-toggle__btn {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.view-toggle__btn svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.view-toggle__btn:not(.is-active):hover {
+  background: var(--accent-bg);
+}
+
+.view-toggle__btn.is-active {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 700;
+}
+
+/* ── Responsive mobile ──────────────────────────────────────── */
+@media (max-width: 767px) {
+  .controls-bar__group--view,
+  .controls-bar__group--action {
+    display: none;
+  }
+
+  .controls-bar__group--filters {
+    flex: 1;
+    justify-content: flex-start;
+    padding: 0;
+    border-left: none;
+    min-width: 0;
+  }
+
+  .controls-bar__group--filters .filter-group .chip {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+  }
+
+  .controls-bar__group--sort {
+    flex: none;
+    padding: 0;
+    border-left: none;
+  }
+
+  .controls-bar__group--sort .sort-group__label {
+    display: none;
+  }
+
+  .controls-bar__group + .controls-bar__group {
+    border-left: none;
+  }
+}
+
+/* Pantallas pequeñas (≤430px): chips → CustomSelect para evitar overflow */
+@media (max-width: 430px) {
+  .controls-bar__group--filters {
+    flex: none;
+    margin-right: auto;
+  }
+
+  .controls-bar__group--filters .filter-group {
+    display: none;
+  }
+
+  .controls-bar__group--filters .filter-select {
+    display: block;
+  }
+}

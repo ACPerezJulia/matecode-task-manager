@@ -1,0 +1,106 @@
+/* stats.css — Sección de bienvenida, tarjetas de estadísticas y barra de progreso. */
+
+/* ── Sección de bienvenida ──────────────────────────────────── */
+.welcome-section {
+  margin-bottom: var(--space-5);
+}
+
+.welcome-section h1 {
+  margin: 0 0 var(--space-1) 0;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+}
+
+.welcome-section__sub {
+  margin: 0 0 var(--space-4) 0;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+/* ── Stat cards ─────────────────────────────────────────────── */
+.stats-cards {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 20px;
+  flex: 1;
+  min-width: 90px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: var(--shadow);
+}
+
+[data-theme="gradient"] .stat-card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.stat-card__value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.stat-card__label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.stat-card--pending .stat-card__value  { color: var(--accent); }
+.stat-card--done .stat-card__value     { color: var(--prio-low); }
+.stat-card--progress .stat-card__value { color: var(--text-h); }
+
+/* ── Barra de progreso ──────────────────────────────────────── */
+.stat-card .progress-bar {
+  margin: var(--space-2) 0 0;
+}
+
+.progress-bar {
+  height: 8px;
+  background: var(--accent-bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: var(--space-4);
+}
+
+.progress-bar__fill {
+  height: 100%;
+  background: linear-gradient(to right, #6c6bff, #9796ff);
+  border-radius: 999px;
+  transition: width 0.8s ease;
+  min-width: 0;
+}
+
+[data-theme="gradient"] .progress-bar {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: transparent;
+}
+
+[data-theme="gradient"] .progress-bar__fill {
+  background: linear-gradient(to right, #a78bfa, #f472b6);
+  box-shadow: 0 0 10px rgba(167, 139, 250, 0.65);
+}
+
+@media (max-width: 480px) {
+  .stats-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .stat-card--progress {
+    grid-column: 1 / -1;
+  }
+  .stat-card__value {
+    font-size: 1.4rem;
+  }
+}

@@ -32,21 +32,6 @@
   border-width: 0;
 }
 
-/* .form-row agrupa campos que en mobile van apilados y en tablet+
-   pasan a ir lado a lado (ej: prioridad + fecha de vencimiento). */
-@media (min-width: 640px) {
-  .task-form .form-row,
-  .auth-form .form-row {
-    display: flex;
-    gap: var(--space-3);
-  }
-  .task-form .form-row > * {
-    flex: 1;
-  }
-}
-
-.task-form .form-row input,
-.task-form .form-row select,
 .task-form .task-panel__meta input,
 .task-form .task-panel__meta select {
   text-align: center;

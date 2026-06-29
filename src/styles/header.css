@@ -1,0 +1,203 @@
+/* header.css — Header sticky, avatar, theme toggle y menú hamburguesa. */
+
+/* ── Header sticky ─────────────────────────────────────────── */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: calc(-1 * var(--space-5));
+  margin-left: calc(-1 * var(--page-pad));
+  margin-right: calc(-1 * var(--page-pad));
+  padding: var(--space-3) var(--page-pad);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: var(--space-5);
+}
+
+[data-theme="gradient"] .app-header {
+  background: rgba(255, 255, 255, 0.08);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+}
+
+.app-header__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-right: auto;
+}
+
+.app-header__logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+  box-shadow: var(--shadow);
+}
+
+.app-header__name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-h);
+  white-space: nowrap;
+}
+
+.app-header__avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--accent-bg);
+  border: 1.5px solid var(--accent-border);
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+  overflow: hidden;
+}
+
+.app-header__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--accent-border);
+}
+
+/* ── Toggle de tema (☀️ 🌙 ✨) ─────────────────────────────── */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--code-bg);
+}
+
+[data-theme="gradient"] .theme-toggle {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-toggle__btn {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  padding: 5px 10px;
+  font-size: 0.88rem;
+  line-height: 1;
+  color: var(--text);
+  transition: background 0.15s, color 0.15s;
+}
+
+.theme-toggle__btn:hover {
+  background: var(--accent-bg);
+}
+
+.theme-toggle__btn.is-active {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+/* ── Menú secundario (theme + email + logout) ─────────────── */
+.header-secondary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.header-hamburger {
+  display: none;
+}
+
+.header-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 98;
+}
+
+/* ── Responsive mobile ──────────────────────────────────────── */
+@media (max-width: 600px) {
+  .app-header {
+    gap: var(--space-2);
+  }
+
+  .app-header__name {
+    display: none;
+  }
+
+  .header-secondary {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: var(--space-3) var(--page-pad);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    z-index: 99;
+  }
+
+  .header-secondary.is-open {
+    display: flex;
+  }
+
+  .header-secondary .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .header-secondary .theme-toggle {
+    align-self: center;
+  }
+
+  .header-hamburger {
+    all: unset;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    color: var(--text-h);
+    font-size: 1.1rem;
+    transition: background 0.15s;
+  }
+
+  .header-hamburger:hover {
+    background: var(--accent-bg);
+  }
+
+  [data-theme="gradient"] .header-secondary.is-open {
+    background: rgba(20, 28, 110, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top-color: rgba(255, 255, 255, 0.12);
+  }
+}
