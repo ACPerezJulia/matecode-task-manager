@@ -6,9 +6,10 @@ import type { Task } from '../types'
 interface TodoListProps {
   tasks: Task[]
   onDeleteCompleted?: () => Promise<void>
+  onDeleteRequest: (task: Task) => void
 }
 
-export function TodoList({ tasks, onDeleteCompleted }: TodoListProps) {
+export function TodoList({ tasks, onDeleteCompleted, onDeleteRequest }: TodoListProps) {
   const [showConfirm, setShowConfirm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -39,7 +40,7 @@ export function TodoList({ tasks, onDeleteCompleted }: TodoListProps) {
           <h2 className="task-section__title">Pendientes ({pending.length})</h2>
           <ul className="task-list">
             {pending.map((task) => (
-              <TaskItem key={task.id} task={task} />
+              <TaskItem key={task.id} task={task} onDeleteRequest={onDeleteRequest} />
             ))}
           </ul>
         </section>
@@ -77,7 +78,7 @@ export function TodoList({ tasks, onDeleteCompleted }: TodoListProps) {
           )}
           <ul className="task-list">
             {completed.map((task) => (
-              <TaskItem key={task.id} task={task} />
+              <TaskItem key={task.id} task={task} onDeleteRequest={onDeleteRequest} />
             ))}
           </ul>
         </section>

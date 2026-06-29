@@ -6,9 +6,10 @@ import type { Task } from '../types'
 interface TaskGridProps {
   tasks: Task[]
   onDeleteCompleted?: () => Promise<void>
+  onDeleteRequest: (task: Task) => void
 }
 
-export function TaskGrid({ tasks, onDeleteCompleted }: TaskGridProps) {
+export function TaskGrid({ tasks, onDeleteCompleted, onDeleteRequest }: TaskGridProps) {
   const [showConfirm, setShowConfirm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -39,7 +40,7 @@ export function TaskGrid({ tasks, onDeleteCompleted }: TaskGridProps) {
           <h2 className="task-section__title">Pendientes ({pending.length})</h2>
           <ul className="task-grid">
             {pending.map((task) => (
-              <TaskCard key={task.id} task={task} />
+              <TaskCard key={task.id} task={task} onDeleteRequest={onDeleteRequest} />
             ))}
           </ul>
         </section>
@@ -77,7 +78,7 @@ export function TaskGrid({ tasks, onDeleteCompleted }: TaskGridProps) {
           )}
           <ul className="task-grid">
             {completed.map((task) => (
-              <TaskCard key={task.id} task={task} />
+              <TaskCard key={task.id} task={task} onDeleteRequest={onDeleteRequest} />
             ))}
           </ul>
         </section>

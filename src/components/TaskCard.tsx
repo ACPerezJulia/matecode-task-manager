@@ -16,9 +16,10 @@ import type { Task } from '../types'
 
 interface TaskCardProps {
   task: Task
+  onDeleteRequest: (task: Task) => void
 }
 
-export function TaskCard({ task }: TaskCardProps) {
+export function TaskCard({ task, onDeleteRequest }: TaskCardProps) {
   const item = useTaskItem(task)
   const [expanded, setExpanded] = useState(false)
   const [isClamped, setIsClamped] = useState(false)
@@ -51,7 +52,7 @@ export function TaskCard({ task }: TaskCardProps) {
         <button
           type="button"
           className="task-card__btn task-card__btn--del"
-          onClick={item.remove}
+          onClick={() => onDeleteRequest(task)}
           disabled={item.busy}
           aria-label="Eliminar tarea"
           title="Eliminar tarea"

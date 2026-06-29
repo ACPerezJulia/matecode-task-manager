@@ -3,7 +3,6 @@ import type { FormEvent } from 'react'
 import toast from 'react-hot-toast'
 import {
   updateTask,
-  deleteTask,
   toggleTaskCompleted,
 } from '../services/firestoreService'
 import { toDateInputValue } from '../utils/format'
@@ -37,21 +36,6 @@ export function useTaskItem(task: Task) {
     } catch (err) {
       console.error('Error al actualizar tarea:', err)
       toast.error('No se pudo actualizar la tarea.')
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  async function remove() {
-    // Confirmación previa para evitar borrados accidentales.
-    if (!window.confirm(`¿Eliminar la tarea "${task.title}"?`)) return
-    setBusy(true)
-    try {
-      await deleteTask(task.id)
-      toast.success('Tarea eliminada.')
-    } catch (err) {
-      console.error('Error al eliminar tarea:', err)
-      toast.error('No se pudo eliminar la tarea.')
     } finally {
       setBusy(false)
     }
@@ -112,7 +96,6 @@ export function useTaskItem(task: Task) {
     editing,
     busy,
     toggle,
-    remove,
     startEditing,
     // Todo lo que necesita el form de edición, agrupado para pasarlo de una.
     edit: {

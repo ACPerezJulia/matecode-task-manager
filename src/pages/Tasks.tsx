@@ -15,9 +15,9 @@ import { TaskListSkeleton } from '../components/Skeleton'
 import { EmailSendAnimation } from '../components/EmailSendAnimation'
 import { filterTasks, sortTasks } from '../utils/taskHelpers'
 import { sendTaskSummary } from '../services/emailService'
-import { deleteCompletedTasks } from '../services/firestoreService'
+import { deleteCompletedTasks, deleteTask } from '../services/firestoreService'
 import { saveUserProfile } from '../services/firestoreService'
-import type { TaskFilter, TaskSort, Theme } from '../types'
+import type { TaskFilter, TaskSort, Theme, Task } from '../types'
 
 export default function Tasks() {
   const { user, logout } = useAuth()
@@ -28,6 +28,7 @@ export default function Tasks() {
   const { view, setView } = useViewMode()
   const [filter, setFilter] = useState<TaskFilter>('all')
   const [sort, setSort] = useState<TaskSort>('recent')
+  const [pendingDeletes, setPendingDeletes] = useState<Map<string, ReturnType<typeof setTimeout>>>(new Map())
   const [isSendingEmail, setIsSendingEmail] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -52,13 +53,14 @@ export default function Tasks() {
   }, [showModal, view])
 
   const effectiveView: 'list' | 'grid' = isMobile ? 'grid' : view
-  const visibleTasks = sortTasks(filterTasks(tasks, filter), sort)
+  const activeTasks = tasks.filter((t) => !pendingDeletes.has(t.id))
+  const visibleTasks = sortTasks(filterTasks(activeTasks, filter), sort)
 
   const firstName = user?.displayName?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'tú'
   const avatarInitial = (user?.displayName?.[0] ?? user?.email?.[0] ?? '?').toUpperCase()
-  const completedCount = tasks.filter((t) => t.completed).length
-  const pendingCount = tasks.length - completedCount
-  const progressPct = tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0
+  const completedCount = activeTasks.filter((t) => t.completed).length
+  const pendingCount = activeTasks.length - completedCount
+  const progressPct = activeTasks.length > 0 ? Math.round((completedCount / activeTasks.length) * 100) : 0
 
   async function handleLogout() {
     await logout()
@@ -71,6 +73,48 @@ export default function Tasks() {
     if (user) {
       saveUserProfile(user.uid, { theme: t }).catch(console.error)
     }
+  }
+
+  function handleDeleteRequest(task: Task) {
+    const timerId = setTimeout(async () => {
+      try {
+        await deleteTask(task.id)
+      } catch {
+        toast.error('No se pudo eliminar la tarea.')
+      } finally {
+        setPendingDeletes((prev) => {
+          const next = new Map(prev)
+          next.delete(task.id)
+          return next
+        })
+      }
+    }, 5000)
+
+    setPendingDeletes((prev) => new Map(prev).set(task.id, timerId))
+
+    toast(
+      (t) => (
+        <div className="toast-undo">
+          <span>Tarea eliminada.</span>
+          <button
+            type="button"
+            className="toast-undo__btn"
+            onClick={() => {
+              clearTimeout(timerId)
+              setPendingDeletes((prev) => {
+                const next = new Map(prev)
+                next.delete(task.id)
+                return next
+              })
+              toast.dismiss(t.id)
+            }}
+          >
+            Deshacer
+          </button>
+        </div>
+      ),
+      { duration: 5000 },
+    )
   }
 
   async function handleDeleteCompleted() {
@@ -276,11 +320,11 @@ export default function Tasks() {
       {loading ? (
         <TaskListSkeleton />
       ) : effectiveView === 'list' ? (
-        <TodoList tasks={visibleTasks} onDeleteCompleted={completedCount > 0 ? handleDeleteCompleted : undefined} />
+        <TodoList tasks={visibleTasks} onDeleteCompleted={completedCount > 0 ? handleDeleteCompleted : undefined} onDeleteRequest={handleDeleteRequest} />
       ) : tasks.length === 0 ? (
         <p className="empty">Todavía no tenés tareas. ¡Usá "Nueva tarea" para crear la primera!</p>
       ) : (
-        <TaskGrid tasks={visibleTasks} onDeleteCompleted={completedCount > 0 ? handleDeleteCompleted : undefined} />
+        <TaskGrid tasks={visibleTasks} onDeleteCompleted={completedCount > 0 ? handleDeleteCompleted : undefined} onDeleteRequest={handleDeleteRequest} />
       )}
 
       {/* FAB: solo en modo grid, acceso rápido al scrollear lejos de los controles */}

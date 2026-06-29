@@ -7,6 +7,8 @@
 [data-theme="classic"] {
   --bg: #eef2ff;
   --surface: #ffffff;
+  --toast-bg: #ffffff;
+  --toast-color: #1e2140;
   --border: #e2e8f0;
   --code-bg: #f8faff;
   --text: #4f5882;
@@ -50,6 +52,8 @@
 [data-theme="midnight"] {
   --bg: #0d0f1a;
   --surface: #161929;
+  --toast-bg: #1e2240;
+  --toast-color: #e8eaf6;
   --border: #252848;
   --code-bg: #1e2240;
   --text: #7986cb;
@@ -74,6 +78,8 @@
 [data-theme="gradient"] {
   --bg: linear-gradient(145deg, #1e2f9e 0%, #4f6ef7 52%, #7c3aed 100%);
   --surface: rgba(255, 255, 255, 0.1);
+  --toast-bg: rgba(22, 16, 68, 0.88);
+  --toast-color: #ffffff;
   --border: rgba(255, 255, 255, 0.16);
   --code-bg: rgba(255, 255, 255, 0.08);
   --text: rgba(255, 255, 255, 0.72);

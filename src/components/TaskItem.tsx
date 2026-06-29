@@ -15,9 +15,10 @@ const TONE_COLOR: Record<BarTone, string> = {
 
 interface TaskItemProps {
   task: Task
+  onDeleteRequest: (task: Task) => void
 }
 
-export function TaskItem({ task }: TaskItemProps) {
+export function TaskItem({ task, onDeleteRequest }: TaskItemProps) {
   const item = useTaskItem(task)
 
   if (item.editing) {
@@ -41,7 +42,7 @@ export function TaskItem({ task }: TaskItemProps) {
         <button
           type="button"
           className="task-card__btn task-card__btn--del"
-          onClick={item.remove}
+          onClick={() => onDeleteRequest(task)}
           disabled={item.busy}
           aria-label="Eliminar tarea"
           title="Eliminar tarea"
