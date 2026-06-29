@@ -10,6 +10,7 @@ import { TaskGrid } from '../components/TaskGrid'
 import { TodoList } from '../components/TodoList'
 import { TodoForm } from '../components/TodoForm'
 import { ViewToggle } from '../components/ViewToggle'
+import { CustomSelect } from '../components/CustomSelect'
 import { TaskListSkeleton } from '../components/Skeleton'
 import { EmailSendAnimation } from '../components/EmailSendAnimation'
 import { filterTasks, sortTasks } from '../utils/taskHelpers'
@@ -216,29 +217,31 @@ export default function Tasks() {
                   <button type="button" className="chip" disabled={filter === 'completed'} onClick={() => setFilter('completed')}>Completadas</button>
                   <button type="button" className="chip" disabled={filter === 'all'} onClick={() => setFilter('all')}>Todas</button>
                 </div>
-                <select
-                  className="filter-select"
+                <CustomSelect
                   value={filter}
-                  onChange={(e) => setFilter(e.target.value as TaskFilter)}
-                >
-                  <option value="all">Todas</option>
-                  <option value="pending">Pendientes</option>
-                  <option value="completed">Completadas</option>
-                </select>
+                  onChange={(v) => setFilter(v as TaskFilter)}
+                  className="filter-select"
+                  options={[
+                    { value: 'all', label: 'Todas' },
+                    { value: 'pending', label: 'Pendientes' },
+                    { value: 'completed', label: 'Completadas' },
+                  ]}
+                />
               </div>
 
               <div className="controls-bar__group controls-bar__group--sort">
                 <div className="sort-group">
                   <span className="sort-group__label">Ordenar por</span>
-                  <select
-                    className="sort-group__select"
+                  <CustomSelect
                     value={sort}
-                    onChange={(e) => setSort(e.target.value as TaskSort)}
-                  >
-                    <option value="recent">Recientes</option>
-                    <option value="priority">Prioridad</option>
-                    <option value="dueDate">Fecha</option>
-                  </select>
+                    onChange={(v) => setSort(v as TaskSort)}
+                    className="sort-group__select"
+                    options={[
+                      { value: 'recent', label: 'Recientes' },
+                      { value: 'priority', label: 'Prioridad' },
+                      { value: 'dueDate', label: 'Fecha' },
+                    ]}
+                  />
                 </div>
               </div>
             </>
@@ -301,7 +304,7 @@ export default function Tasks() {
       {isSendingEmail && <EmailSendAnimation />}
 
       <footer className="app-footer">
-        <p>© {new Date().getFullYear()} Desarrollado por Analía Pérez Juliá · Todos los derechos reservados</p>
+        <p>© {new Date().getFullYear()} Desarrollado por <a href="https://acperezjulia.github.io/" target="_blank" rel="noopener noreferrer">Analía Pérez Juliá</a></p>
       </footer>
     </main>
   )
