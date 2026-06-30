@@ -17,7 +17,7 @@ SPA de gestión de tareas desarrollada como proyecto integrador del Módulo 4 de
 
 | Capa | Tecnología |
 |---|---|
-| Frontend | React 19 + TypeScript, Vite |
+| Frontend | React 19 + TypeScript, Vite, Tabler Icons |
 | Auth + DB | Firebase Authentication + Firestore |
 | Email | AWS SES via Vercel Function |
 | Tests | Vitest + React Testing Library |
@@ -32,10 +32,12 @@ SPA de gestión de tareas desarrollada como proyecto integrador del Módulo 4 de
 - Recuperación de contraseña via email (Firebase Password Reset) desde la pantalla de login
 - Sesión persistente con redirección automática
 - Rutas protegidas (sin acceso sin autenticación)
-- Avatar en el navbar: foto de perfil de Google cuando el usuario se autentica con Google; inicial del nombre en caso contrario
+- Menú de navegación en header con hamburguesa para todos los tamaños de pantalla: muestra avatar (foto de Google o inicial), email del usuario, acceso a resumen por email, instrucciones de uso y cierre de sesión
+- Instrucciones de uso integradas en la app: modal accesible desde el menú, con guía rápida de las funcionalidades principales
+- Iconografía consistente con **Tabler Icons** (`@tabler/icons-react`): reemplaza emojis en header, modal de ayuda y lista de tareas
 - CRUD completo de tareas con sincronización en tiempo real (Firestore `onSnapshot`)
 - Eliminación individual con patrón **undo**: la tarea desaparece al instante y un toast ofrece "Deshacer" durante 5 segundos; si no se usa, el borrado se confirma en Firestore
-- Eliminación masiva de tareas completadas con botón 🧹 y confirmación inline (sin dialogs del sistema)
+- Eliminación masiva de tareas completadas con confirmación inline (sin dialogs del sistema)
 - Dashboard con saludo personalizado, estadísticas de tareas y barra de progreso con degradado
 - Campos por tarea: título, descripción, prioridad (baja/media/alta), fecha y hora de vencimiento, etiqueta
 - Cards con chips semánticos de prioridad y estado
@@ -146,7 +148,7 @@ Los componentes solo describen qué se muestra. La lógica de negocio vive en ho
 
 ```
 src/
-├── components/   # UI: TaskCard, TaskModal, TaskEditForm, CustomSelect, DueChip...
+├── components/   # UI: TaskCard, TaskModal, TaskEditForm, HelpModal, CustomSelect, DueChip...
 ├── hooks/        # Lógica reutilizable: useTasks, useTaskItem, useAuth, useTheme
 ├── services/     # Firebase, Firestore, emailService
 ├── pages/        # Vistas: Login, Register, ForgotPassword, Tasks
@@ -155,13 +157,13 @@ src/
 │   ├── tokens.css    # Variables de diseño (colores, espaciado, radios por tema)
 │   ├── base.css      # Reset suave, tipografía, elementos HTML
 │   ├── components.css # Primitivas: .card, .badge, .empty
-│   ├── buttons.css   # Sistema de botones
+│   ├── buttons.css   # Sistema de botones (.btn con flex centrado para íconos)
 │   ├── forms.css     # Layout de formularios
 │   ├── select.css    # Componente CustomSelect
-│   ├── header.css    # Header sticky, avatar, theme toggle, hamburguesa
+│   ├── header.css    # Header sticky, theme toggle centrado, menú hamburguesa
 │   ├── stats.css     # Sección de bienvenida, stat cards, barra de progreso
 │   ├── toolbar.css   # Controls bar, chips, filtros, toggle de vista
-│   ├── modal.css     # Animaciones, FAB, modal de nueva tarea
+│   ├── modal.css     # Animaciones, FAB, modal de nueva tarea, modal de ayuda
 │   ├── tasks.css     # Ítems de tarea, lista, confirmación de borrado
 │   ├── grid.css      # Vista de cuadrícula (TaskGrid, TaskCard)
 │   ├── auth.css      # Vistas de login/registro/recuperación
@@ -170,8 +172,7 @@ src/
 └── types/        # Interfaces compartidas: Task, TaskFormValues, Theme...
 
 api/
-├── send-email.ts       # Vercel Function: recibe payload, llama a SES
-└── _emailTemplate.ts   # Template HTML + generateSummaryEmail() — testeable sin SES
+└── send-email.ts   # Vercel Function autónoma: valida payload, genera HTML y llama a SES
 ```
 
 ### Tiempo real con onSnapshot
@@ -190,19 +191,19 @@ En pantallas ≤767px, un hook `matchMedia` detecta el breakpoint y deriva el va
 
 El frontend nunca habla con AWS directamente. Llama a `POST /api/send-email` (Vercel Function), que tiene acceso a las credenciales en variables de entorno del servidor. Las variables sin prefijo `VITE_` no llegan nunca al bundle del cliente.
 
-### Template de email desacoplado del handler
+### Función de email autónoma (sin imports locales)
 
-`api/_emailTemplate.ts` exporta `generateSummaryEmail(data)` de forma pura: toma datos, devuelve `{ html, text }`. El handler `send-email.ts` solo valida, mapea el tema a color de acento y llama a SES. Esto permite testear el template sin depender de AWS ni Vercel.
+`api/send-email.ts` es completamente autónomo: el template HTML, la lógica de generación y el handler de SES conviven en el mismo archivo. Esta decisión responde a una limitación concreta del entorno Vercel con `"type": "module"` en `package.json`: en modo ESM, Node.js exige extensiones explícitas (`.js`) en los imports locales al compilar TypeScript a JavaScript. Al no poder usar `import` de otros `.ts` locales sin configuración adicional del bundler, la solución más robusta es mantener la función como un único módulo sin dependencias internas.
 
 ---
 
 ## Flujo de email de resumen
 
-1. El usuario hace clic en **✉️ Resumen** en el header de la app
+1. El usuario hace clic en **Enviar resumen** en el menú del header
 2. `Tasks.tsx` llama a `sendTaskSummary(email, tasks, { name, theme })`
 3. `emailService.ts` formatea las fechas en zona horaria local (el servidor corre en UTC) y hace `POST /api/send-email`
-4. La Vercel Function mapea el tema del usuario a un color de acento (`classic` → `#4F6EF7`, `midnight` → `#5c7cfa`)
-5. `generateSummaryEmail()` agrupa las tareas pendientes por prioridad (alta / media / baja), las renderiza en un grid de 2 columnas usando tablas anidadas (compatible con todos los clientes de email), construye el HTML reemplazando los `{{PLACEHOLDERS}}` y genera el fallback en texto plano
+4. La Vercel Function valida el payload y mapea el tema del usuario a un color de acento (`classic` → `#4F6EF7`, `midnight` → `#5c7cfa`, `gradient` → `#7c3aed`)
+5. La función genera el HTML internamente: agrupa las tareas pendientes y completadas con sus tarjetas de estadísticas, renderiza las tareas en un grid de 2 columnas usando tablas anidadas (compatible con todos los clientes de email), construye el HTML reemplazando los `{{PLACEHOLDERS}}` y genera el fallback en texto plano
 6. AWS SES envía el email con ambas versiones (HTML + texto)
 
 ---
@@ -256,8 +257,9 @@ npm run test
 
 Cobertura actual: 15 tests en 4 archivos.
 
-- `emailService.test.ts`: verifica que el payload se construye correctamente, que las fechas se formatean en el cliente, y el manejo de errores del serverless
-- `_emailTemplate.test.ts`: verifica la generación del HTML sin depender de AWS
+- `emailService.test.ts`: verifica que el payload se construye correctamente, que las fechas se formatean en zona horaria local, y el manejo de errores del serverless
+- `taskHelpers.test.ts`: verifica el filtrado y ordenamiento de tareas
+- `TodoForm.test.tsx` y `TodoList.test.tsx`: tests de componentes con mocks de Firebase
 
 ---
 
