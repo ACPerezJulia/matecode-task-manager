@@ -31,7 +31,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  margin-right: auto;
+  flex: 1;
 }
 
 .app-header__logo {
@@ -58,6 +58,8 @@
 }
 
 .app-header__avatar {
+  all: unset;
+  box-sizing: border-box;
   width: 34px;
   height: 34px;
   border-radius: 50%;
@@ -72,6 +74,13 @@
   flex-shrink: 0;
   user-select: none;
   overflow: hidden;
+  cursor: pointer;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+
+.app-header__avatar:hover {
+  opacity: 0.8;
+  border-color: var(--accent);
 }
 
 .app-header__avatar-img {
@@ -80,6 +89,132 @@
   object-fit: cover;
   border-radius: 50%;
   box-shadow: inset 0 0 0 1.5px var(--accent-border);
+}
+
+/* ── Dropdown del avatar ────────────────────────────────────── */
+.avatar-menu {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar-menu__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 101;
+}
+
+.avatar-menu__dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 102;
+  min-width: 180px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  animation: fadeIn 0.15s ease;
+}
+
+[data-theme="gradient"] .avatar-menu__dropdown {
+  background: rgba(22, 16, 68, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.avatar-menu__email {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text);
+  opacity: 0.6;
+  padding: 6px 10px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.avatar-menu__item {
+  all: unset;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: 9px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-h);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.avatar-menu__item:hover {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+/* ── Fila de perfil en menú mobile ─────────────────────────── */
+.header-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.header-profile__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent-bg);
+  border: 1.5px solid var(--accent-border);
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.header-profile__email {
+  font-size: 0.8rem;
+  color: var(--text);
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* ── Botón de ayuda (?) — siempre visible ───────────────────── */
+.header-help-btn {
+  all: unset;
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.header-help-btn:hover {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: var(--accent);
 }
 
 /* ── Toggle de tema (☀️ 🌙 ✨) ─────────────────────────────── */
@@ -117,7 +252,19 @@
   color: var(--accent-contrast);
 }
 
-/* ── Menú secundario (theme + email + logout) ─────────────── */
+/* ── Toggle centrado (desktop y mobile) ─────────────────────── */
+.theme-toggle--center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Items exclusivos del menú hamburguesa — ocultos en desktop */
+.header-mobile-only {
+  display: none;
+}
+
+/* ── Menú secundario (email en desktop, theme+email en mobile) ── */
 .header-secondary {
   display: flex;
   align-items: center;
@@ -169,8 +316,16 @@
     justify-content: center;
   }
 
-  .header-secondary .theme-toggle {
-    align-self: center;
+  .header-mobile-only {
+    display: flex;
+  }
+
+  .header-help-btn {
+    display: none;
+  }
+
+  .avatar-menu {
+    display: none;
   }
 
   .header-hamburger {

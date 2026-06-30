@@ -179,6 +179,61 @@
   margin: 0;
 }
 
+/* ── Modal de ayuda ─────────────────────────────────────────── */
+.help-modal {
+  max-width: 560px;
+}
+
+.help-tips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.help-tip {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--accent-bg);
+  border: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.help-tip:hover {
+  background: var(--surface-2, var(--border));
+}
+
+.help-tip__icon {
+  font-size: 1.25rem;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+.help-tip__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.help-tip__title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-h);
+  letter-spacing: -0.2px;
+}
+
+.help-tip__desc {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text);
+  line-height: 1.55;
+}
+
 /* ── Botones de prioridad ────────────────────────────────────── */
 .pri-btns {
   display: flex;

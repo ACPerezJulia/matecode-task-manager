@@ -13,6 +13,7 @@ import { ViewToggle } from '../components/ViewToggle'
 import { CustomSelect } from '../components/CustomSelect'
 import { TaskListSkeleton } from '../components/Skeleton'
 import { EmailSendAnimation } from '../components/EmailSendAnimation'
+import { HelpModal } from '../components/HelpModal'
 import { filterTasks, sortTasks } from '../utils/taskHelpers'
 import { sendTaskSummary } from '../services/emailService'
 import { deleteCompletedTasks, deleteTask } from '../services/firestoreService'
@@ -33,6 +34,8 @@ export default function Tasks() {
   const [showModal, setShowModal] = useState(false)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false)
+  const [showHelp, setShowHelp] = useState(false)
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 767px)').matches)
 
   useEffect(() => {
@@ -153,26 +156,39 @@ export default function Tasks() {
           <span className="app-header__name">Mate Code App</span>
         </div>
 
+        {/* Theme toggle — centrado en desktop, se oculta en mobile (está en el menú) */}
+        <div className="theme-toggle theme-toggle--center">
+          <button
+            type="button"
+            className={`theme-toggle__btn${theme === 'classic' ? ' is-active' : ''}`}
+            onClick={() => handleThemeChange('classic')}
+            title="Clásico"
+          >☀️</button>
+          <button
+            type="button"
+            className={`theme-toggle__btn${theme === 'midnight' ? ' is-active' : ''}`}
+            onClick={() => handleThemeChange('midnight')}
+            title="Nocturno"
+          >🌙</button>
+          <button
+            type="button"
+            className={`theme-toggle__btn${theme === 'gradient' ? ' is-active' : ''}`}
+            onClick={() => handleThemeChange('gradient')}
+            title="Vívido"
+          >✨</button>
+        </div>
+
+        {/* Acciones — colapsadas en hamburger en mobile */}
         <div className={`header-secondary${menuOpen ? ' is-open' : ''}`}>
-          <div className="theme-toggle">
-            <button
-              type="button"
-              className={`theme-toggle__btn${theme === 'classic' ? ' is-active' : ''}`}
-              onClick={() => handleThemeChange('classic')}
-              title="Clásico"
-            >☀️</button>
-            <button
-              type="button"
-              className={`theme-toggle__btn${theme === 'midnight' ? ' is-active' : ''}`}
-              onClick={() => handleThemeChange('midnight')}
-              title="Nocturno"
-            >🌙</button>
-            <button
-              type="button"
-              className={`theme-toggle__btn${theme === 'gradient' ? ' is-active' : ''}`}
-              onClick={() => handleThemeChange('gradient')}
-              title="Vívido"
-            >✨</button>
+
+          {/* Fila de perfil — solo en mobile */}
+          <div className="header-profile header-mobile-only">
+            <div className="header-profile__avatar">
+              {user?.photoURL
+                ? <img src={user.photoURL} alt={user.displayName ?? 'Avatar'} className="app-header__avatar-img" referrerPolicy="no-referrer" />
+                : avatarInitial}
+            </div>
+            <span className="header-profile__email">{user?.email}</span>
           </div>
 
           <button
@@ -185,16 +201,60 @@ export default function Tasks() {
             ✉️ Resumen
           </button>
 
-          <button type="button" className="btn btn--ghost" onClick={handleLogout}>
+          {/* Solo en el menú mobile */}
+          <button
+            type="button"
+            className="btn btn--ghost header-mobile-only"
+            onClick={() => { setShowHelp(true); setMenuOpen(false) }}
+          >
+            Instrucciones de uso
+          </button>
+          <button
+            type="button"
+            className="btn btn--ghost header-mobile-only"
+            onClick={handleLogout}
+          >
             Cerrar sesión
           </button>
         </div>
 
-        <div className="app-header__avatar" title={user?.displayName ?? user?.email ?? ''}>
-          {user?.photoURL
-            ? <img src={user.photoURL} alt={user.displayName ?? 'Avatar'} className="app-header__avatar-img" referrerPolicy="no-referrer" />
-            : avatarInitial}
+        {/* Avatar con dropdown de cuenta */}
+        <div className="avatar-menu">
+          <button
+            type="button"
+            className="app-header__avatar"
+            onClick={() => setAvatarMenuOpen(o => !o)}
+            aria-label="Menú de cuenta"
+            aria-expanded={avatarMenuOpen}
+          >
+            {user?.photoURL
+              ? <img src={user.photoURL} alt={user.displayName ?? 'Avatar'} className="app-header__avatar-img" referrerPolicy="no-referrer" />
+              : avatarInitial}
+          </button>
+
+          {avatarMenuOpen && (
+            <>
+              <div className="avatar-menu__dropdown">
+                <span className="avatar-menu__email">{user?.email}</span>
+                <button type="button" className="avatar-menu__item" onClick={handleLogout}>
+                  Cerrar sesión
+                </button>
+              </div>
+              <div className="avatar-menu__overlay" onClick={() => setAvatarMenuOpen(false)} aria-hidden="true" />
+            </>
+          )}
         </div>
+
+        {/* Ayuda — siempre visible */}
+        <button
+          type="button"
+          className="header-help-btn"
+          onClick={() => setShowHelp(true)}
+          title="Ayuda"
+          aria-label="Abrir ayuda"
+        >
+          ?
+        </button>
 
         <button
           type="button"
@@ -346,6 +406,8 @@ export default function Tasks() {
 
 
       {isSendingEmail && <EmailSendAnimation />}
+
+      {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
 
       <footer className="app-footer">
         <p>© {new Date().getFullYear()} Desarrollado por <a href="https://acperezjulia.github.io/" target="_blank" rel="noopener noreferrer">Analía Pérez Juliá</a></p>
