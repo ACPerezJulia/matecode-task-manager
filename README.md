@@ -255,8 +255,9 @@ service cloud.firestore {
 npm run test
 ```
 
-Cobertura actual: 15 tests en 4 archivos.
+Cobertura actual: 24 tests en 5 archivos.
 
+- `firebaseErrors.test.ts`: verifica el mapeo de todos los códigos de error de Firebase a mensajes legibles para el usuario, incluyendo código desconocido y string vacío como casos borde — función pura, sin mocks
 - `emailService.test.ts`: verifica que el payload se construye correctamente, que las fechas se formatean en zona horaria local, y el manejo de errores del serverless
 - `taskHelpers.test.ts`: verifica el filtrado y ordenamiento de tareas
 - `TodoForm.test.tsx` y `TodoList.test.tsx`: tests de componentes con mocks de Firebase
