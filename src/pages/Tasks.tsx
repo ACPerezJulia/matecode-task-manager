@@ -14,6 +14,7 @@ import { CustomSelect } from '../components/CustomSelect'
 import { TaskListSkeleton } from '../components/Skeleton'
 import { EmailSendAnimation } from '../components/EmailSendAnimation'
 import { HelpModal } from '../components/HelpModal'
+import { IconMail, IconHelp, IconSun, IconMoon, IconSparkles, IconLogout } from '@tabler/icons-react'
 import { filterTasks, sortTasks } from '../utils/taskHelpers'
 import { sendTaskSummary } from '../services/emailService'
 import { deleteCompletedTasks, deleteTask } from '../services/firestoreService'
@@ -34,7 +35,6 @@ export default function Tasks() {
   const [showModal, setShowModal] = useState(false)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 767px)').matches)
 
@@ -163,26 +163,24 @@ export default function Tasks() {
             className={`theme-toggle__btn${theme === 'classic' ? ' is-active' : ''}`}
             onClick={() => handleThemeChange('classic')}
             title="Clásico"
-          >☀️</button>
+          ><IconSun size={18} /></button>
           <button
             type="button"
             className={`theme-toggle__btn${theme === 'midnight' ? ' is-active' : ''}`}
             onClick={() => handleThemeChange('midnight')}
             title="Nocturno"
-          >🌙</button>
+          ><IconMoon size={18} /></button>
           <button
             type="button"
             className={`theme-toggle__btn${theme === 'gradient' ? ' is-active' : ''}`}
             onClick={() => handleThemeChange('gradient')}
             title="Vívido"
-          >✨</button>
+          ><IconSparkles size={18} /></button>
         </div>
 
-        {/* Acciones — colapsadas en hamburger en mobile */}
+        {/* Menú desplegable */}
         <div className={`header-secondary${menuOpen ? ' is-open' : ''}`}>
-
-          {/* Fila de perfil — solo en mobile */}
-          <div className="header-profile header-mobile-only">
+          <div className="header-profile">
             <div className="header-profile__avatar">
               {user?.photoURL
                 ? <img src={user.photoURL} alt={user.displayName ?? 'Avatar'} className="app-header__avatar-img" referrerPolicy="no-referrer" />
@@ -194,67 +192,26 @@ export default function Tasks() {
           <button
             type="button"
             className="btn btn--ghost"
-            onClick={handleSendSummary}
+            onClick={() => { handleSendSummary(); setMenuOpen(false) }}
             disabled={tasks.length === 0 || isSendingEmail}
-            title="Recibir un resumen de tareas por email"
           >
-            ✉️ Resumen
+            <IconMail size={18} /> Enviar resumen
           </button>
-
-          {/* Solo en el menú mobile */}
           <button
             type="button"
-            className="btn btn--ghost header-mobile-only"
+            className="btn btn--ghost"
             onClick={() => { setShowHelp(true); setMenuOpen(false) }}
           >
-            Instrucciones de uso
+            <IconHelp size={18} /> Instrucciones de uso
           </button>
           <button
             type="button"
-            className="btn btn--ghost header-mobile-only"
+            className="btn btn--ghost btn--danger"
             onClick={handleLogout}
           >
-            Cerrar sesión
+            <IconLogout size={18} /> Cerrar sesión
           </button>
         </div>
-
-        {/* Avatar con dropdown de cuenta */}
-        <div className="avatar-menu">
-          <button
-            type="button"
-            className="app-header__avatar"
-            onClick={() => setAvatarMenuOpen(o => !o)}
-            aria-label="Menú de cuenta"
-            aria-expanded={avatarMenuOpen}
-          >
-            {user?.photoURL
-              ? <img src={user.photoURL} alt={user.displayName ?? 'Avatar'} className="app-header__avatar-img" referrerPolicy="no-referrer" />
-              : avatarInitial}
-          </button>
-
-          {avatarMenuOpen && (
-            <>
-              <div className="avatar-menu__dropdown">
-                <span className="avatar-menu__email">{user?.email}</span>
-                <button type="button" className="avatar-menu__item" onClick={handleLogout}>
-                  Cerrar sesión
-                </button>
-              </div>
-              <div className="avatar-menu__overlay" onClick={() => setAvatarMenuOpen(false)} aria-hidden="true" />
-            </>
-          )}
-        </div>
-
-        {/* Ayuda — siempre visible */}
-        <button
-          type="button"
-          className="header-help-btn"
-          onClick={() => setShowHelp(true)}
-          title="Ayuda"
-          aria-label="Abrir ayuda"
-        >
-          ?
-        </button>
 
         <button
           type="button"

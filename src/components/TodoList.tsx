@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import { IconTrashX } from '@tabler/icons-react'
 import { TaskItem } from './TaskItem'
 import type { Task } from '../types'
 
@@ -57,7 +58,7 @@ export function TodoList({ tasks, onDeleteCompleted, onDeleteRequest }: TodoList
                 onClick={() => setShowConfirm(true)}
                 title="Eliminar todas las completadas"
               >
-                🧹
+                <IconTrashX size={16} />
               </button>
             )}
           </h2>

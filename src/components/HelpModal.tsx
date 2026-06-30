@@ -1,63 +1,78 @@
+import type { ReactNode } from 'react'
+import {
+  IconFilePlus,
+  IconCircleCheck,
+  IconPencil,
+  IconTrash,
+  IconFilter,
+  IconLayoutGrid,
+  IconPalette,
+  IconMail,
+  IconTrashX,
+  IconSun,
+  IconMoon,
+  IconSparkles,
+} from '@tabler/icons-react'
+
 interface HelpItem {
-  icon: string
+  icon: ReactNode
   title: string
-  description: string
+  description: ReactNode
 }
 
 const HELP_ITEMS: HelpItem[] = [
   {
-    icon: '📝',
+    icon: <IconFilePlus size={20} />,
     title: 'Crear una tarea',
     description:
       'Tocá el botón + para abrir el formulario. En desktop también podés usar Ctrl + Enter.',
   },
   {
-    icon: '✅',
+    icon: <IconCircleCheck size={20} />,
     title: 'Completar una tarea',
     description:
       'Tocá el círculo o el check que aparece en la tarjeta para marcarla como hecha. El contador de progreso se actualiza automáticamente.',
   },
   {
-    icon: '✏️',
+    icon: <IconPencil size={20} />,
     title: 'Editar una tarea',
     description:
       'Tocá el ícono de lápiz sobre la tarea. Se abre el mismo formulario con los datos cargados y podés modificar lo que necesites.',
   },
   {
-    icon: '🗑️',
+    icon: <IconTrash size={20} />,
     title: 'Eliminar una tarea',
     description:
       'Tocá el ícono × para eliminar. Tenés 5 segundos para arrepentirte: apretá "Deshacer" para recuperarla.',
   },
   {
-    icon: '🔍',
+    icon: <IconFilter size={20} />,
     title: 'Filtrar y ordenar',
     description:
       'Filtrá tus tareas por Todas / Pendientes / Completadas. Ordenalas por las más recientes primero, por fecha o por prioridad.',
   },
   {
-    icon: '🔄',
+    icon: <IconLayoutGrid size={20} />,
     title: 'Vista lista o grilla',
     description:
       'Disponible en desktop y tablet. En la barra de controles podés alternar entre vista lista y grilla.',
   },
   {
-    icon: '🎨',
+    icon: <IconPalette size={20} />,
     title: 'Temas visuales',
-    description:
-      'Cambiá el aspecto entre ☀️ claro, 🌙 oscuro o ✨ vívido. La preferencia se guarda automáticamente en tu cuenta.',
+    description: <>Cambiá el aspecto entre <IconSun size={13} /> claro, <IconMoon size={13} /> oscuro o <IconSparkles size={13} /> vívido desde el header. La preferencia se guarda automáticamente en tu cuenta.</>,
   },
   {
-    icon: '✉️',
+    icon: <IconMail size={20} />,
     title: 'Resumen por email',
     description:
-      'El botón "Resumen" te envía un email con tus tareas agrupadas por prioridad. Llega a la dirección con la que iniciaste sesión.',
+      'El botón "Enviar resumen" te envía un email con tus tareas agrupadas por prioridad. Llega a la dirección con la que iniciaste sesión.',
   },
   {
-    icon: '🧹',
+    icon: <IconTrashX size={20} />,
     title: 'Limpiar completadas',
     description:
-      'El botón 🧹 aparecerá cuando haya tareas completadas. Las elimina todas de una sola vez para mantener la lista ordenada.',
+      'El botón de escoba aparecerá cuando haya tareas completadas. Las elimina todas de una sola vez para mantener la lista ordenada.',
   },
 ]
 
