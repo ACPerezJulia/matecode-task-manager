@@ -50,17 +50,25 @@
 }
 
 .section-clean-btn {
-  background: none;
-  border: none;
+  all: unset;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 1rem;
-  padding: 0 2px;
-  opacity: 0.5;
-  transition: opacity 0.15s;
-  line-height: 1;
+  color: #e53e3e;
+  background: #fff5f5;
+  border: 1px solid #feb2b2;
+  opacity: 0.45;
+  transition: background 0.12s, border-color 0.12s, opacity 0.15s;
 }
 
 .section-clean-btn:hover {
+  background: #fed7d7;
+  border-color: #e53e3e;
   opacity: 1;
 }
 

@@ -1,6 +1,10 @@
 /* buttons.css — Sistema de botones reutilizable. */
 
 .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   font-family: var(--sans);
   font-size: 0.95rem;
   font-weight: 600;

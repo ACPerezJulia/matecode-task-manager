@@ -209,9 +209,12 @@
 }
 
 .help-tip__icon {
-  font-size: 1.25rem;
-  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  color: var(--accent);
+  margin-top: 1px;
 }
 
 .help-tip__body {

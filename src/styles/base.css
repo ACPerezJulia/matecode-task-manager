@@ -88,6 +88,23 @@ select {
   transition: border-color 0.2s;
 }
 
+input::placeholder,
+textarea::placeholder {
+  color: var(--text);
+  opacity: 0.6;
+}
+
+/* Autofill en clásico/nocturno: tapa el fondo gris del browser con el color de superficie del tema. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px var(--surface) inset;
+  box-shadow: 0 0 0px 1000px var(--surface) inset;
+  -webkit-text-fill-color: var(--text-h);
+  caret-color: var(--text-h);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
 /* Las <option> las renderiza el SO: no leen CSS variables ni heredan el tema.
    Forzamos colores neutros hardcodeados para que sean legibles en todos los temas. */
 select option {
@@ -108,6 +125,7 @@ select:focus-visible {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-bg);
 }
+
 
 /* Solo accent-color para checkboxes nativos; .task-check maneja todo lo demás. */
 input[type='checkbox'] {

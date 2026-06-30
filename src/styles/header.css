@@ -135,6 +135,12 @@
   max-width: 220px;
 }
 
+.avatar-menu__divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
 .avatar-menu__item {
   all: unset;
   box-sizing: border-box;
@@ -149,9 +155,23 @@
   transition: background 0.12s;
 }
 
-.avatar-menu__item:hover {
+.avatar-menu__item:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.avatar-menu__item:not(:disabled):hover {
   background: var(--accent-bg);
   color: var(--accent);
+}
+
+.avatar-menu__item--danger {
+  color: #e53e3e;
+}
+
+.avatar-menu__item--danger:not(:disabled):hover {
+  background: #fff5f5;
+  color: #c53030;
 }
 
 /* ── Fila de perfil en menú mobile ─────────────────────────── */
@@ -191,31 +211,6 @@
   min-width: 0;
 }
 
-/* ── Botón de ayuda (?) — siempre visible ───────────────────── */
-.header-help-btn {
-  all: unset;
-  box-sizing: border-box;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--accent-bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-size: 0.95rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background 0.15s, color 0.15s;
-}
-
-.header-help-btn:hover {
-  background: var(--accent);
-  color: var(--accent-contrast);
-  border-color: var(--accent);
-}
 
 /* ── Toggle de tema (☀️ 🌙 ✨) ─────────────────────────────── */
 .theme-toggle {
@@ -259,20 +254,61 @@
   transform: translateX(-50%);
 }
 
-/* Items exclusivos del menú hamburguesa — ocultos en desktop */
-.header-mobile-only {
+
+/* ── Menú desplegable (hamburger en todos los tamaños) ───────── */
+.header-secondary {
   display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 240px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  padding: var(--space-3) var(--space-3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 99;
 }
 
-/* ── Menú secundario (email en desktop, theme+email en mobile) ── */
-.header-secondary {
+.header-secondary.is-open {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
+}
+
+[data-theme="gradient"] .header-secondary.is-open {
+  background: rgba(20, 28, 110, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.header-secondary .btn {
+  width: 100%;
+  justify-content: center;
 }
 
 .header-hamburger {
-  display: none;
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  color: var(--text-h);
+  font-size: 1.1rem;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.header-hamburger:hover {
+  background: var(--accent-bg);
 }
 
 .header-overlay {
@@ -292,67 +328,10 @@
   }
 
   .header-secondary {
-    display: none;
-    position: absolute;
-    top: 100%;
     left: 0;
     right: 0;
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-3);
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    padding: var(--space-3) var(--page-pad);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    z-index: 99;
+    border-radius: 0;
+    min-width: unset;
   }
 
-  .header-secondary.is-open {
-    display: flex;
-  }
-
-  .header-secondary .btn {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .header-mobile-only {
-    display: flex;
-  }
-
-  .header-help-btn {
-    display: none;
-  }
-
-  .avatar-menu {
-    display: none;
-  }
-
-  .header-hamburger {
-    all: unset;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: var(--code-bg);
-    border: 1px solid var(--border);
-    color: var(--text-h);
-    font-size: 1.1rem;
-    transition: background 0.15s;
-  }
-
-  .header-hamburger:hover {
-    background: var(--accent-bg);
-  }
-
-  [data-theme="gradient"] .header-secondary.is-open {
-    background: rgba(20, 28, 110, 0.88);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top-color: rgba(255, 255, 255, 0.12);
-  }
 }
