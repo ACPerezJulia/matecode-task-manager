@@ -88,6 +88,11 @@
   background: var(--accent-bg);
 }
 
+.custom-select__option.is-active {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
 /* ── Contexto: sort-group y filter-select (toolbar) ─────────── */
 /* Override del tamaño para que se vea como el chip de ordenamiento */
 .sort-group__select .custom-select__trigger,
