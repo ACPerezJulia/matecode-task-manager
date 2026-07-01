@@ -127,7 +127,7 @@ export function TaskModal({ userId, onClose }: TaskModalProps) {
           <p className="task-modal__optional-label">Opcionales</p>
 
           <div className="task-modal__field">
-            <label>Prioridad</label>
+            <span>Prioridad</span>
             <div className="pri-btns">
               <button
                 type="button"

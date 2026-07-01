@@ -36,9 +36,9 @@ export function TaskEditForm({ edit }: TaskEditFormProps) {
       <p className="task-panel__optional-label">Opcionales</p>
       <div className="task-panel__meta">
         <div>
-          <label id={`edit-priority-label-${edit.taskId}`}>Prioridad</label>
+          <span>Prioridad</span>
           <CustomSelect
-            aria-labelledby={`edit-priority-label-${edit.taskId}`}
+            aria-label="Prioridad"
             value={edit.priority ?? ''}
             onChange={edit.onPriorityChange}
             options={[

@@ -10,7 +10,7 @@ interface CustomSelectProps<T extends string> {
   options: SelectOption<T>[]
   onChange: (value: T) => void
   className?: string
-  'aria-labelledby'?: string
+  'aria-label'?: string
 }
 
 export function CustomSelect<T extends string>({
@@ -18,7 +18,7 @@ export function CustomSelect<T extends string>({
   options,
   onChange,
   className,
-  'aria-labelledby': ariaLabelledby,
+  'aria-label': ariaLabel,
 }: CustomSelectProps<T>) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -51,7 +51,7 @@ export function CustomSelect<T extends string>({
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-labelledby={ariaLabelledby}
+        aria-label={ariaLabel}
       >
         <span>{selected?.label}</span>
         <span className="custom-select__arrow" aria-hidden="true">▾</span>
