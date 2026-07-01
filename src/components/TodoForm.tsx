@@ -105,9 +105,9 @@ export function TodoForm({ userId, onSuccess, onCancel }: TodoFormProps) {
       <p className="task-panel__optional-label">Opcionales</p>
       <div className="task-panel__meta">
         <div>
-          <label className="task-panel__field-label" htmlFor="tp-priority">Prioridad</label>
+          <label id="tp-priority-label" className="task-panel__field-label">Prioridad</label>
           <CustomSelect
-            id="tp-priority"
+            aria-labelledby="tp-priority-label"
             value={form.priority ?? ''}
             onChange={handlePriorityChange}
             options={[
