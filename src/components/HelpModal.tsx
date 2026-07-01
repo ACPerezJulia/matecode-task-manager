@@ -79,7 +79,7 @@ const HELP_ITEMS: HelpItem[] = [
     icon: <IconTrashX size={20} />,
     title: 'Limpiar completadas',
     description:
-      'El botón de escoba aparecerá cuando haya tareas completadas. Las elimina todas de una sola vez para mantener la lista ordenada.',
+      'El botón de escoba aparece cuando hay tareas completadas. Las elimina todas de una vez — tenés 10 segundos para arrepentirte usando "Deshacer".',
   },
 ]
 

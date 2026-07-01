@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
@@ -61,7 +61,7 @@ export default function Tasks() {
   const visibleTasks = sortTasks(filterTasks(activeTasks, filter), sort)
   const filteredTasks = searchQuery.trim()
     ? visibleTasks.filter(t => {
-        const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+        const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(new RegExp('[\\u0300-\\u036f]', 'g'), '')
         const q = norm(searchQuery)
         return (
           norm(t.title).includes(q) ||
@@ -71,7 +71,7 @@ export default function Tasks() {
       })
     : visibleTasks
 
-  const firstName = user?.displayName?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'tÃº'
+  const firstName = user?.displayName?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'tú'
   const avatarInitial = (user?.displayName?.[0] ?? user?.email?.[0] ?? '?').toUpperCase()
   const completedCount = activeTasks.filter((t) => t.completed).length
   const pendingCount = activeTasks.length - completedCount
@@ -79,7 +79,7 @@ export default function Tasks() {
 
   async function handleLogout() {
     await logout()
-    toast.success('SesiÃ³n cerrada.')
+    toast.success('Sesión cerrada.')
     navigate('/login')
   }
 
@@ -132,26 +132,68 @@ export default function Tasks() {
     )
   }
 
-  async function handleDeleteCompleted() {
+  function handleDeleteCompleted() {
     const ids = tasks.filter((t) => t.completed).map((t) => t.id)
     if (ids.length === 0) return
-    await deleteCompletedTasks(ids)
-    toast.success(`${ids.length} tarea${ids.length > 1 ? 's' : ''} eliminada${ids.length > 1 ? 's' : ''}.`)
+
+    const timerId = setTimeout(async () => {
+      try {
+        await deleteCompletedTasks(ids)
+      } catch {
+        toast.error('No se pudieron eliminar las tareas.')
+      } finally {
+        setPendingDeletes((prev) => {
+          const next = new Map(prev)
+          ids.forEach(id => next.delete(id))
+          return next
+        })
+      }
+    }, 10000)
+
+    setPendingDeletes((prev) => {
+      const next = new Map(prev)
+      ids.forEach(id => next.set(id, timerId))
+      return next
+    })
+
+    toast(
+      (t) => (
+        <div className="toast-undo">
+          <span>{ids.length} tarea{ids.length > 1 ? 's' : ''} completada{ids.length > 1 ? 's' : ''} eliminada{ids.length > 1 ? 's' : ''}.</span>
+          <button
+            type="button"
+            className="toast-undo__btn"
+            onClick={() => {
+              clearTimeout(timerId)
+              setPendingDeletes((prev) => {
+                const next = new Map(prev)
+                ids.forEach(id => next.delete(id))
+                return next
+              })
+              toast.dismiss(t.id)
+            }}
+          >
+            Deshacer
+          </button>
+        </div>
+      ),
+      { duration: 10000 },
+    )
   }
 
   async function handleSendSummary() {
     if (!user?.email) return
     setIsSendingEmail(true)
 
-    // Promesa de tiempo mÃ­nimo para que se complete la animaciÃ³n del sobre volando
+    // Promesa de tiempo mínimo para que se complete la animación del sobre volando
     const minAnimationTimer = new Promise((resolve) => setTimeout(resolve, 2900))
 
-    // PeticiÃ³n real al backend
+    // Petición real al backend
     const emailRequest = sendTaskSummary(user.email, tasks, { name: firstName, theme })
 
     try {
       await Promise.all([minAnimationTimer, emailRequest])
-      toast.success('Â¡Resumen enviado! RevisÃ¡ tu email ðŸ“¬')
+      toast.success('¡Resumen enviado! Revisá tu email 📬')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Error al enviar el resumen')
     } finally {
@@ -161,20 +203,20 @@ export default function Tasks() {
 
   return (
     <main>
-      {/* â”€â”€ Header sticky â”€â”€ */}
+      {/* ── Header sticky ── */}
       <header className="app-header">
         <div className="app-header__brand">
           <span className="app-header__logo">MC</span>
           <span className="app-header__name">Mate Code App</span>
         </div>
 
-        {/* Theme toggle â€” centrado en desktop, se oculta en mobile (estÃ¡ en el menÃº) */}
+        {/* Theme toggle — centrado en desktop, se oculta en mobile (está en el menú) */}
         <div className="theme-toggle theme-toggle--center">
           <button
             type="button"
             className={`theme-toggle__btn${theme === 'classic' ? ' is-active' : ''}`}
             onClick={() => handleThemeChange('classic')}
-            title="ClÃ¡sico"
+            title="Clásico"
           ><IconSun size={18} /></button>
           <button
             type="button"
@@ -186,11 +228,11 @@ export default function Tasks() {
             type="button"
             className={`theme-toggle__btn${theme === 'gradient' ? ' is-active' : ''}`}
             onClick={() => handleThemeChange('gradient')}
-            title="VÃ­vido"
+            title="Vívido"
           ><IconSparkles size={18} /></button>
         </div>
 
-        {/* MenÃº desplegable */}
+        {/* Menú desplegable */}
         <div className={`header-secondary${menuOpen ? ' is-open' : ''}`}>
           <div className="header-profile">
             <div className="header-profile__avatar">
@@ -221,7 +263,7 @@ export default function Tasks() {
             className="btn btn--ghost btn--danger"
             onClick={handleLogout}
           >
-            <IconLogout size={18} /> Cerrar sesiÃ³n
+            <IconLogout size={18} /> Cerrar sesión
           </button>
         </div>
 
@@ -229,10 +271,10 @@ export default function Tasks() {
           type="button"
           className="header-hamburger"
           onClick={() => setMenuOpen(m => !m)}
-          aria-label={menuOpen ? 'Cerrar menÃº' : 'Abrir menÃº'}
+          aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
           aria-expanded={menuOpen}
         >
-          {menuOpen ? 'âœ•' : 'â˜°'}
+          {menuOpen ? '✕' : '☰'}
         </button>
 
         {menuOpen && (
@@ -240,11 +282,11 @@ export default function Tasks() {
         )}
       </header>
 
-      {/* â”€â”€ Bienvenida + stats â”€â”€ */}
+      {/* ── Bienvenida + stats ── */}
       <section className="welcome-section">
-        <h1>Hola, {firstName} ðŸ‘‹</h1>
+        <h1>Hola, {firstName} 👋</h1>
         <p className="welcome-section__sub">
-          {pendingCount} pendientes Â· {completedCount} completadas
+          {pendingCount} pendientes · {completedCount} completadas
         </p>
         {tasks.length > 0 && (
           <div className="stats-cards">
@@ -273,7 +315,7 @@ export default function Tasks() {
         )}
       </section>
 
-      {/* â”€â”€ Toolbar: vista Â· filtros Â· orden Â· acciÃ³n â”€â”€ */}
+      {/* ── Toolbar: vista · filtros · orden · acción ── */}
       {!loading && (
         <div className="controls-bar">
           {/* Grupo 1: toggle de vista (oculto en mobile via CSS) */}
@@ -320,7 +362,7 @@ export default function Tasks() {
             </>
           )}
 
-          {/* Grupo 4: acciÃ³n siempre visible */}
+          {/* Grupo 4: acción siempre visible */}
           <div className="controls-bar__group controls-bar__group--action">
             <button
               type="button"
@@ -330,13 +372,13 @@ export default function Tasks() {
                 else setIsFormOpen((f) => !f)
               }}
             >
-              {isFormOpen && effectiveView === 'list' ? 'Ã— Cancelar' : 'Nueva tarea'}
+              {isFormOpen && effectiveView === 'list' ? '× Cancelar' : 'Nueva tarea'}
             </button>
           </div>
         </div>
       )}
 
-      {/* â”€â”€ Buscador â”€â”€ */}
+      {/* ── Buscador ── */}
       {!loading && tasks.length > 0 && (
         <div className="search-bar">
           <IconSearch className="search-bar__icon" size={16} aria-hidden="true" />
@@ -356,7 +398,7 @@ export default function Tasks() {
               type="button"
               className="search-bar__clear"
               onClick={() => setSearchQuery('')}
-              aria-label="Limpiar bÃºsqueda"
+              aria-label="Limpiar búsqueda"
             >
               <IconX size={14} />
             </button>
@@ -364,7 +406,7 @@ export default function Tasks() {
         </div>
       )}
 
-      {/* â”€â”€ Panel inline de nueva tarea (modo lista) â”€â”€ */}
+      {/* ── Panel inline de nueva tarea (modo lista) ── */}
       {!loading && effectiveView === 'list' && isFormOpen && user && (
         <TodoForm
           userId={user.uid}
@@ -373,20 +415,20 @@ export default function Tasks() {
         />
       )}
 
-      {/* â”€â”€ Contenido principal â”€â”€ */}
+      {/* ── Contenido principal ── */}
       {loading ? (
         <TaskListSkeleton />
       ) : effectiveView === 'list' ? (
         <TodoList tasks={filteredTasks} onDeleteCompleted={completedCount > 0 ? handleDeleteCompleted : undefined} onDeleteRequest={handleDeleteRequest} />
       ) : tasks.length === 0 ? (
-        <p className="empty">TodavÃ­a no tenÃ©s tareas. Â¡UsÃ¡ "Nueva tarea" para crear la primera!</p>
+        <p className="empty">Todavía no tenés tareas. ¡Usá "Nueva tarea" para crear la primera!</p>
       ) : filteredTasks.length === 0 ? (
         <p className="empty">No encontramos tareas que coincidan con "{searchQuery}".</p>
       ) : (
         <TaskGrid tasks={filteredTasks} onDeleteCompleted={completedCount > 0 ? handleDeleteCompleted : undefined} onDeleteRequest={handleDeleteRequest} />
       )}
 
-      {/* FAB: solo en modo grid, acceso rÃ¡pido al scrollear lejos de los controles */}
+      {/* FAB: solo en modo grid, acceso rápido al scrollear lejos de los controles */}
       {effectiveView === 'grid' && (
         <button
           type="button"
@@ -409,7 +451,7 @@ export default function Tasks() {
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
 
       <footer className="app-footer">
-        <p>Â© {new Date().getFullYear()} Desarrollado por <a href="https://acperezjulia.github.io/" target="_blank" rel="noopener noreferrer">AnalÃ­a PÃ©rez JuliÃ¡</a></p>
+        <p>© {new Date().getFullYear()} Desarrollado por <a href="https://acperezjulia.github.io/" target="_blank" rel="noopener noreferrer">Analía Pérez Juliá</a></p>
       </footer>
     </main>
   )
