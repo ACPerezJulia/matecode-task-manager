@@ -378,7 +378,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     await ses.send(
       new SendEmailCommand({
-        Source:      fromEmail,
+        Source:      `MateCode <${fromEmail}>`,
         Destination: { ToAddresses: [to] },
         Message: {
           Subject: { Data: 'Tu resumen de tareas — Mate Code App', Charset: 'UTF-8' },
