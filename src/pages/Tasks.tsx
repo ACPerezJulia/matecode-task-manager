@@ -403,7 +403,7 @@ export default function Tasks() {
 
       {/* ── Contenido principal ── */}
       {loading ? (
-        <TaskListSkeleton />
+        <TaskListSkeleton view={effectiveView} count={effectiveView === 'grid' ? 6 : 3} />
       ) : effectiveView === 'list' ? (
         <TodoList tasks={filteredTasks} onDeleteCompleted={completedCount > 0 ? handleDeleteCompleted : undefined} onDeleteRequest={handleDeleteRequest} />
       ) : tasks.length === 0 ? (
