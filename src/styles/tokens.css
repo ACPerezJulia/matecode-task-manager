@@ -5,6 +5,7 @@
 /* ── Tema clásico (default) ────────────────────────────────── */
 :root,
 [data-theme="classic"] {
+  color-scheme: light;
   --bg: #eef2ff;
   --surface: #ffffff;
   --toast-bg: #ffffff;
@@ -50,6 +51,7 @@
 
 /* ── Tema nocturno (midnight) ───────────────────────────────── */
 [data-theme="midnight"] {
+  color-scheme: dark;
   --bg: #0d0f1a;
   --surface: #161929;
   --toast-bg: #1e2240;
@@ -76,6 +78,7 @@
 
 /* ── Tema degradado (gradient) ──────────────────────────────── */
 [data-theme="gradient"] {
+  color-scheme: dark;
   --bg: linear-gradient(145deg, #1e2f9e 0%, #4f6ef7 52%, #7c3aed 100%);
   --surface: rgba(255, 255, 255, 0.1);
   --toast-bg: rgba(22, 16, 68, 0.88);

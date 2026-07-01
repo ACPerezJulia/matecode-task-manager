@@ -69,6 +69,7 @@ export function TaskEditForm({ edit }: TaskEditFormProps) {
             type="date"
             value={edit.dueDateStr}
             min={new Date().toISOString().split('T')[0]}
+            max="2050-12-31"
             onChange={(e) => edit.setDueDateStr(e.target.value)}
             aria-label="Fecha"
           />

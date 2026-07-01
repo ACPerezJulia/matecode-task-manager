@@ -163,6 +163,7 @@ export function TodoForm({ userId, onClose }: TodoFormProps) {
                 type="date"
                 value={form.date}
                 min={new Date().toISOString().split('T')[0]}
+                max="2050-12-31"
                 onChange={(e) => set('date', e.target.value)}
               />
             </div>
