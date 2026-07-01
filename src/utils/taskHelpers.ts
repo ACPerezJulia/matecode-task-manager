@@ -46,17 +46,12 @@ export type BarTone = 'red' | 'yellow' | 'green' | 'grey'
  * - si no hay ni prioridad ni fecha, gris
  */
 export function getCardBarTone(task: Task): BarTone {
-  if (task.priority) {
-    if (task.priority === 'high') return 'red'
-    if (task.priority === 'medium') return 'yellow'
-    return 'green'
-  }
-  if (task.dueDate) {
-    const status = getDueStatus(task.dueDate, task.completed)
-    if (status === 'overdue') return 'red'
-    if (status === 'soon') return 'yellow'
-    return 'grey'
-  }
+  // Vencida siempre alerta en rojo, por encima de cualquier prioridad
+  if (task.dueDate && getDueStatus(task.dueDate, task.completed) === 'overdue') return 'red'
+  if (task.priority === 'high') return 'red'
+  if (task.priority === 'medium') return 'yellow'
+  if (task.priority === 'low') return 'green'
+  if (task.dueDate && getDueStatus(task.dueDate, task.completed) === 'soon') return 'yellow'
   return 'grey'
 }
 

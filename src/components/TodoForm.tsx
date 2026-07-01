@@ -126,6 +126,7 @@ export function TodoForm({ userId, onSuccess, onCancel }: TodoFormProps) {
             name="date"
             type="date"
             value={form.date}
+            min={new Date().toISOString().split('T')[0]}
             onChange={handleChange}
           />
         </div>

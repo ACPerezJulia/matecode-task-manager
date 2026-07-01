@@ -160,6 +160,7 @@ export function TaskModal({ userId, onClose }: TaskModalProps) {
                 id="modal-date"
                 type="date"
                 value={form.date}
+                min={new Date().toISOString().split('T')[0]}
                 onChange={(e) => set('date', e.target.value)}
               />
             </div>
