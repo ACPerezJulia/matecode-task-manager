@@ -17,6 +17,7 @@ export function TaskEditForm({ edit }: TaskEditFormProps) {
         <label htmlFor={`edit-title-${edit.taskId}`}>Título</label>
         <input
           id={`edit-title-${edit.taskId}`}
+          name="title"
           value={edit.title}
           onChange={(e) => edit.setTitle(e.target.value)}
           aria-label="Título"
@@ -26,6 +27,7 @@ export function TaskEditForm({ edit }: TaskEditFormProps) {
         <label htmlFor={`edit-desc-${edit.taskId}`}>Descripción</label>
         <textarea
           id={`edit-desc-${edit.taskId}`}
+          name="description"
           value={edit.description}
           onChange={(e) => edit.setDescription(e.target.value)}
           aria-label="Descripción"
@@ -34,8 +36,9 @@ export function TaskEditForm({ edit }: TaskEditFormProps) {
       <p className="task-panel__optional-label">Opcionales</p>
       <div className="task-panel__meta">
         <div>
-          <label>Prioridad</label>
+          <label htmlFor={`edit-priority-${edit.taskId}`}>Prioridad</label>
           <CustomSelect
+            id={`edit-priority-${edit.taskId}`}
             value={edit.priority ?? ''}
             onChange={edit.onPriorityChange}
             options={[
@@ -50,6 +53,7 @@ export function TaskEditForm({ edit }: TaskEditFormProps) {
           <label htmlFor={`edit-label-${edit.taskId}`}>Etiqueta</label>
           <input
             id={`edit-label-${edit.taskId}`}
+            name="label"
             type="text"
             value={edit.label}
             onChange={(e) => edit.setLabel(e.target.value)}
@@ -61,6 +65,7 @@ export function TaskEditForm({ edit }: TaskEditFormProps) {
           <label htmlFor={`edit-date-${edit.taskId}`}>Fecha</label>
           <input
             id={`edit-date-${edit.taskId}`}
+            name="date"
             type="date"
             value={edit.dueDateStr}
             onChange={(e) => edit.setDueDateStr(e.target.value)}
@@ -71,6 +76,7 @@ export function TaskEditForm({ edit }: TaskEditFormProps) {
           <label htmlFor={`edit-time-${edit.taskId}`}>Hora</label>
           <input
             id={`edit-time-${edit.taskId}`}
+            name="time"
             type="time"
             value={edit.dueTimeStr}
             onChange={(e) => edit.setDueTimeStr(e.target.value)}

@@ -10,6 +10,7 @@ interface CustomSelectProps<T extends string> {
   options: SelectOption<T>[]
   onChange: (value: T) => void
   className?: string
+  id?: string
 }
 
 export function CustomSelect<T extends string>({
@@ -17,6 +18,7 @@ export function CustomSelect<T extends string>({
   options,
   onChange,
   className,
+  id,
 }: CustomSelectProps<T>) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -44,6 +46,7 @@ export function CustomSelect<T extends string>({
       ref={ref}
     >
       <button
+        id={id}
         type="button"
         className="custom-select__trigger"
         onClick={() => setOpen((o) => !o)}
