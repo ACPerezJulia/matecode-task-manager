@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
@@ -60,13 +60,18 @@ export default function Tasks() {
   const activeTasks = tasks.filter((t) => !pendingDeletes.has(t.id))
   const visibleTasks = sortTasks(filterTasks(activeTasks, filter), sort)
   const filteredTasks = searchQuery.trim()
-    ? visibleTasks.filter(t =>
-        t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        t.description?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+    ? visibleTasks.filter(t => {
+        const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+        const q = norm(searchQuery)
+        return (
+          norm(t.title).includes(q) ||
+          norm(t.description ?? '').includes(q) ||
+          norm(t.label ?? '').includes(q)
+        )
+      })
     : visibleTasks
 
-  const firstName = user?.displayName?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'tú'
+  const firstName = user?.displayName?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'tÃº'
   const avatarInitial = (user?.displayName?.[0] ?? user?.email?.[0] ?? '?').toUpperCase()
   const completedCount = activeTasks.filter((t) => t.completed).length
   const pendingCount = activeTasks.length - completedCount
@@ -74,7 +79,7 @@ export default function Tasks() {
 
   async function handleLogout() {
     await logout()
-    toast.success('Sesión cerrada.')
+    toast.success('SesiÃ³n cerrada.')
     navigate('/login')
   }
 
@@ -138,15 +143,15 @@ export default function Tasks() {
     if (!user?.email) return
     setIsSendingEmail(true)
 
-    // Promesa de tiempo mínimo para que se complete la animación del sobre volando
+    // Promesa de tiempo mÃ­nimo para que se complete la animaciÃ³n del sobre volando
     const minAnimationTimer = new Promise((resolve) => setTimeout(resolve, 2900))
 
-    // Petición real al backend
+    // PeticiÃ³n real al backend
     const emailRequest = sendTaskSummary(user.email, tasks, { name: firstName, theme })
 
     try {
       await Promise.all([minAnimationTimer, emailRequest])
-      toast.success('¡Resumen enviado! Revisá tu email 📬')
+      toast.success('Â¡Resumen enviado! RevisÃ¡ tu email ðŸ“¬')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Error al enviar el resumen')
     } finally {
@@ -156,20 +161,20 @@ export default function Tasks() {
 
   return (
     <main>
-      {/* ── Header sticky ── */}
+      {/* â”€â”€ Header sticky â”€â”€ */}
       <header className="app-header">
         <div className="app-header__brand">
           <span className="app-header__logo">MC</span>
           <span className="app-header__name">Mate Code App</span>
         </div>
 
-        {/* Theme toggle — centrado en desktop, se oculta en mobile (está en el menú) */}
+        {/* Theme toggle â€” centrado en desktop, se oculta en mobile (estÃ¡ en el menÃº) */}
         <div className="theme-toggle theme-toggle--center">
           <button
             type="button"
             className={`theme-toggle__btn${theme === 'classic' ? ' is-active' : ''}`}
             onClick={() => handleThemeChange('classic')}
-            title="Clásico"
+            title="ClÃ¡sico"
           ><IconSun size={18} /></button>
           <button
             type="button"
@@ -181,11 +186,11 @@ export default function Tasks() {
             type="button"
             className={`theme-toggle__btn${theme === 'gradient' ? ' is-active' : ''}`}
             onClick={() => handleThemeChange('gradient')}
-            title="Vívido"
+            title="VÃ­vido"
           ><IconSparkles size={18} /></button>
         </div>
 
-        {/* Menú desplegable */}
+        {/* MenÃº desplegable */}
         <div className={`header-secondary${menuOpen ? ' is-open' : ''}`}>
           <div className="header-profile">
             <div className="header-profile__avatar">
@@ -216,7 +221,7 @@ export default function Tasks() {
             className="btn btn--ghost btn--danger"
             onClick={handleLogout}
           >
-            <IconLogout size={18} /> Cerrar sesión
+            <IconLogout size={18} /> Cerrar sesiÃ³n
           </button>
         </div>
 
@@ -224,10 +229,10 @@ export default function Tasks() {
           type="button"
           className="header-hamburger"
           onClick={() => setMenuOpen(m => !m)}
-          aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+          aria-label={menuOpen ? 'Cerrar menÃº' : 'Abrir menÃº'}
           aria-expanded={menuOpen}
         >
-          {menuOpen ? '✕' : '☰'}
+          {menuOpen ? 'âœ•' : 'â˜°'}
         </button>
 
         {menuOpen && (
@@ -235,11 +240,11 @@ export default function Tasks() {
         )}
       </header>
 
-      {/* ── Bienvenida + stats ── */}
+      {/* â”€â”€ Bienvenida + stats â”€â”€ */}
       <section className="welcome-section">
-        <h1>Hola, {firstName} 👋</h1>
+        <h1>Hola, {firstName} ðŸ‘‹</h1>
         <p className="welcome-section__sub">
-          {pendingCount} pendientes · {completedCount} completadas
+          {pendingCount} pendientes Â· {completedCount} completadas
         </p>
         {tasks.length > 0 && (
           <div className="stats-cards">
@@ -268,7 +273,7 @@ export default function Tasks() {
         )}
       </section>
 
-      {/* ── Toolbar: vista · filtros · orden · acción ── */}
+      {/* â”€â”€ Toolbar: vista Â· filtros Â· orden Â· acciÃ³n â”€â”€ */}
       {!loading && (
         <div className="controls-bar">
           {/* Grupo 1: toggle de vista (oculto en mobile via CSS) */}
@@ -315,7 +320,7 @@ export default function Tasks() {
             </>
           )}
 
-          {/* Grupo 4: acción siempre visible */}
+          {/* Grupo 4: acciÃ³n siempre visible */}
           <div className="controls-bar__group controls-bar__group--action">
             <button
               type="button"
@@ -325,13 +330,13 @@ export default function Tasks() {
                 else setIsFormOpen((f) => !f)
               }}
             >
-              {isFormOpen && effectiveView === 'list' ? '× Cancelar' : 'Nueva tarea'}
+              {isFormOpen && effectiveView === 'list' ? 'Ã— Cancelar' : 'Nueva tarea'}
             </button>
           </div>
         </div>
       )}
 
-      {/* ── Buscador ── */}
+      {/* â”€â”€ Buscador â”€â”€ */}
       {!loading && tasks.length > 0 && (
         <div className="search-bar">
           <IconSearch className="search-bar__icon" size={16} aria-hidden="true" />
@@ -351,7 +356,7 @@ export default function Tasks() {
               type="button"
               className="search-bar__clear"
               onClick={() => setSearchQuery('')}
-              aria-label="Limpiar búsqueda"
+              aria-label="Limpiar bÃºsqueda"
             >
               <IconX size={14} />
             </button>
@@ -359,7 +364,7 @@ export default function Tasks() {
         </div>
       )}
 
-      {/* ── Panel inline de nueva tarea (modo lista) ── */}
+      {/* â”€â”€ Panel inline de nueva tarea (modo lista) â”€â”€ */}
       {!loading && effectiveView === 'list' && isFormOpen && user && (
         <TodoForm
           userId={user.uid}
@@ -368,20 +373,20 @@ export default function Tasks() {
         />
       )}
 
-      {/* ── Contenido principal ── */}
+      {/* â”€â”€ Contenido principal â”€â”€ */}
       {loading ? (
         <TaskListSkeleton />
       ) : effectiveView === 'list' ? (
         <TodoList tasks={filteredTasks} onDeleteCompleted={completedCount > 0 ? handleDeleteCompleted : undefined} onDeleteRequest={handleDeleteRequest} />
       ) : tasks.length === 0 ? (
-        <p className="empty">Todavía no tenés tareas. ¡Usá "Nueva tarea" para crear la primera!</p>
+        <p className="empty">TodavÃ­a no tenÃ©s tareas. Â¡UsÃ¡ "Nueva tarea" para crear la primera!</p>
       ) : filteredTasks.length === 0 ? (
         <p className="empty">No encontramos tareas que coincidan con "{searchQuery}".</p>
       ) : (
         <TaskGrid tasks={filteredTasks} onDeleteCompleted={completedCount > 0 ? handleDeleteCompleted : undefined} onDeleteRequest={handleDeleteRequest} />
       )}
 
-      {/* FAB: solo en modo grid, acceso rápido al scrollear lejos de los controles */}
+      {/* FAB: solo en modo grid, acceso rÃ¡pido al scrollear lejos de los controles */}
       {effectiveView === 'grid' && (
         <button
           type="button"
@@ -404,8 +409,9 @@ export default function Tasks() {
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
 
       <footer className="app-footer">
-        <p>© {new Date().getFullYear()} Desarrollado por <a href="https://acperezjulia.github.io/" target="_blank" rel="noopener noreferrer">Analía Pérez Juliá</a></p>
+        <p>Â© {new Date().getFullYear()} Desarrollado por <a href="https://acperezjulia.github.io/" target="_blank" rel="noopener noreferrer">AnalÃ­a PÃ©rez JuliÃ¡</a></p>
       </footer>
     </main>
   )
 }
+
