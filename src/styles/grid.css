@@ -209,18 +209,33 @@
 .task-card__desc.is-expanded {
   display: block;
   overflow: visible;
-  cursor: pointer;
 }
 
-.task-card__desc--expandable {
-  cursor: pointer;
+.task-card__desc-wrapper {
+  position: relative;
 }
 
-.task-card__desc-more {
-  margin-left: 3px;
+.task-card__desc-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1.5em;
+  background: linear-gradient(transparent, var(--surface));
+  pointer-events: none;
+}
+
+.task-card__see-more {
+  all: unset;
+  box-sizing: border-box;
   font-size: 0.72rem;
   color: var(--accent);
-  font-style: italic;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.task-card__see-more:hover {
+  text-decoration: underline;
 }
 
 /* ── Footer: prioridad · fecha · hora · etiqueta ─────────────── */

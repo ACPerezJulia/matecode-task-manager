@@ -95,22 +95,26 @@ export function TaskCard({ task, onDeleteRequest }: TaskCardProps) {
           </strong>
 
           {task.description && (
-            <p
-              ref={descRef}
-              className={[
-                'task-card__desc',
-                expanded ? 'is-expanded' : '',
-                isClamped ? 'task-card__desc--expandable' : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              onClick={isClamped || expanded ? () => setExpanded((e) => !e) : undefined}
-            >
-              {task.description}
-              {isClamped && !expanded && (
-                <span className="task-card__desc-more"> ver más</span>
+            <>
+              <div className="task-card__desc-wrapper">
+                <p
+                  ref={descRef}
+                  className={`task-card__desc${expanded ? ' is-expanded' : ''}`}
+                >
+                  {task.description}
+                </p>
+                {isClamped && !expanded && <div className="task-card__desc-fade" />}
+              </div>
+              {(isClamped || expanded) && (
+                <button
+                  type="button"
+                  className="task-card__see-more"
+                  onClick={() => setExpanded((e) => !e)}
+                >
+                  {expanded ? 'Ver menos' : 'Ver más'}
+                </button>
               )}
-            </p>
+            </>
           )}
         </div>
       </div>

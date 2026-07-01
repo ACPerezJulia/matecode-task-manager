@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react'
 import { useTaskItem } from '../hooks/useTaskItem'
 import { TaskEditForm } from './TaskEditForm'
 import { TaskCheck } from './TaskCheck'
@@ -20,6 +21,15 @@ interface TaskItemProps {
 
 export function TaskItem({ task, onDeleteRequest }: TaskItemProps) {
   const item = useTaskItem(task)
+  const [expanded, setExpanded] = useState(false)
+  const [isClamped, setIsClamped] = useState(false)
+  const descRef = useRef<HTMLParagraphElement>(null)
+
+  useEffect(() => {
+    const el = descRef.current
+    if (!el || expanded) return
+    setIsClamped(el.scrollHeight > el.clientHeight + 1)
+  }, [task.description, expanded])
 
   if (item.editing) {
     return (
@@ -84,7 +94,26 @@ export function TaskItem({ task, onDeleteRequest }: TaskItemProps) {
             {task.title}
           </strong>
           {task.description && (
-            <p className="task-card__desc">{task.description}</p>
+            <>
+              <div className="task-card__desc-wrapper">
+                <p
+                  ref={descRef}
+                  className={`task-card__desc${expanded ? ' is-expanded' : ''}`}
+                >
+                  {task.description}
+                </p>
+                {isClamped && !expanded && <div className="task-card__desc-fade" />}
+              </div>
+              {(isClamped || expanded) && (
+                <button
+                  type="button"
+                  className="task-card__see-more"
+                  onClick={() => setExpanded((e) => !e)}
+                >
+                  {expanded ? 'Ver menos' : 'Ver más'}
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
