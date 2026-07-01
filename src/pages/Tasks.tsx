@@ -14,7 +14,7 @@ import { CustomSelect } from '../components/CustomSelect'
 import { TaskListSkeleton } from '../components/Skeleton'
 import { EmailSendAnimation } from '../components/EmailSendAnimation'
 import { HelpModal } from '../components/HelpModal'
-import { IconMail, IconHelp, IconSun, IconMoon, IconSparkles, IconLogout } from '@tabler/icons-react'
+import { IconMail, IconHelp, IconSun, IconMoon, IconSparkles, IconLogout, IconSearch, IconX } from '@tabler/icons-react'
 import { filterTasks, sortTasks } from '../utils/taskHelpers'
 import { sendTaskSummary } from '../services/emailService'
 import { deleteCompletedTasks, deleteTask } from '../services/firestoreService'
@@ -36,6 +36,7 @@ export default function Tasks() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 767px)').matches)
 
   useEffect(() => {
@@ -58,6 +59,12 @@ export default function Tasks() {
   const effectiveView: 'list' | 'grid' = isMobile ? 'grid' : view
   const activeTasks = tasks.filter((t) => !pendingDeletes.has(t.id))
   const visibleTasks = sortTasks(filterTasks(activeTasks, filter), sort)
+  const filteredTasks = searchQuery.trim()
+    ? visibleTasks.filter(t =>
+        t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        t.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : visibleTasks
 
   const firstName = user?.displayName?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'tú'
   const avatarInitial = (user?.displayName?.[0] ?? user?.email?.[0] ?? '?').toUpperCase()
@@ -324,6 +331,34 @@ export default function Tasks() {
         </div>
       )}
 
+      {/* ── Buscador ── */}
+      {!loading && tasks.length > 0 && (
+        <div className="search-bar">
+          <IconSearch className="search-bar__icon" size={16} aria-hidden="true" />
+          <input
+            id="search"
+            name="search"
+            type="text"
+            placeholder="Buscar tareas..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="search-bar__input"
+            autoComplete="off"
+            aria-label="Buscar tareas"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              className="search-bar__clear"
+              onClick={() => setSearchQuery('')}
+              aria-label="Limpiar búsqueda"
+            >
+              <IconX size={14} />
+            </button>
+          )}
+        </div>
+      )}
+
       {/* ── Panel inline de nueva tarea (modo lista) ── */}
       {!loading && effectiveView === 'list' && isFormOpen && user && (
         <TodoForm
@@ -337,11 +372,13 @@ export default function Tasks() {
       {loading ? (
         <TaskListSkeleton />
       ) : effectiveView === 'list' ? (
-        <TodoList tasks={visibleTasks} onDeleteCompleted={completedCount > 0 ? handleDeleteCompleted : undefined} onDeleteRequest={handleDeleteRequest} />
+        <TodoList tasks={filteredTasks} onDeleteCompleted={completedCount > 0 ? handleDeleteCompleted : undefined} onDeleteRequest={handleDeleteRequest} />
       ) : tasks.length === 0 ? (
         <p className="empty">Todavía no tenés tareas. ¡Usá "Nueva tarea" para crear la primera!</p>
+      ) : filteredTasks.length === 0 ? (
+        <p className="empty">No encontramos tareas que coincidan con "{searchQuery}".</p>
       ) : (
-        <TaskGrid tasks={visibleTasks} onDeleteCompleted={completedCount > 0 ? handleDeleteCompleted : undefined} onDeleteRequest={handleDeleteRequest} />
+        <TaskGrid tasks={filteredTasks} onDeleteCompleted={completedCount > 0 ? handleDeleteCompleted : undefined} onDeleteRequest={handleDeleteRequest} />
       )}
 
       {/* FAB: solo en modo grid, acceso rápido al scrollear lejos de los controles */}

@@ -5,6 +5,7 @@ import {
   IconPencil,
   IconTrash,
   IconFilter,
+  IconSearch,
   IconLayoutGrid,
   IconPalette,
   IconMail,
@@ -50,6 +51,12 @@ const HELP_ITEMS: HelpItem[] = [
     title: 'Filtrar y ordenar',
     description:
       'Filtrá tus tareas por Todas / Pendientes / Completadas. Ordenalas por las más recientes primero, por fecha o por prioridad.',
+  },
+  {
+    icon: <IconSearch size={20} />,
+    title: 'Buscar tareas',
+    description:
+      'Escribí en el buscador para filtrar las tareas en tiempo real por título o descripción. Se combina con los filtros de estado y el orden activo.',
   },
   {
     icon: <IconLayoutGrid size={20} />,

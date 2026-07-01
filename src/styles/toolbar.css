@@ -206,6 +206,50 @@
   }
 }
 
+/* ── Buscador de tareas ─────────────────────────────────────── */
+.search-bar {
+  position: relative;
+  margin-bottom: var(--space-4);
+}
+
+.search-bar__icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text);
+  opacity: 0.5;
+  pointer-events: none;
+  display: flex;
+}
+
+input.search-bar__input {
+  padding-left: 40px;
+}
+
+.search-bar__clear {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  opacity: 0.5;
+  padding: 4px;
+  width: auto;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.search-bar__clear:hover {
+  opacity: 1;
+  background: var(--accent-bg);
+}
+
 /* Pantallas pequeñas (≤430px): chips → CustomSelect para evitar overflow */
 @media (max-width: 430px) {
   .controls-bar__group--filters {
