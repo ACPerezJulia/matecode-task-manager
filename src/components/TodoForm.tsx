@@ -1,45 +1,45 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import toast from 'react-hot-toast'
 import { createTask } from '../services/firestoreService'
-import { CustomSelect } from './CustomSelect'
 import type { TaskFormValues } from '../types'
 
 interface TodoFormProps {
   userId: string
-  onSuccess?: () => void
-  onCancel?: () => void
+  onClose?: () => void
 }
 
-type TodoFormState = Omit<TaskFormValues, 'priority'> & {
-  priority: TaskFormValues['priority'] | ''
-  date: string
-  time: string
-}
-
-const emptyForm = (): TodoFormState => ({
+const empty = (): TaskFormValues & { date: string; time: string } => ({
   title: '',
   description: '',
-  priority: '',
+  priority: undefined,
   dueDate: '',
   label: '',
   date: '',
   time: '',
 })
 
-export function TodoForm({ userId, onSuccess, onCancel }: TodoFormProps) {
-  const [form, setForm] = useState<TodoFormState>(emptyForm)
+export function TodoForm({ userId, onClose }: TodoFormProps) {
+  const [form, setForm] = useState(empty)
   const [submitting, setSubmitting] = useState(false)
+  const titleRef = useRef<HTMLInputElement>(null)
 
-  function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  useEffect(() => {
+    titleRef.current?.focus()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose?.()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function set(field: string, value: string) {
+    setForm((prev) => ({ ...prev, [field]: value }))
   }
 
-  function handlePriorityChange(value: string) {
+  function togglePriority(p: TaskFormValues['priority']) {
     setForm((prev) => ({
       ...prev,
-      priority: value as TaskFormValues['priority'] | '',
+      priority: prev.priority === p ? undefined : p,
     }))
   }
 
@@ -48,12 +48,10 @@ export function TodoForm({ userId, onSuccess, onCancel }: TodoFormProps) {
       toast.error('La tarea necesita un título.')
       return
     }
-
     if (!form.description.trim()) {
       toast.error('La tarea necesita una descripción.')
       return
     }
-
     setSubmitting(true)
     try {
       const dueDate = form.date
@@ -62,109 +60,143 @@ export function TodoForm({ userId, onSuccess, onCancel }: TodoFormProps) {
       await createTask(userId, {
         title: form.title.trim(),
         description: form.description.trim(),
-        priority: form.priority || undefined,
+        priority: form.priority,
         dueDate,
         label: form.label?.trim() || undefined,
       })
       toast.success('Tarea creada.')
-      setForm(emptyForm())
-      onSuccess?.()
+      onClose?.()
     } catch (err) {
-      console.error('Error al crear tarea:', err)
+      console.error(err)
       toast.error('No se pudo crear la tarea.')
     } finally {
       setSubmitting(false)
     }
   }
 
+  function handleContainerKey(e: React.KeyboardEvent) {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) void handleSubmit()
+  }
+
   return (
-    <form className="card task-panel" onSubmit={(e) => { e.preventDefault(); void handleSubmit() }}>
-      <p className="task-panel__heading">Nueva tarea</p>
-
-      <label htmlFor="title" className="sr-only">Título</label>
-      <input
-        id="title"
-        name="title"
-        type="text"
-        value={form.title}
-        onChange={handleChange}
-        placeholder="¿Qué tenés que hacer?"
-        autoFocus
-      />
-
-      <label htmlFor="description" className="sr-only">Descripción</label>
-      <textarea
-        id="description"
-        name="description"
-        value={form.description}
-        onChange={handleChange}
-        placeholder="Descripción... ¡dame más detalles!"
-        rows={2}
-      />
-
-      <p className="task-panel__optional-label">Opcionales</p>
-      <div className="task-panel__meta">
-        <div>
-          <span className="task-panel__field-label">Prioridad</span>
-          <CustomSelect
-            aria-label="Prioridad"
-            value={form.priority ?? ''}
-            onChange={handlePriorityChange}
-            options={[
-              { value: '', label: 'Sin prioridad' },
-              { value: 'low', label: 'Baja' },
-              { value: 'medium', label: 'Media' },
-              { value: 'high', label: 'Alta' },
-            ]}
-          />
-        </div>
-
-        <div>
-          <label className="task-panel__field-label" htmlFor="tp-date">Fecha</label>
-          <input
-            id="tp-date"
-            name="date"
-            type="date"
-            value={form.date}
-            min={new Date().toISOString().split('T')[0]}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div>
-          <label className="task-panel__field-label" htmlFor="tp-time">Hora</label>
-          <input
-            id="tp-time"
-            name="time"
-            type="time"
-            value={form.time}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div>
-          <label className="task-panel__field-label" htmlFor="tp-label">Etiqueta</label>
-          <input
-            id="tp-label"
-            name="label"
-            type="text"
-            value={form.label ?? ''}
-            onChange={handleChange}
-            placeholder="#Dev, #Personal..."
-          />
-        </div>
-      </div>
-
-      <div className="task-panel__actions">
-        {onCancel && (
-          <button type="button" className="btn btn--ghost" onClick={onCancel}>
-            Cancelar
+    <div
+      className="task-modal-overlay"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Nueva tarea"
+    >
+      <div
+        className="task-modal"
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={handleContainerKey}
+      >
+        <div className="task-modal__header">
+          <div>
+            <h2 className="task-modal__title">Nueva tarea</h2>
+            <p className="task-modal__hint">Ctrl+Enter para crear rápido</p>
+          </div>
+          <button
+            type="button"
+            className="task-modal__close"
+            onClick={onClose}
+            aria-label="Cerrar"
+          >
+            ×
           </button>
-        )}
-        <button type="submit" className="btn btn--primary" disabled={submitting}>
-          {submitting ? 'Creando...' : 'Agregar tarea'}
-        </button>
+        </div>
+
+        <div className="task-modal__body">
+          <input
+            id="modal-title"
+            ref={titleRef}
+            type="text"
+            value={form.title}
+            onChange={(e) => set('title', e.target.value)}
+            placeholder="¿Qué tenés que hacer?"
+            aria-label="Título"
+          />
+
+          <textarea
+            id="modal-desc"
+            rows={2}
+            value={form.description}
+            onChange={(e) => set('description', e.target.value)}
+            placeholder="Descripción... ¡dame más detalles!"
+            aria-label="Descripción"
+          />
+
+          <p className="task-modal__optional-label">Opcionales</p>
+
+          <div className="task-modal__field">
+            <span>Prioridad</span>
+            <div className="pri-btns">
+              <button
+                type="button"
+                className={`pri-btn pri-btn--low${form.priority === 'low' ? ' is-active' : ''}`}
+                onClick={() => togglePriority('low')}
+              >
+                🟢 Baja
+              </button>
+              <button
+                type="button"
+                className={`pri-btn pri-btn--medium${form.priority === 'medium' ? ' is-active' : ''}`}
+                onClick={() => togglePriority('medium')}
+              >
+                🟡 Media
+              </button>
+              <button
+                type="button"
+                className={`pri-btn pri-btn--high${form.priority === 'high' ? ' is-active' : ''}`}
+                onClick={() => togglePriority('high')}
+              >
+                🔴 Alta
+              </button>
+            </div>
+          </div>
+
+          <div className="task-modal__meta-grid">
+            <div className="task-modal__field">
+              <label htmlFor="modal-date">Fecha</label>
+              <input
+                id="modal-date"
+                type="date"
+                value={form.date}
+                min={new Date().toISOString().split('T')[0]}
+                onChange={(e) => set('date', e.target.value)}
+              />
+            </div>
+            <div className="task-modal__field">
+              <label htmlFor="modal-time">Hora</label>
+              <input
+                id="modal-time"
+                type="time"
+                value={form.time}
+                onChange={(e) => set('time', e.target.value)}
+              />
+            </div>
+            <div className="task-modal__field">
+              <label htmlFor="modal-label">Etiqueta</label>
+              <input
+                id="modal-label"
+                type="text"
+                value={form.label ?? ''}
+                onChange={(e) => set('label', e.target.value)}
+                placeholder="#Trabajo, #Personal, Dev..."
+              />
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="btn btn--primary task-modal__submit"
+            onClick={() => void handleSubmit()}
+            disabled={submitting}
+          >
+            {submitting ? 'Creando...' : 'Agregar tarea'}
+          </button>
+        </div>
       </div>
-    </form>
+    </div>
   )
 }

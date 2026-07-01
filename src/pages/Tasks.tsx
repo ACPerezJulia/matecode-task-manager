@@ -5,10 +5,9 @@ import { useAuth } from '../hooks/useAuth'
 import { useTasks } from '../hooks/useTasks'
 import { useTheme } from '../hooks/useTheme'
 import { useViewMode } from '../hooks/useViewMode'
-import { TaskModal } from '../components/TaskModal'
+import { TodoForm } from '../components/TodoForm'
 import { TaskGrid } from '../components/TaskGrid'
 import { TodoList } from '../components/TodoList'
-import { TodoForm } from '../components/TodoForm'
 import { ViewToggle } from '../components/ViewToggle'
 import { CustomSelect } from '../components/CustomSelect'
 import { TaskListSkeleton } from '../components/Skeleton'
@@ -33,7 +32,6 @@ export default function Tasks() {
   const [pendingDeletes, setPendingDeletes] = useState<Map<string, ReturnType<typeof setTimeout>>>(new Map())
   const [isSendingEmail, setIsSendingEmail] = useState(false)
   const [showModal, setShowModal] = useState(false)
-  const [isFormOpen, setIsFormOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -48,13 +46,13 @@ export default function Tasks() {
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (view === 'grid' && e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !showModal) {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !showModal) {
         setShowModal(true)
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [showModal, view])
+  }, [showModal])
 
   const effectiveView: 'list' | 'grid' = isMobile ? 'grid' : view
   const activeTasks = tasks.filter((t) => !pendingDeletes.has(t.id))
@@ -366,13 +364,10 @@ export default function Tasks() {
           <div className="controls-bar__group controls-bar__group--action">
             <button
               type="button"
-              className={`btn ${isFormOpen && effectiveView === 'list' ? 'btn--ghost' : 'btn--primary'}`}
-              onClick={() => {
-                if (effectiveView === 'grid') setShowModal(true)
-                else setIsFormOpen((f) => !f)
-              }}
+              className="btn btn--primary"
+              onClick={() => setShowModal(true)}
             >
-              {isFormOpen && effectiveView === 'list' ? '× Cancelar' : 'Nueva tarea'}
+              Nueva tarea
             </button>
           </div>
         </div>
@@ -406,15 +401,6 @@ export default function Tasks() {
         </div>
       )}
 
-      {/* ── Panel inline de nueva tarea (modo lista) ── */}
-      {!loading && effectiveView === 'list' && isFormOpen && user && (
-        <TodoForm
-          userId={user.uid}
-          onSuccess={() => setIsFormOpen(false)}
-          onCancel={() => setIsFormOpen(false)}
-        />
-      )}
-
       {/* ── Contenido principal ── */}
       {loading ? (
         <TaskListSkeleton />
@@ -428,21 +414,9 @@ export default function Tasks() {
         <TaskGrid tasks={filteredTasks} onDeleteCompleted={completedCount > 0 ? handleDeleteCompleted : undefined} onDeleteRequest={handleDeleteRequest} />
       )}
 
-      {/* FAB: solo en modo grid, acceso rápido al scrollear lejos de los controles */}
-      {effectiveView === 'grid' && (
-        <button
-          type="button"
-          className="fab"
-          onClick={() => setShowModal(true)}
-          aria-label="Nueva tarea"
-        >
-          +
-        </button>
-      )}
-
-      {/* Modal para crear tarea (solo modo grid) */}
+      {/* Modal de nueva tarea */}
       {user && showModal && (
-        <TaskModal userId={user.uid} onClose={() => setShowModal(false)} />
+        <TodoForm userId={user.uid} onClose={() => setShowModal(false)} />
       )}
 
 
