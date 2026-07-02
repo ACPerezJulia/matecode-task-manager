@@ -15,9 +15,13 @@ SPA de gestión de tareas desarrollada como proyecto integrador del Módulo 4 de
 
 ## Demo
 
+<div align="center">
 <img src="https://github.com/user-attachments/assets/70e6bc11-ca6b-41f2-bdb1-86f225ba36f2" alt="MateCode App — vista general en múltiples dispositivos" width="700" />
+</div>
 
+<div align="center">
 <video src="https://github.com/user-attachments/assets/b7683a88-37d7-4e95-ae33-8b0cfed8e6cf" controls width="380"></video>
+</div>
 
 Un recorrido completo por MateCode: desde las pantallas de autenticación (login, registro y recuperación de contraseña) hasta el task manager en acción. Se pueden ver los filtros, la creación, edición y eliminación de tareas, el marcado como completadas, la guía de uso integrada, el envío del resumen por email y cómo llega el email al destinatario.
 
@@ -128,7 +132,7 @@ src/
 ├── hooks/        # useTasks (onSnapshot + CRUD), useAuth (onAuthStateChanged), useTheme, useTaskItem, useViewMode
 ├── services/     # firebase.ts (init), firestoreService.ts (CRUD), emailService.ts (POST a la función)
 ├── types/        # Task, TaskFormValues, TaskFilter, TaskSort, Theme — interfaces compartidas
-├── utils/        # taskHelpers.ts (filtros, orden, colores), firebaseErrors.ts, format.ts
+├── utils/        # taskHelpers.ts (filtros, orden, colores), firebaseErrors.ts, format.ts, validate.ts
 ├── routes/       # ProtectedRoute, PublicOnlyRoute
 ├── pages/        # Login, Register, ForgotPassword, Tasks
 ├── components/   # TodoForm, TaskEditForm, TaskCard, TaskGrid, TodoList, CustomSelect, Skeleton...
@@ -160,7 +164,9 @@ api/
 
 > **Nota:** AWS SES opera en modo sandbox, por lo que el envío solo funciona hacia direcciones verificadas manualmente en la consola de AWS. La funcionalidad está implementada y operativa — la restricción es del entorno de pruebas, no del código.
 
+<div align="center">
 <img src="https://github.com/user-attachments/assets/602726d1-4428-4948-abf1-3a502c7fe62f" alt="Email de resumen de tareas recibido en Gmail" width="380" />
+</div>
 
 ---
 
@@ -230,3 +236,21 @@ El proyecto se desarrolló usando Claude como copiloto de desarrollo. El modelo 
 La guía del PI incluía un asistente conversacional (Tyrion Lannister sobre Gemini API). Lo implementé — llegué a tener la serverless function, el proxy y el system prompt funcionando — pero la evaluación fue clara: agregaba complejidad, dependía de una API key adicional y el resultado no estaba a la altura del resto de la app en UX ni en valor para el usuario. Lo descarté deliberadamente: es preferible tener menos features bien ejecutadas que muchas a medias.
 
 ---
+
+## 🛠️ Otras herramientas
+
+| Herramienta | Uso |
+|---|---|
+| Canva | Edición de capturas de pantalla en dispositivos para el README |
+
+---
+
+## 👩‍💻 Desarrolladora
+
+Analía Pérez Juliá
+
+---
+
+## 📄 Licencia
+
+MIT © 2026 Halina87
