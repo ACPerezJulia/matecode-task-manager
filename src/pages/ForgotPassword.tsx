@@ -4,6 +4,7 @@ import { sendPasswordResetEmail } from 'firebase/auth'
 import { FirebaseError } from 'firebase/app'
 import toast from 'react-hot-toast'
 import { auth } from '../services/firebase'
+import { validateEmail } from '../utils/validate'
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('')
@@ -12,7 +13,7 @@ export default function ForgotPassword() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!validateEmail(email)) {
       toast.error('El email no es válido.')
       return
     }
