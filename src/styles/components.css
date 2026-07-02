@@ -9,9 +9,25 @@
   border-radius: var(--radius);
   padding: var(--space-4);
   box-shadow: var(--shadow);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
-/* En vibrante las cards son frosted glass sobre el gradient */
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent-border);
+    box-shadow: var(--shadow), 0 12px 32px var(--accent-bg);
+  }
+}
+
+/* Frosted glass en nocturno */
+[data-theme="midnight"] .card {
+  background: rgba(22, 25, 41, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Frosted glass en vívido */
 [data-theme="gradient"] .card {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
