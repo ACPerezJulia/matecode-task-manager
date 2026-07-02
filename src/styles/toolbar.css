@@ -144,7 +144,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 12px;
+  padding: 3px 12px;
   border-radius: 9px;
   font: inherit;
   font-size: 0.82rem;
@@ -171,6 +171,31 @@
   font-weight: 700;
 }
 
+/* ── Grupo de búsqueda en toolbar ───────────────────────────── */
+.controls-bar__group--search {
+  flex: 1;
+  min-width: 0;
+  justify-content: stretch;
+}
+
+.controls-bar__group--search .search-bar {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.controls-bar__group--search .search-bar__input,
+.controls-bar__group--action .btn--primary {
+  box-shadow: var(--shadow);
+}
+
+/* ── Altura uniforme de todos los elementos de la toolbar ── */
+.controls-bar__group--search .search-bar__input,
+.controls-bar__group--action .btn--primary,
+.view-toggle {
+  height: 34px;
+  box-sizing: border-box;
+}
+
 /* ── Responsive mobile ──────────────────────────────────────── */
 @media (max-width: 767px) {
   .controls-bar__group--view,
@@ -178,7 +203,7 @@
     display: none;
   }
 
-  .controls-bar__group--filters {
+  .controls-bar__group--search {
     flex: 1;
     justify-content: flex-start;
     padding: 0;
@@ -186,14 +211,10 @@
     min-width: 0;
   }
 
-  .controls-bar__group--filters .filter-group .chip {
-    padding: 6px 10px;
-    font-size: 0.78rem;
-  }
-
   .controls-bar__group--sort {
     flex: none;
     padding: 0;
+    padding-left: var(--space-3);
     border-left: none;
   }
 
@@ -250,18 +271,3 @@ input.search-bar__input {
   background: var(--accent-bg);
 }
 
-/* Pantallas pequeñas (≤430px): chips → CustomSelect para evitar overflow */
-@media (max-width: 430px) {
-  .controls-bar__group--filters {
-    flex: none;
-    margin-right: auto;
-  }
-
-  .controls-bar__group--filters .filter-group {
-    display: none;
-  }
-
-  .controls-bar__group--filters .filter-select {
-    display: block;
-  }
-}

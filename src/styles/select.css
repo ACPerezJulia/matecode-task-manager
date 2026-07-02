@@ -102,6 +102,8 @@
   padding: 6px 12px;
   border-width: 1px;
   box-shadow: var(--shadow);
+  height: 34px;
+  box-sizing: border-box;
 }
 
 [data-theme="gradient"] .sort-group__select .custom-select__trigger,
