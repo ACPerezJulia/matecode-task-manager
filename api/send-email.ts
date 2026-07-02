@@ -77,16 +77,19 @@ function buildTaskCardContent(
 ): string {
   const title = escapeHtml(task.title.trim() || '(sin título)')
 
-  const dateChip = task.dueDate
-    ? `<span style="font-size:10px;color:#6b7280;background:#f0f4ff;padding:2px 7px;border-radius:20px;border:1px solid #e2e8f0;margin-right:5px;">&#x1F4C5; ${escapeHtml(task.dueDate)}</span>`
-    : ''
-
-  const labelChip = task.label
-    ? `<span style="font-size:10px;color:${accentColor};background:#eef2ff;padding:2px 7px;border-radius:20px;border:1px solid #c7d2fe;font-weight:600;">#${escapeHtml(task.label)}</span>`
-    : ''
-
-  const chips = dateChip || labelChip
-    ? `<div style="margin-top:5px;">${dateChip}${labelChip}</div>`
+  const chipParts: string[] = []
+  if (task.dueDate) {
+    chipParts.push(
+      `<span style="display:inline-block;white-space:nowrap;font-size:10px;color:#6b7280;background:#f0f4ff;padding:2px 7px;border-radius:20px;border:1px solid #e2e8f0;">&#x1F4C5; ${escapeHtml(task.dueDate)}</span>`,
+    )
+  }
+  if (task.label) {
+    chipParts.push(
+      `<span style="display:inline-block;white-space:nowrap;font-size:10px;color:${accentColor};background:#eef2ff;padding:2px 7px;border-radius:20px;border:1px solid #c7d2fe;font-weight:600;">#${escapeHtml(task.label)}</span>`,
+    )
+  }
+  const chips = chipParts.length
+    ? `<div style="margin-top:6px;line-height:2;">${chipParts.join('<br>')}</div>`
     : ''
 
   return `<div style="background:${cardBg};border-radius:10px;border:1px solid ${cardBorder};padding:10px 12px;box-shadow:inset 3px 0 0 ${sideColor};">
