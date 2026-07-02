@@ -35,6 +35,8 @@
   min-width: 90px;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: 2px;
   box-shadow: var(--shadow);
 }
@@ -56,9 +58,77 @@
   color: var(--text);
 }
 
+.stat-card--total .stat-card__value    { color: var(--text-h); }
 .stat-card--pending .stat-card__value  { color: var(--accent); }
 .stat-card--done .stat-card__value     { color: var(--prio-low); }
 .stat-card--progress .stat-card__value { color: var(--text-h); }
+
+.stat-card--progress {
+  display: none;
+}
+
+/* ── Ícono dentro del label (visible en desktop, queda solo en mobile) ── */
+.stat-card__label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Barra de progreso delgada (desktop y mobile) ── */
+.stats-progress-mobile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.stats-progress-mobile__bar {
+  flex: 1;
+  height: 5px;
+  background: var(--accent-bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.stats-progress-mobile__fill {
+  height: 100%;
+  background: linear-gradient(to right, #6c6bff, #9796ff);
+  border-radius: 999px;
+  transition: width 0.8s ease;
+}
+
+[data-theme="gradient"] .stats-progress-mobile__fill {
+  background: linear-gradient(to right, #a78bfa, #f472b6);
+}
+
+.stats-progress-mobile__pct {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 2.5rem;
+  text-align: right;
+}
+
+/* ── Cards clickeables (Total, Pendientes, Completadas) ── */
+button.stat-card {
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+button.stat-card:hover:not(.is-active) {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.stat-card.is-active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
 
 /* ── Barra de progreso ──────────────────────────────────────── */
 .stat-card .progress-bar {
@@ -95,12 +165,24 @@
 @media (max-width: 480px) {
   .stats-cards {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
   }
+
   .stat-card--progress {
-    grid-column: 1 / -1;
+    display: none;
   }
+
+  .stat-card {
+    padding: 10px 12px;
+  }
+
   .stat-card__value {
     font-size: 1.4rem;
   }
+
+  .stat-card__label-text {
+    display: none;
+  }
+
 }

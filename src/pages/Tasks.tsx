@@ -13,12 +13,31 @@ import { CustomSelect } from '../components/CustomSelect'
 import { TaskListSkeleton } from '../components/Skeleton'
 import { EmailSendAnimation } from '../components/EmailSendAnimation'
 import { HelpModal } from '../components/HelpModal'
-import { IconMail, IconHelp, IconSun, IconMoon, IconSparkles, IconLogout, IconSearch, IconX } from '@tabler/icons-react'
+import { IconMail, IconHelp, IconSun, IconMoon, IconSparkles, IconLogout, IconSearch, IconX, IconListCheck, IconClock, IconCircleCheck } from '@tabler/icons-react'
 import { filterTasks, sortTasks } from '../utils/taskHelpers'
 import { sendTaskSummary } from '../services/emailService'
 import { deleteCompletedTasks, deleteTask } from '../services/firestoreService'
 import { saveUserProfile } from '../services/firestoreService'
 import type { TaskFilter, TaskSort, Theme, Task } from '../types'
+
+function getDynamicSubtitle(
+  tasks: Task[],
+  pendingCount: number,
+  completedCount: number,
+  progressPct: number,
+): string | null {
+  if (tasks.length === 0) return null
+  const todayStr = new Date().toDateString()
+  const dueTodayCount = tasks.filter(
+    t => !t.completed && t.dueDate && t.dueDate.toDate().toDateString() === todayStr
+  ).length
+  if (dueTodayCount > 0) return `Tenés ${dueTodayCount} tarea${dueTodayCount > 1 ? 's' : ''} para hoy`
+  if (progressPct === 100) return '¡Todo listo! Gran día 🎉'
+  if (progressPct >= 70) return '¡Casi terminás, vas muy bien!'
+  if (progressPct >= 30) return 'Vas bien, seguí así 💪'
+  if (pendingCount > 0 && completedCount === 0) return '¡A arrancar!'
+  return null
+}
 
 export default function Tasks() {
   const { user, logout } = useAuth()
@@ -74,6 +93,7 @@ export default function Tasks() {
   const completedCount = activeTasks.filter((t) => t.completed).length
   const pendingCount = activeTasks.length - completedCount
   const progressPct = activeTasks.length > 0 ? Math.round((completedCount / activeTasks.length) * 100) : 0
+  const dynamicSubtitle = getDynamicSubtitle(activeTasks, pendingCount, completedCount, progressPct)
 
   async function handleLogout() {
     await logout()
@@ -283,19 +303,54 @@ export default function Tasks() {
       {/* ── Bienvenida + stats ── */}
       <section className="welcome-section">
         <h1>Hola, {firstName} 👋</h1>
-        <p className="welcome-section__sub">
-          {pendingCount} pendientes · {completedCount} completadas
-        </p>
+        {dynamicSubtitle && (
+          <p className="welcome-section__sub">{dynamicSubtitle}</p>
+        )}
         {tasks.length > 0 && (
+          <>
           <div className="stats-cards">
-            <div className="stat-card stat-card--pending">
+            <button
+              type="button"
+              className={`stat-card stat-card--total${filter === 'all' ? ' is-active' : ''}`}
+              onClick={() => setFilter('all')}
+              aria-label="Ver todas las tareas"
+              aria-pressed={filter === 'all'}
+              title="Total de tareas"
+            >
+              <span className="stat-card__value">{activeTasks.length}</span>
+              <span className="stat-card__label">
+                <IconListCheck size={14} aria-hidden="true" />
+                <span className="stat-card__label-text">Total</span>
+              </span>
+            </button>
+            <button
+              type="button"
+              className={`stat-card stat-card--pending${filter === 'pending' ? ' is-active' : ''}`}
+              onClick={() => setFilter('pending')}
+              aria-label="Ver tareas pendientes"
+              aria-pressed={filter === 'pending'}
+              title="Tareas pendientes"
+            >
               <span className="stat-card__value">{pendingCount}</span>
-              <span className="stat-card__label">Pendientes</span>
-            </div>
-            <div className="stat-card stat-card--done">
+              <span className="stat-card__label">
+                <IconClock size={14} aria-hidden="true" />
+                <span className="stat-card__label-text">Pendientes</span>
+              </span>
+            </button>
+            <button
+              type="button"
+              className={`stat-card stat-card--done${filter === 'completed' ? ' is-active' : ''}`}
+              onClick={() => setFilter('completed')}
+              aria-label="Ver tareas completadas"
+              aria-pressed={filter === 'completed'}
+              title="Tareas completadas"
+            >
               <span className="stat-card__value">{completedCount}</span>
-              <span className="stat-card__label">Completadas</span>
-            </div>
+              <span className="stat-card__label">
+                <IconCircleCheck size={14} aria-hidden="true" />
+                <span className="stat-card__label-text">Completadas</span>
+              </span>
+            </button>
             <div className="stat-card stat-card--progress">
               <span className="stat-card__value">{progressPct}%</span>
               <span className="stat-card__label">Progreso</span>
@@ -310,6 +365,13 @@ export default function Tasks() {
               </div>
             </div>
           </div>
+          <div className="stats-progress-mobile" aria-hidden="true">
+            <div className="stats-progress-mobile__bar">
+              <div className="stats-progress-mobile__fill" style={{ width: `${progressPct}%` }} />
+            </div>
+            <span className="stats-progress-mobile__pct">{progressPct}%</span>
+          </div>
+          </>
         )}
       </section>
 
@@ -324,22 +386,31 @@ export default function Tasks() {
           {/* Grupos 2 y 3: solo cuando hay tareas */}
           {tasks.length > 0 && (
             <>
-              <div className="controls-bar__group controls-bar__group--filters">
-                <div className="filter-group">
-                  <button type="button" className="chip" disabled={filter === 'pending'} onClick={() => setFilter('pending')}>Pendientes</button>
-                  <button type="button" className="chip" disabled={filter === 'completed'} onClick={() => setFilter('completed')}>Completadas</button>
-                  <button type="button" className="chip" disabled={filter === 'all'} onClick={() => setFilter('all')}>Todas</button>
+              <div className="controls-bar__group controls-bar__group--search">
+                <div className="search-bar">
+                  <IconSearch className="search-bar__icon" size={16} aria-hidden="true" />
+                  <input
+                    id="search"
+                    name="search"
+                    type="text"
+                    placeholder="Buscar tareas..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="search-bar__input"
+                    autoComplete="off"
+                    aria-label="Buscar tareas"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      className="search-bar__clear"
+                      onClick={() => setSearchQuery('')}
+                      aria-label="Limpiar búsqueda"
+                    >
+                      <IconX size={14} />
+                    </button>
+                  )}
                 </div>
-                <CustomSelect
-                  value={filter}
-                  onChange={(v) => setFilter(v as TaskFilter)}
-                  className="filter-select"
-                  options={[
-                    { value: 'all', label: 'Todas' },
-                    { value: 'pending', label: 'Pendientes' },
-                    { value: 'completed', label: 'Completadas' },
-                  ]}
-                />
               </div>
 
               <div className="controls-bar__group controls-bar__group--sort">
@@ -370,34 +441,6 @@ export default function Tasks() {
               Nueva tarea
             </button>
           </div>
-        </div>
-      )}
-
-      {/* ── Buscador ── */}
-      {!loading && tasks.length > 0 && (
-        <div className="search-bar">
-          <IconSearch className="search-bar__icon" size={16} aria-hidden="true" />
-          <input
-            id="search"
-            name="search"
-            type="text"
-            placeholder="Buscar tareas..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="search-bar__input"
-            autoComplete="off"
-            aria-label="Buscar tareas"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              className="search-bar__clear"
-              onClick={() => setSearchQuery('')}
-              aria-label="Limpiar búsqueda"
-            >
-              <IconX size={14} />
-            </button>
-          )}
         </div>
       )}
 
