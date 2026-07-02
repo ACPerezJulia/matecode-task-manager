@@ -99,10 +99,6 @@
   border-radius: 22px 0 0 22px;
 }
 
-.task-card--bar-red::before    { background: var(--prio-high); }
-.task-card--bar-yellow::before { background: var(--prio-medium); }
-.task-card--bar-green::before  { background: var(--prio-low); }
-.task-card--bar-grey::before   { background: var(--border); }
 
 /* ── Head: checkbox + columna de contenido ───────────────────── */
 .task-card__head {

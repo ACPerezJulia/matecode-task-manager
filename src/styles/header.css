@@ -57,31 +57,6 @@
   white-space: nowrap;
 }
 
-.app-header__avatar {
-  all: unset;
-  box-sizing: border-box;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--accent-bg);
-  border: 1.5px solid var(--accent-border);
-  color: var(--accent);
-  font-size: 0.82rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  user-select: none;
-  overflow: hidden;
-  cursor: pointer;
-  transition: opacity 0.15s, border-color 0.15s;
-}
-
-.app-header__avatar:hover {
-  opacity: 0.8;
-  border-color: var(--accent);
-}
 
 .app-header__avatar-img {
   width: 100%;
@@ -91,88 +66,6 @@
   box-shadow: inset 0 0 0 1.5px var(--accent-border);
 }
 
-/* ── Dropdown del avatar ────────────────────────────────────── */
-.avatar-menu {
-  position: relative;
-  flex-shrink: 0;
-}
-
-.avatar-menu__overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 101;
-}
-
-.avatar-menu__dropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  z-index: 102;
-  min-width: 180px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 6px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
-  animation: fadeIn 0.15s ease;
-}
-
-[data-theme="gradient"] .avatar-menu__dropdown {
-  background: rgba(22, 16, 68, 0.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-
-.avatar-menu__email {
-  display: block;
-  font-size: 0.75rem;
-  color: var(--text);
-  opacity: 0.6;
-  padding: 6px 10px 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 220px;
-}
-
-.avatar-menu__divider {
-  height: 1px;
-  background: var(--border);
-  margin: 4px 0;
-}
-
-.avatar-menu__item {
-  all: unset;
-  box-sizing: border-box;
-  display: block;
-  width: 100%;
-  padding: 9px 10px;
-  border-radius: 9px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-h);
-  cursor: pointer;
-  transition: background 0.12s;
-}
-
-.avatar-menu__item:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-.avatar-menu__item:not(:disabled):hover {
-  background: var(--accent-bg);
-  color: var(--accent);
-}
-
-.avatar-menu__item--danger {
-  color: #e53e3e;
-}
-
-.avatar-menu__item--danger:not(:disabled):hover {
-  background: #fff5f5;
-  color: #c53030;
-}
 
 /* ── Fila de perfil en menú mobile ─────────────────────────── */
 .header-profile {
