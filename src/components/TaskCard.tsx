@@ -4,6 +4,8 @@ import { TaskEditForm } from './TaskEditForm'
 import { TaskCheck } from './TaskCheck'
 import { DueChip } from './DueChip'
 import { priorityLabel, getCardBarTone, type BarTone } from '../utils/taskHelpers'
+import { formatTimeOnly } from '../utils/format'
+import type { Task } from '../types'
 
 const TONE_COLOR: Record<BarTone, string> = {
   red:    'var(--prio-high)',
@@ -11,15 +13,14 @@ const TONE_COLOR: Record<BarTone, string> = {
   green:  'var(--prio-low)',
   grey:   'var(--border)',
 }
-import { formatTimeOnly } from '../utils/format'
-import type { Task } from '../types'
 
 interface TaskCardProps {
   task: Task
   onDeleteRequest: (task: Task) => void
+  variant: 'list' | 'grid'
 }
 
-export function TaskCard({ task, onDeleteRequest }: TaskCardProps) {
+export function TaskCard({ task, onDeleteRequest, variant }: TaskCardProps) {
   const item = useTaskItem(task)
   const [expanded, setExpanded] = useState(false)
   const [isClamped, setIsClamped] = useState(false)
@@ -31,23 +32,24 @@ export function TaskCard({ task, onDeleteRequest }: TaskCardProps) {
     setIsClamped(el.scrollHeight > el.clientHeight + 1)
   }, [task.description, expanded])
 
+  const rootClass = variant === 'list' ? 'task-item' : 'task-card'
+  const toneColor = TONE_COLOR[getCardBarTone(task)]
+
   if (item.editing) {
     return (
-      <li className="task-card card">
+      <li className={`${rootClass} card`}>
         <TaskEditForm edit={item.edit} />
       </li>
     )
   }
 
-  const priorityColor = TONE_COLOR[getCardBarTone(task)]
   const timeStr = task.dueDate ? formatTimeOnly(task.dueDate) : null
 
   return (
     <li
-      className={`task-card card${task.completed ? ' is-completed' : ''}`}
-      style={{ boxShadow: `inset 4px 0 0 ${priorityColor}, 0 2px 16px rgba(0,0,0,0.4)` }}
+      className={`${rootClass} card${task.completed ? ' is-completed' : ''}`}
+      style={{ boxShadow: `inset 4px 0 0 ${toneColor}, 0 2px 16px rgba(0,0,0,0.4)` }}
     >
-      {/* × arriba / ✏ abajo — absolutos en esquina superior derecha */}
       <div className="task-card__actions">
         <button
           type="button"
@@ -82,7 +84,6 @@ export function TaskCard({ task, onDeleteRequest }: TaskCardProps) {
         </button>
       </div>
 
-      {/* Checkbox + columna de contenido (título y descripción alineados) */}
       <div className="task-card__head">
         <TaskCheck
           checked={task.completed}
@@ -93,7 +94,6 @@ export function TaskCard({ task, onDeleteRequest }: TaskCardProps) {
           <strong className={`task-title${task.completed ? ' is-completed' : ''}`}>
             {task.title}
           </strong>
-
           {task.description && (
             <>
               <div className="task-card__desc-wrapper">
@@ -119,7 +119,6 @@ export function TaskCard({ task, onDeleteRequest }: TaskCardProps) {
         </div>
       </div>
 
-      {/* Footer: prioridad (dot) + fecha + hora + etiqueta */}
       {(task.priority || task.dueDate || task.label) && (
         <div className="task-card__footer">
           {task.priority && (

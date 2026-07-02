@@ -23,7 +23,7 @@ export function TaskGrid({ tasks, onDeleteCompleted, onDeleteRequest }: TaskGrid
           <h2 className="task-section__title">Pendientes ({pending.length})</h2>
           <ul className="task-grid">
             {pending.map((task) => (
-              <TaskCard key={task.id} task={task} onDeleteRequest={onDeleteRequest} />
+              <TaskCard key={task.id} task={task} onDeleteRequest={onDeleteRequest} variant="grid" />
             ))}
           </ul>
         </section>
@@ -46,7 +46,7 @@ export function TaskGrid({ tasks, onDeleteCompleted, onDeleteRequest }: TaskGrid
           </h2>
           <ul className="task-grid">
             {completed.map((task) => (
-              <TaskCard key={task.id} task={task} onDeleteRequest={onDeleteRequest} />
+              <TaskCard key={task.id} task={task} onDeleteRequest={onDeleteRequest} variant="grid" />
             ))}
           </ul>
         </section>

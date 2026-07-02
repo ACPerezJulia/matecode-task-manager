@@ -1,5 +1,5 @@
 import { IconTrashX } from '@tabler/icons-react'
-import { TaskItem } from './TaskItem'
+import { TaskCard } from './TaskCard'
 import type { Task } from '../types'
 
 interface TodoListProps {
@@ -23,7 +23,7 @@ export function TodoList({ tasks, onDeleteCompleted, onDeleteRequest }: TodoList
           <h2 className="task-section__title">Pendientes ({pending.length})</h2>
           <ul className="task-list">
             {pending.map((task) => (
-              <TaskItem key={task.id} task={task} onDeleteRequest={onDeleteRequest} />
+              <TaskCard key={task.id} task={task} onDeleteRequest={onDeleteRequest} variant="list" />
             ))}
           </ul>
         </section>
@@ -46,7 +46,7 @@ export function TodoList({ tasks, onDeleteCompleted, onDeleteRequest }: TodoList
           </h2>
           <ul className="task-list">
             {completed.map((task) => (
-              <TaskItem key={task.id} task={task} onDeleteRequest={onDeleteRequest} />
+              <TaskCard key={task.id} task={task} onDeleteRequest={onDeleteRequest} variant="list" />
             ))}
           </ul>
         </section>
