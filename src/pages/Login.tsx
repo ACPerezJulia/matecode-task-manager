@@ -58,7 +58,7 @@ export default function Login() {
       <div className="auth-header">
         <div className="auth-logo">MC</div>
         <h1>Mate Code App</h1>
-        <p>Organizá tu trabajo, task a task ✦</p>
+        <p>Tus tareas, bien cebadas ✦</p>
       </div>
 
       <div className="auth-card">
