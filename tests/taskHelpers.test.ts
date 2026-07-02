@@ -1,20 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { Timestamp } from 'firebase/firestore'
 import { filterTasks, sortTasks } from '../src/utils/taskHelpers'
-import type { Task } from '../src/types'
+import { makeTask } from './helpers'
 
 // taskHelpers es lógica pura: no toca Firebase, así que no necesita mocks.
-function makeTask(overrides: Partial<Task> = {}): Task {
-  return {
-    id: 'task-1',
-    userId: 'user-123',
-    title: 'Tarea',
-    description: 'Desc',
-    completed: false,
-    createdAt: Timestamp.fromMillis(0),
-    ...overrides,
-  }
-}
 
 describe('filterTasks', () => {
   const tasks = [

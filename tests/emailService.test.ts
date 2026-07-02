@@ -2,19 +2,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { Timestamp } from 'firebase/firestore'
 import { sendTaskSummary } from '../src/services/emailService'
 import { formatDateForEmail } from '../src/utils/format'
-import type { Task } from '../src/types'
-
-function makeTask(overrides: Partial<Task> = {}): Task {
-  return {
-    id: 'task-1',
-    userId: 'user-123',
-    title: 'Tarea',
-    description: 'Desc',
-    completed: false,
-    createdAt: Timestamp.fromMillis(0),
-    ...overrides,
-  }
-}
+import { makeTask } from './helpers'
 
 describe('sendTaskSummary', () => {
   afterEach(() => {
