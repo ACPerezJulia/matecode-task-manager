@@ -414,6 +414,18 @@ export default function Tasks() {
         <TaskGrid tasks={filteredTasks} onDeleteCompleted={completedCount > 0 ? handleDeleteCompleted : undefined} onDeleteRequest={handleDeleteRequest} />
       )}
 
+      {/* FAB: solo en mobile, para crear tarea al scrollear lejos de la toolbar */}
+      {isMobile && (
+        <button
+          type="button"
+          className="fab"
+          onClick={() => setShowModal(true)}
+          aria-label="Nueva tarea"
+        >
+          +
+        </button>
+      )}
+
       {/* Modal de nueva tarea */}
       {user && showModal && (
         <TodoForm userId={user.uid} onClose={() => setShowModal(false)} />
