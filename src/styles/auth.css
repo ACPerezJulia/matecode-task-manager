@@ -92,6 +92,14 @@
   background: var(--border);
 }
 
+/* ── Botón de Google ── */
+.btn--google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
 /* ── Estado de éxito en ForgotPassword ── */
 .forgot-success {
   display: flex;
@@ -158,6 +166,82 @@
 .password-rules__item--valid {
   color: var(--accent);
   opacity: 1;
+}
+
+/* ── Input con ojito de visibilidad ── */
+.input-password-wrapper {
+  position: relative;
+}
+
+.input-password-wrapper input {
+  width: 100%;
+  padding-right: 2.5rem;
+}
+
+.input-password-wrapper__toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text);
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.15s;
+}
+
+.input-password-wrapper__toggle:hover {
+  opacity: 1;
+}
+
+/* ── Barra de fortaleza de contraseña ── */
+.strength-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.strength-bar__segments {
+  display: flex;
+  flex: 1;
+  gap: 4px;
+}
+
+.strength-bar__segment {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  transition: background 0.25s;
+}
+
+.strength-bar__segment.is-filled.strength--weak   { background: #f59e0b; }
+.strength-bar__segment.is-filled.strength--medium { background: #eab308; }
+.strength-bar__segment.is-filled.strength--strong { background: var(--accent); }
+
+.strength-bar__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  min-width: 3rem;
+  text-align: right;
+}
+
+.strength-bar__label.strength--weak   { color: #f59e0b; }
+.strength-bar__label.strength--medium { color: #eab308; }
+.strength-bar__label.strength--strong { color: var(--accent); }
+
+/* ── Error inline de confirmación de contraseña ── */
+.confirm-error {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: 0.72rem;
+  color: var(--danger);
+  font-weight: 500;
 }
 
 /* ── Link de alternativa (¿Ya tenés cuenta?) ── */
