@@ -317,6 +317,24 @@
   z-index: 98;
 }
 
+/* ── Botón de email en header ───────────────────────────────── */
+/* Mobile: oculto (está en el menú). Desktop: visible. */
+.header-email-desktop {
+  display: none;
+  white-space: nowrap;
+}
+
+@media (min-width: 601px) {
+  .header-email-desktop {
+    display: inline-flex;
+  }
+
+  /* El mismo botón dentro del menú se oculta en desktop */
+  .header-email-menu {
+    display: none;
+  }
+}
+
 /* ── Responsive mobile ──────────────────────────────────────── */
 @media (max-width: 600px) {
   .app-header {

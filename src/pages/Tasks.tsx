@@ -250,6 +250,17 @@ export default function Tasks() {
           ><IconSparkles size={18} /></button>
         </div>
 
+        {/* Botón de email — solo desktop, fuera del menú */}
+        <button
+          type="button"
+          className="btn btn--ghost header-email-desktop"
+          onClick={handleSendSummary}
+          disabled={tasks.length === 0 || isSendingEmail}
+          title="Enviar resumen por email"
+        >
+          <IconMail size={18} /> Enviar resumen
+        </button>
+
         {/* Menú desplegable */}
         <div className={`header-secondary${menuOpen ? ' is-open' : ''}`}>
           <div className="header-profile">
@@ -263,7 +274,7 @@ export default function Tasks() {
 
           <button
             type="button"
-            className="btn btn--ghost"
+            className="btn btn--ghost header-email-menu"
             onClick={() => { handleSendSummary(); setMenuOpen(false) }}
             disabled={tasks.length === 0 || isSendingEmail}
           >

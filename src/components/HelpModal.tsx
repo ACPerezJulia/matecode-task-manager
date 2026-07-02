@@ -26,60 +26,60 @@ const HELP_ITEMS: HelpItem[] = [
     icon: <IconFilePlus size={20} />,
     title: 'Crear una tarea',
     description:
-      'Tocá el botón + para abrir el formulario. En desktop también podés usar Ctrl + Enter.',
+      'Tocá el botón "Nueva tarea" (o el + en celular) para agregar una nueva tarea. Desde la computadora también podés usar Ctrl + Enter.',
   },
   {
     icon: <IconCircleCheck size={20} />,
     title: 'Completar una tarea',
     description:
-      'Tocá el círculo o el check que aparece en la tarjeta para marcarla como hecha. El contador de progreso se actualiza automáticamente.',
+      'Tocá el círculo al lado de la tarea para marcarla como hecha.',
   },
   {
     icon: <IconPencil size={20} />,
     title: 'Editar una tarea',
     description:
-      'Tocá el ícono de lápiz sobre la tarea. Se abre el mismo formulario con los datos cargados y podés modificar lo que necesites.',
+      'Tocá el ícono de lápiz para editar la tarea.',
   },
   {
     icon: <IconTrash size={20} />,
     title: 'Eliminar una tarea',
     description:
-      'Tocá el ícono × para eliminar. Tenés 5 segundos para arrepentirte: apretá "Deshacer" para recuperarla.',
+      'Tocá el ícono × para eliminar. Tenés 5 segundos para arrepentirte: apretá "Deshacer" en el aviso que aparece.',
   },
   {
     icon: <IconFilter size={20} />,
-    title: 'Filtrar y ordenar',
+    title: 'Filtrar por estado',
     description:
-      'Filtrá tus tareas por Todas / Pendientes / Completadas. Ordenalas por las más recientes primero, por fecha o por prioridad.',
+      'Tocá los recuadros de Total, Pendientes o Completadas para filtrar.',
   },
   {
     icon: <IconSearch size={20} />,
-    title: 'Buscar tareas',
+    title: 'Buscar y ordenar',
     description:
-      'Escribí en el buscador para filtrar las tareas en tiempo real por título o descripción. Se combina con los filtros de estado y el orden activo.',
+      'Escribí en el buscador para encontrar tareas por nombre, descripción o etiqueta. Con "Ordenar por" podés cambiar el orden en que aparecen.',
   },
   {
     icon: <IconLayoutGrid size={20} />,
     title: 'Vista lista o grilla',
     description:
-      'Disponible en desktop y tablet. En la barra de controles podés alternar entre vista lista y grilla.',
+      'En computadora o tablet podés elegir ver las tareas en lista o en grilla usando los botones de arriba a la izquierda.',
   },
   {
     icon: <IconPalette size={20} />,
     title: 'Temas visuales',
-    description: <>Cambiá el aspecto entre <IconSun size={13} /> claro, <IconMoon size={13} /> oscuro o <IconSparkles size={13} /> vívido desde el header. La preferencia se guarda automáticamente en tu cuenta.</>,
+    description: <>Cambiá el aspecto entre <IconSun size={13} /> claro, <IconMoon size={13} /> oscuro o <IconSparkles size={13} /> vívido.</>,
   },
   {
     icon: <IconMail size={20} />,
     title: 'Resumen por email',
     description:
-      'El botón "Enviar resumen" te envía un email con tus tareas agrupadas por prioridad. Llega a la dirección con la que iniciaste sesión.',
+      'En computadora encontrás el botón "Enviar resumen" en la barra superior. En celular está dentro del menú ☰. Te llega al email con el que iniciaste sesión.',
   },
   {
     icon: <IconTrashX size={20} />,
     title: 'Limpiar completadas',
     description:
-      'El botón de escoba aparece cuando hay tareas completadas. Las elimina todas de una vez — tenés 10 segundos para arrepentirte usando "Deshacer".',
+      'Cuando tenés tareas completadas, aparece un botón para eliminarlas todas de una vez. Tenés 10 segundos para arrepentirte con "Deshacer".',
   },
 ]
 
